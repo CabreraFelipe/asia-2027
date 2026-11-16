@@ -1,0 +1,43 @@
+/* V5.4.1 — Local presentation preferences for each tab. Move existing DOM nodes only. */
+(()=>{'use strict';
+const el=id=>document.getElementById(id),main=document.querySelector('main'),help=el('help502'),home=el('layout51');
+if(!main||!help||!home)return;
+const make=(tag,text,cls)=>{const n=document.createElement(tag);if(text!=null)n.textContent=text;if(cls)n.className=cls;return n;};
+const button=(text,fn,cls='secondary')=>{const b=make('button',text,cls);b.type='button';b.addEventListener('click',fn);return b;};
+const specs=[['diet','Dieta',[['overview','lastWeight'],['daily','dailyV4'],['foods','foods44'],['nutrition','nutrition52'],['water','water52'],['measure','measureV4'],['charts','chartsV4'],['history','historyV4'],['compare','compareV4'],['calendar','dietCalendarV4'],['photos','photosV4'],['weekly','weeklyV4']]],['training','Gym',[['work','workV4'],['strength','strengthV4'],['sessions','sessionsV4'],['calendar','trainCalendarV4'],['muscle','muscleV4']]],['health','Salud',[['health','healthRefresh'],['history','healthMetric'],['coach','healthAnalyze'],['daily','healthStepsCopy'],['watch','watch43']]],['progress54','Progreso',[['overview','range54'],['stats','category54'],['photos','view54']]]];
+const organizerByTab=new Map([['home',home]]),revealByNode=new Map();
+// These three shared panels belong to the whole application, rather than one tab.
+for(const id of ['coachV4','configV4','settingsV4']){const n=el(id);if(n?.parentElement===main)main.insertBefore(n,help);}
+main.insertBefore(home,help);
+for(const [id,title,items] of specs){
+ const root=el(id);if(!root)continue;
+ const cards=new Map();for(const [k,anchor] of items){const node=el(anchor)?.closest('.card');if(!node||node.parentElement!==root||[...cards.values()].some(c=>c.node===node))continue;const heading=node.tagName==='DETAILS'?node.querySelector(':scope > summary'):node.querySelector('h2');if(!heading)continue;cards.set(k,{node,heading,name:heading.textContent.trim()});}
+ if(!cards.size)continue;
+ const keys=[...cards.keys()],key='asia-layout-v541-'+id;
+ const defaults=()=>({order:[...keys],hidden:[],folded:[...cards].filter(([,c])=>c.initialFold).map(([k])=>k)});
+ for(const c of cards.values())c.initialFold=c.node.tagName==='DETAILS'&&!c.node.open;
+ function normalize(x){if(!x||typeof x!=='object')return defaults();const valid=a=>Array.isArray(a)?[...new Set(a.filter(k=>cards.has(k)))]:[];const order=valid(x.order);return {order:[...order,...keys.filter(k=>!order.includes(k))],hidden:valid(x.hidden),folded:Array.isArray(x.folded)?valid(x.folded):defaults().folded};}
+ let state=defaults();try{state=normalize(JSON.parse(localStorage.getItem(key)||'null'));}catch{}
+ const organizer=make('details',null,'card layout51 layout541');organizer.id='layout541-'+id;organizer.append(make('summary','⚙ Personalizar '+title),make('p','Ordená, ocultá o plegá apartados. Solo cambia esta pestaña; no borra registros.','tiny'));
+ const list=make('div',null,'layoutList51'),msg=make('p','','tiny');msg.setAttribute('role','status');organizer.append(list,msg);main.insertBefore(organizer,help);organizerByTab.set(id==='progress54'?'progress':id,organizer);
+ function save(){try{localStorage.setItem(key,JSON.stringify(state));msg.textContent='';}catch{msg.textContent='No se pudo guardar la vista; los cambios son temporales.';}}
+ function member(prop,k,on){state[prop]=state[prop].filter(x=>x!==k);if(on)state[prop].push(k);}
+ function fold(k,on,store=true){const c=cards.get(k);member('folded',k,on);if(c.node.tagName==='DETAILS'){if(c.node.open===on)c.node.open=!on;}else{c.node.classList.toggle('folded51',on);c.toggle.setAttribute('aria-expanded',String(!on));}if(store){save();sync();}}
+ function reveal(k){const c=cards.get(k);if(state.hidden.includes(k)||state.folded.includes(k)||c.node.classList.contains('hiddenPanel51')||(c.node.tagName==='DETAILS'&&!c.node.open)){member('hidden',k,false);c.node.classList.remove('hiddenPanel51');fold(k,false);}}
+ for(const [k,c] of cards){c.node.dataset.panel541=k;revealByNode.set(c.node,()=>reveal(k));if(c.node.tagName==='DETAILS'){c.node.addEventListener('toggle',()=>{const on=!c.node.open;if(state.folded.includes(k)!==on){member('folded',k,on);save();sync();}});}else{const header=c.heading.parentElement===c.node?c.heading:c.heading.parentElement;header.classList.add('foldHeader51');c.toggle=button(c.name,()=>fold(k,!state.folded.includes(k)),'foldToggle51');c.toggle.setAttribute('aria-label',c.name);c.heading.replaceChildren(c.toggle);}}
+ function sync(){for(const row of list.children){const k=row.dataset.key51,i=state.order.indexOf(k);row.querySelector('input').checked=!state.hidden.includes(k);const [up,down,f]=row.querySelectorAll('button');up.disabled=i===0;down.disabled=i===keys.length-1;f.textContent=state.folded.includes(k)?'Abrir':'Plegar';f.setAttribute('aria-label',f.textContent+' '+cards.get(k).name);}}
+ function apply(){for(const k of state.order){const c=cards.get(k);root.append(c.node);c.node.classList.toggle('hiddenPanel51',state.hidden.includes(k));fold(k,state.folded.includes(k),false);}for(const k of state.order)list.append(list.querySelector(`[data-key51="${k}"]`));sync();}
+ function move(k,d){const i=state.order.indexOf(k),j=i+d;if(j<0||j>=keys.length)return;[state.order[i],state.order[j]]=[state.order[j],state.order[i]];apply();save();const row=list.querySelector(`[data-key51="${k}"]`),b=row.querySelectorAll('button')[d<0?0:1];(b.disabled?row.querySelector('input'):b).focus({preventScroll:true});}
+ for(const k of keys){const c=cards.get(k),row=make('div',null,'layoutRow51');row.dataset.key51=k;const label=make('label',null,'layoutLabel51'),check=make('input');check.type='checkbox';check.addEventListener('change',()=>{member('hidden',k,!check.checked);c.node.classList.toggle('hiddenPanel51',!check.checked);save();sync();});label.append(check,make('span',c.name));const tools=make('div',null,'layoutTools51');for(const [txt,d] of [['↑',-1],['↓',1]]){const b=button(txt,()=>move(k,d));b.setAttribute('aria-label',(d<0?'Subir ':'Bajar ')+c.name);tools.append(b);}tools.append(button('Plegar',()=>fold(k,!state.folded.includes(k))));row.append(label,tools);list.append(row);}
+ organizer.append(button('Restablecer orden original',()=>{state=defaults();apply();save();}));apply();
+}
+// Only explicit navigation reveals hidden destinations. Reopening a tab itself preserves preferences.
+window.asiaRevealPanel541=target=>{for(let n=target;n&&n!==main;n=n.parentElement){const reveal=revealByNode.get(n);if(reveal)reveal();}};
+window.asiaScrollTo541=(target,options)=>{if(!target)return;window.asiaRevealPanel541(target);target.scrollIntoView(options);};
+function show(t){for(const [name,panel] of organizerByTab)panel.classList.toggle('hide',name!==t);}
+const previousTab=tab;tab=function(t){previousTab(t);show(t);};
+const active=[['home','home42'],['diet','diet'],['training','training'],['health','health'],['progress','progress54']].find(([,id])=>!el(id)?.classList.contains('hide'));
+show(active?.[0]||'home');
+// Existing history-edit buttons sometimes navigate without scrolling.
+document.addEventListener('click',e=>{const b=e.target.closest('button');if(b?.dataset.workEdit)window.asiaRevealPanel541(el('workV4'));},true);
+})();
