@@ -104,7 +104,7 @@ nav{padding:7px 8px calc(7px + env(safe-area-inset-bottom));gap:3px;background:#
 #progress54 .datePill601 #end54::-webkit-calendar-picker-indicator{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;cursor:pointer}
 
 /* R22: presentation only, unchanged palette and tab navigation. */
-.personalHidden822,.personalEmpty822{display:none!important}.homeGrid42.personalCompact822{gap:6px}.homeGrid42.personalCompact822 .metric{padding:7px}.headerQuick505.personalCompact822 button{min-height:36px;padding-block:5px}.headerQuick505 button[id^="quick822_"]{overflow-wrap:anywhere;min-width:0}#personal822 .row{flex-wrap:wrap}#personal822 .layoutLabel51 input{width:auto}#personal822 h3{margin-top:14px}
+.personalHidden822,.personalEmpty822{display:none!important}#home42 .homeGrid42.personalCompact822{gap:6px}#home42 .homeGrid42.personalCompact822 .metric{padding:7px 9px;min-height:72px;gap:2px}#home42 .homeGrid42.personalCompact822 .metric b{font-size:clamp(18px,4.8vw,24px)}#home42 .homeGrid42.personalCompact822 .metric>small:first-child{font-size:11px}.headerQuick505.personalCompact822{gap:5px;margin-top:8px}.headerQuick505.personalCompact822 button{min-height:44px;padding:4px 3px;gap:3px;font-size:11px}.headerQuick505.personalCompact822 .uiIcon57{width:17px;height:17px}.headerQuick505 button[id^="quick822_"]{overflow-wrap:anywhere;min-width:0}#personal822 .row{flex-wrap:wrap}#personal822 .layoutLabel51 input{width:auto}#personal822 h3{margin-top:14px}
 
 /* R32.2 — card hierarchy, consistent disclosure headers and mobile touch targets. */
 main section>.card.sectionfold>summary,main section>.card .foldToggle51{font-size:16px;font-weight:720;line-height:1.35;min-height:44px;color:var(--ink);letter-spacing:-.1px}
