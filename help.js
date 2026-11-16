@@ -1,4 +1,4 @@
-/* V5.0.4 — presentation only. Move static guidance, never form fields/status/results. */
+/* V5.0.5 — presentation only. Move static guidance, never form fields/status/results. */
 (()=>{'use strict';
 const byId=id=>document.getElementById(id);
 const home=byId('home42'), coach=byId('coach50'), vacation=byId('vacation44'), badges=byId('badges44');
@@ -52,5 +52,7 @@ const rules=[
 ];
 const paras=[...main.querySelectorAll('p.meta,p.tiny')].filter(p=>!p.id&&!p.hasAttribute('role')&&!p.closest('#reportContent'));
 for(const [prefix,topic,short] of rules){const p=paras.find(x=>x.textContent.trim().startsWith(prefix));if(!p)continue;const parent=p.parentNode;if(!parent)continue;if(short){const compact=document.createElement('p');compact.className=p.className+' compact502';compact.textContent=short;parent.insertBefore(compact,p);}group(topic).append(p);}
+const appearance=group('Apariencia');
+const themeButton=byId('themeV4');if(themeButton)appearance.append(themeButton);
 main.append(help);
 })();

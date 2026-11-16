@@ -15,8 +15,20 @@ const fixed=(n,d=1)=>valid(n)?fmt(n,d):'—';
 const knownNum=v=>v!==''&&v!=null&&Number.isFinite(+v)?+v:null;
 const limitDate=()=>date();
 // Header and jump navigation.
-document.querySelector('header').innerHTML='<div class="brand"><img src="asia-icon-v4-180.png" alt="Asia 2027"><div><small>PROYECTO PERSONAL · V5.0.4</small><h1>Mi progreso</h1><div>Meta 72 kg · 8 mar 2027</div></div></div><div class="countdown"><strong id="countdown"></strong><span id="countdownLabel">días para Asia</span></div><button id="themeV4" class="secondary" type="button">Cambiar tema</button>';
+document.querySelector('header').innerHTML='<div class="brand"><img src="asia-icon-v4-180.png" alt="Asia 2027"><div><small>PROYECTO PERSONAL · V5.0.5</small><h1>Mi progreso</h1><div>Meta 72 kg · 8 mar 2027</div></div></div><div class="countdown"><strong id="countdown"></strong><span id="countdownLabel">días para Asia</span></div><div class="headerQuick505" role="group" aria-label="Accesos rápidos"><button id="quickGym505" class="secondary" type="button"><span aria-hidden="true">▣</span><span>Entreno hoy</span></button><button id="quickDaily505" class="secondary" type="button"><span aria-hidden="true">✓</span><span>Registro diario</span></button><button id="quickXiaomi505" class="secondary" type="button"><span aria-hidden="true">▤</span><span>Informe Xiaomi</span></button></div><button id="themeV4" class="secondary" type="button">Cambiar tema</button>';
 let light=false;try{light=localStorage.getItem('asia-theme-v4')==='light'}catch{};const theme=()=>{document.documentElement.classList.toggle('light',light);$('themeV4').textContent=light?'Modo oscuro':'Modo claro'};theme();$('themeV4').onclick=()=>{light=!light;theme();try{localStorage.setItem('asia-theme-v4',light?'light':'dark')}catch{}};
+// Quick shortcuts: reuse the existing forms and keep same-day drafts intact.
+$('quickGym505').onclick=()=>{
+ const today=date();
+ if(window.asiaVacationContext44?.().active){tab('home');window.asiaRenderHome42?.();window.asiaRenderExtras44?.();$('homeGym42').click();return;}
+ const planned=[1,2,4,5].includes(new Date(today+'T12:00:00').getDay());
+ if(!planned){tab('home');window.asiaRenderHome42?.();jump('homeWorkout42');return;}
+ tab('training');
+ if($('trainDay').value!==today){$('trainDay').value=today;$('trainDay').onchange();}
+ jump('workV4');
+};
+$('quickDaily505').onclick=()=>{tab('diet');if($('day').value!==date()){$('day').value=date();loadDiet();}jump('dailyV4');};
+$('quickXiaomi505').onclick=()=>{tab('diet');if($('measureDay').value!==date()){$('measureDay').value=date();loadBody();}jump('reportUpload505');};
 function countdown(){let d=dayDiff('2027-03-08',date());$('countdown').textContent=Math.max(0,d);$('countdownLabel').textContent=d>0?'días para Asia':d===0?'¡Día del viaje!':'Fecha del viaje cumplida'}countdown();setInterval(countdown,60000);
 const dietCards=[...$('diet').children],trainCards=[...$('training').children];
 // Keep dashboard visible; collapse other sections to reduce scrolling.
