@@ -154,3 +154,19 @@ nav button[aria-current=page]{font-weight:750}
 
 /* V8.5.5: recovery comparison within existing historical activity card */
 #healthRecovery855{margin-top:12px}#healthRecoveryCards855{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:8px 0}#healthRecoveryCards855 .healthCompare855{min-width:0;padding:9px;display:flex;flex-direction:column;gap:4px}#healthRecoveryCards855 .healthCompare855 b{font-size:clamp(17px,5vw,24px);overflow-wrap:anywhere;color:var(--accent-text)}#healthRecoveryCards855 small{overflow-wrap:anywhere}#healthRecovery855 .scroll{max-width:100%;overflow-x:auto}#healthRecovery855 table{min-width:420px}
+
+/* V8.5.6: readable Coach answers in the existing theme. */
+#coach50 .coachAnswer856{white-space:normal;overflow-wrap:anywhere;min-width:0;line-height:1.55}
+#coach50 .coachAnswer856 h4{font-size:14px;color:var(--accent-text,var(--ink));margin:14px 0 5px;line-height:1.4}
+#coach50 .coachAnswer856 h4:first-child{margin-top:6px}
+#coach50 .coachAnswer856 p{white-space:pre-wrap;margin:7px 0}
+#coach50 .coachAnswer856 ul,#coach50 .coachAnswer856 ol{padding-inline-start:22px;margin:7px 0}
+#coach50 .coachAnswer856 li{padding-inline-start:2px;margin:5px 0}
+#coach50 .coachAnswer856 pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;background:var(--field);padding:8px;border-radius:8px}
+#coach50 .coachContext856{display:block;color:var(--muted);font-size:11px;margin:8px 0 0}
+#coach50 .coachAnswerTools856{display:flex;justify-content:flex-end;margin-top:10px}
+#coach50 .coachAnswerTools856 button,#coach50 .coachFollowTools856 button{min-height:44px;font-size:12px;padding:7px 10px}
+#coach50 #coachFollow856{margin-top:10px;border-top:1px solid var(--edge);padding-top:9px}
+#coach50 .coachFollowTools856{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+#coach50 .coachFollowTools856 button{flex:1 1 120px;min-width:0}
+#coach50 #coachCopyStatus856:empty{display:none}
