@@ -122,6 +122,7 @@
       const c=document.createElement('canvas'),scale=Math.min(1,1900/Math.max(im.width,im.height));c.width=Math.max(1,Math.round(im.width*scale));c.height=Math.max(1,Math.round(im.height*scale));const ctx=c.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);ctx.drawImage(im,0,0,c.width,c.height);let result=c.toDataURL('image/jpeg',0.86);if(result.length>3500000)result=c.toDataURL('image/jpeg',0.65);if(result.length>3500000)throw Error('La imagen sigue siendo demasiado grande.');return result;
     } finally{URL.revokeObjectURL(url);}
   }
+  window.asiaNutritionScan52=async(mode,file)=>{getToken();if(!['meal','label'].includes(mode))throw Error('Modo inválido');const image=await imageForAI(file);return call('nutrition52',{mode,image},endpoint.replace(/\/api$/,'/nutrition'));};
   function showReview(r,file,chosenDate){
     if($('report').files[0]!==file||$('measureDay').value!==chosenDate)throw Error('La captura o fecha cambió durante el análisis. Volvé a escanear.');
     const v=r.result;if(!v||typeof v!=='object')throw Error('El servidor no devolvió datos estructurados.');
