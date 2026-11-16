@@ -19,14 +19,14 @@
     }
     return token;
   }
-  async function call(kind, payload) {
+  async function call(kind, payload, route=endpoint) {
     const access = getToken();
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 120000);
     try {
-      const response = await fetch(endpoint, {
+      const response = await fetch(route, {
         method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+access},
-        body:JSON.stringify({kind,...payload}), signal:controller.signal, cache:'no-store'
+        body:JSON.stringify(kind==='coach'?payload:{kind,...payload}), signal:controller.signal, redirect:'error', cache:'no-store'
       });
       let body; try { body = await response.json(); } catch { throw Error('Respuesta no válida del servidor.'); }
       if (!response.ok || body.ok !== true) {
@@ -50,13 +50,13 @@
     const old = token; token = candidate;
     try {
       const r = await call('chat',{data:{question:'Respondé solamente: Conexión correcta. Prueba sin datos personales.'}});
-      if(old!==token){window.asiaHealthReset?.();window.asiaBackupReset42?.();window.asiaWatchReset43?.();}
+      if(old!==token){window.asiaHealthReset?.();window.asiaBackupReset42?.();window.asiaWatchReset43?.();window.asiaCoachReset50?.();}
       try { if ($('aiRemember').checked) localStorage.setItem(tokenKey, token); else localStorage.removeItem(tokenKey); }
       catch { status('aiConnection','Conexión correcta. No se pudo guardar la clave; se usará durante esta sesión.'); $('aiToken').value=''; return; }
       $('aiToken').value=''; status('aiConnection','Conexión correcta. '+r.model+' · '+r.remaining+' consultas de chat disponibles hoy.');
     } catch(e) { token = old; throw e; }
   });
-  $('aiDisconnect').onclick=()=>{ window.asiaHealthReset?.(); window.asiaBackupReset42?.(); window.asiaWatchReset43?.(); token=''; $('aiToken').value=''; $('aiRemember').checked=false; try{localStorage.removeItem(tokenKey)}catch{}; status('aiConnection','Clave olvidada en este dispositivo.'); };
+  $('aiDisconnect').onclick=()=>{ window.asiaHealthReset?.(); window.asiaBackupReset42?.(); window.asiaWatchReset43?.();window.asiaCoachReset50?.(); token=''; $('aiToken').value=''; $('aiRemember').checked=false; try{localStorage.removeItem(tokenKey)}catch{}; status('aiConnection','Clave olvidada en este dispositivo.'); };
   // Solo se transfieren datos numéricos/estados de registros recientes; no fotos guardadas ni notas libres.
   const ordered = (obj, n) => Object.entries(obj||{}).sort(([a],[b])=>a.localeCompare(b)).slice(-n);
   function bodySummary(n=42) { return ordered(data.body,n).map(([d,b])=>({date:d,...Object.fromEntries(fields.map(([k])=>[k,b[k]]).filter(([,v])=>valid(v)))})); }
@@ -64,7 +64,7 @@
   function workSummary(n=16) { return ordered(data.work,n).map(([k,w])=>({date:k.slice(0,10),routine:routines[+k.split('_')[1]]?.name,cardio_minutes:Number(w.cardioMin)||0,cardio_speed:Number(w.cardioSpeed)||null,cardio_incline:Number(w.cardioIncline)||0,cardio_rpe:Number(w.cardioRPE)||null,exercises:Object.fromEntries(Object.entries(w.ex||{}).map(([name,sets])=>[name,sets.filter(s=>s.done&&valid(s.kg)&&valid(s.reps)).map(s=>[s.kg,s.reps])]).filter(([,sets])=>sets.length))})); }
   function summary(includeWork=true){
     let p={today:date(),baseline_kg:data.settings?.baseline??null,height_m:data.settings?.height??null,body:bodySummary(),diet:dietSummary(),diet_codes:{yes:'cumplido',partial:'parcial',no:'no cumplido',vac:'vacaciones'},exercise_sets_format:'[kg externos, repeticiones]; unilateral por pierna; 0 kg puede ser peso corporal',workouts:includeWork?workSummary():[],plan:{meals:'Cafe con leche descremada por la mañana; almuerzo y cena misma preparacion familiar, pesos cocidos; merienda cafe, dos tostadas, queso crema, huevos duros o pollo/atun, fruta; sin yogur.',menu:menus,workout:routines.map(r=>({name:r.name,cardio:r.cardio,ex:r.ex.map(e=>e.slice(0,4))})),limits:'150 min maximo por sesion, 1–3 RIR; peso objetivo 72 kg, 70 aspiracional.'}};
-    p.vacation_mode=window.asiaVacationContext44?.();
+    p.current_goals=window.asiaGoals50?.();p.vacation_mode=window.asiaVacationContext44?.();
     const health = window.asiaHealthSummary?.(); if(health?.daily?.length)p.apple_health=health;
     while(JSON.stringify(p).length>20500&&p.workouts.length>1)p.workouts.shift();
     while(JSON.stringify(p).length>20500&&p.body.length>1)p.body.shift();
@@ -86,6 +86,7 @@
   // Minimal safe Markdown renderer: creates DOM text and elements, never interprets arbitrary HTML.
   function inline(el,t){const re=/(\*\*[^*\n]+\*\*|`[^`\n]+`|\*[^*\n]+\*)/g;let i=0;for(const m of t.matchAll(re)){el.append(document.createTextNode(t.slice(i,m.index)));let v=m[0],n=document.createElement(v.startsWith('**')?'strong':v.startsWith('`')?'code':'em');n.textContent=v.slice(v.startsWith('**')?2:1,v.startsWith('**')?-2:-1);el.append(n);i=m.index+v.length}el.append(document.createTextNode(t.slice(i)));}
   function renderFormatted(el,t){el.replaceChildren();let list=null,table=null;for(let line of String(t).split('\n')){line=line.trim();if(!line){list=null;table=null;continue}if(/^\|.*\|$/.test(line)){list=null;let cells=line.slice(1,-1).split('|').map(x=>x.trim());if(cells.every(x=>/^:?-+:?$/.test(x)))continue;if(!table){let wrap=document.createElement('div');wrap.className='ai-table';table=document.createElement('table');wrap.append(table);el.append(wrap)}let row=table.insertRow();for(const cell of cells)inline(row.insertCell(),cell);continue}table=null;let h=line.match(/^#{1,6}\s+(.*)$/),b=line.match(/^[-*]\s+(.*)$/),o=line.match(/^\d+[.)]\s+(.*)$/);if(b||o){let tag=b?'UL':'OL';if(!list||list.tagName!==tag){list=document.createElement(tag.toLowerCase());el.append(list)}let li=document.createElement('li');inline(li,(b||o)[1]);list.append(li);continue}list=null;let p=document.createElement(h?'h3':'p');inline(p,h?h[1]:line);el.append(p)}}
+  window.asiaCoachRequest50=payload=>call('coach',payload,endpoint.replace(/\/api$/,'/coach'));
   window.asiaBackupRequest42=async(method='GET',payload=null,id=null)=>{const access=getToken(),controller=new AbortController(),timer=setTimeout(()=>controller.abort(),25000);try{const url=endpoint.replace(/\/api$/,'/backup')+(id===null?'':'?id='+encodeURIComponent(id));const response=await fetch(url,{method,headers:{Authorization:'Bearer '+access,...(payload?{'Content-Type':'application/json'}:{})},body:payload?JSON.stringify(payload):undefined,signal:controller.signal,cache:'no-store',redirect:'error'});let r;try{r=await response.json()}catch{throw Error('Respuesta no válida (HTTP '+response.status+').')}if(!response.ok||r.ok!==true){let e=Error(r.error||'HTTP '+response.status);e.status=response.status;throw e}return r}finally{clearTimeout(timer)}};
   window.asiaHealthHasAccess=()=>/^[a-fA-F0-9]{64}$/.test(token);
   window.asiaHealthGet=async()=>{
