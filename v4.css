@@ -194,3 +194,8 @@ nav button[aria-current=page]{font-weight:750}
 #planner820 .plannerSelected858{margin:10px 0;padding:10px;min-width:0}#planner820 .plannerSelected858 button,#planner820 .plannerSelected858 select{min-height:44px;max-width:100%;white-space:normal}
 #planner820 .plannerPrimary858{font-weight:700}#planner820 .plannerMore858{margin:8px 0}#planner820 .plannerMore858>summary{min-height:44px;display:flex;align-items:center;gap:6px;cursor:pointer}#planner820 .plannerMore858>summary:before{content:'›';display:inline-block}#planner820 .plannerMore858[open]>summary:before{transform:rotate(90deg)}
 @media(min-width:650px){#planner820 .plannerDays858{grid-template-columns:repeat(7,minmax(0,1fr))}}
+
+/* V8.6.3: one entry point per tab, inline editor; preserve native disclosure and controls. */
+.inlineOrganizer863:not([open]){display:none!important}
+.inlineOrganizer863[open]{margin-top:0;scroll-margin-top:12px}
+.viewTools85 button[aria-expanded="true"]{border-color:var(--teal);color:var(--teal)}
