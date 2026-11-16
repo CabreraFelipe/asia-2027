@@ -3,6 +3,9 @@
   const endpoint = 'https://asia-2027-ai.cabrerafelipe2003.workers.dev/api';
   const tokenKey = 'asia-ai-access-v1';
   let token = '', busy = false, chat = [], pending = null;
+  try { const saved=JSON.parse(localStorage.getItem('asia-chat-v4')||'[]'); if(Array.isArray(saved)) chat=saved.filter(x=>['user','assistant'].includes(x.role)&&typeof x.text==='string').slice(-12); }catch{}
+  function saveChat(){try{localStorage.setItem('asia-chat-v4',JSON.stringify(chat))}catch{}}
+  try { window.asiaWeeklyAI=JSON.parse(localStorage.getItem('asia-weekly-ai-v4')||'null'); }catch{}
   try { token = localStorage.getItem(tokenKey) || ''; } catch {}
   $('aiRemember').checked = Boolean(token);
   const status = (id, text) => { $(id).textContent = text; };
@@ -11,7 +14,7 @@
   function setBusy(v) { busy = v; buttons.forEach(id => $(id).disabled = v); }
   function getToken() {
     if (!/^[a-fA-F0-9]{64}$/.test(token)) {
-      $('aiSettings').scrollIntoView({behavior:'smooth'});
+      if(window.asiaOpenSettings)window.asiaOpenSettings();else $('aiSettings').scrollIntoView({behavior:'smooth'});
       throw Error('Primero configurá tu clave APP_ACCESS_TOKEN en Conexión con IA.');
     }
     return token;
@@ -56,10 +59,10 @@
   // Solo se transfieren datos numéricos/estados de registros recientes; no fotos guardadas ni notas libres.
   const ordered = (obj, n) => Object.entries(obj||{}).sort(([a],[b])=>a.localeCompare(b)).slice(-n);
   function bodySummary(n=42) { return ordered(data.body,n).map(([d,b])=>({date:d,...Object.fromEntries(fields.map(([k])=>[k,b[k]]).filter(([,v])=>valid(v)))})); }
-  function dietSummary(n=42) { return ordered(data.diet,n).map(([d,b])=>({date:d,adherence:['yes','partial','no','vac'].includes(b.ad)?b.ad:null,steps:b.steps!==''&&Number.isFinite(+b.steps)?+b.steps:null,energy:b.energy!==''&&Number.isFinite(+b.energy)?+b.energy:null})); }
+  function dietSummary(n=42) { return ordered(data.diet,n).map(([d,b])=>({date:d,adherence:['yes','partial','no','vac'].includes(b.ad)?b.ad:null,steps:b.steps!==''&&Number.isFinite(+b.steps)?+b.steps:null,energy:b.energy!==''&&Number.isFinite(+b.energy)?+b.energy:null,sleep_hours:b.sleep!=null&&b.sleep!==''&&Number.isFinite(+b.sleep)?+b.sleep:null,recovery:b.recovery!=null&&b.recovery!==''&&Number.isFinite(+b.recovery)?+b.recovery:null})); }
   function workSummary(n=16) { return ordered(data.work,n).map(([k,w])=>({date:k.slice(0,10),routine:routines[+k.split('_')[1]]?.name,cardio_minutes:Number(w.cardioMin)||0,cardio_speed:Number(w.cardioSpeed)||null,cardio_incline:Number(w.cardioIncline)||0,cardio_rpe:Number(w.cardioRPE)||null,exercises:Object.fromEntries(Object.entries(w.ex||{}).map(([name,sets])=>[name,sets.filter(s=>s.done&&valid(s.kg)&&valid(s.reps)).map(s=>[s.kg,s.reps])]).filter(([,sets])=>sets.length))})); }
   function summary(includeWork=true){
-    let p={today:date(),baseline_kg:data.settings?.baseline??null,height_m:data.settings?.height??null,body:bodySummary(),diet:dietSummary(),diet_codes:{yes:'cumplido',partial:'parcial',no:'no cumplido',vac:'vacaciones'},exercise_sets_format:'[kg externos, repeticiones]; unilateral por pierna; 0 kg puede ser peso corporal',workouts:includeWork?workSummary():[]};
+    let p={today:date(),baseline_kg:data.settings?.baseline??null,height_m:data.settings?.height??null,body:bodySummary(),diet:dietSummary(),diet_codes:{yes:'cumplido',partial:'parcial',no:'no cumplido',vac:'vacaciones'},exercise_sets_format:'[kg externos, repeticiones]; unilateral por pierna; 0 kg puede ser peso corporal',workouts:includeWork?workSummary():[],plan:{meals:'Cafe con leche descremada por la mañana; almuerzo y cena misma preparacion familiar, pesos cocidos; merienda cafe, dos tostadas, queso crema, huevos duros o pollo/atun, fruta; sin yogur.',menu:menus,workout:routines.map(r=>({name:r.name,cardio:r.cardio,ex:r.ex.map(e=>e.slice(0,4))})),limits:'150 min maximo por sesion, 1–3 RIR; peso objetivo 72 kg, 70 aspiracional.'}};
     while(JSON.stringify(p).length>20500&&p.workouts.length>1)p.workouts.shift();
     while(JSON.stringify(p).length>20500&&p.body.length>1)p.body.shift();
     return p;
@@ -69,23 +72,27 @@
     task(id,'Analizando los registros…',async()=>{
       if(kind==='training'&&!Object.keys(data.work||{}).length)throw Error('Guardá al menos una sesión antes de analizar.');
       if(kind!=='training'&&!Object.keys(data.body||{}).length&&!Object.keys(data.diet||{}).length&&!Object.keys(data.work||{}).length)throw Error('Guardá registros antes de pedir un análisis.');
-      const p=summary(); if(selected)p.selected_exercise=$('exercisePick').value;
-      const r=await call(kind,{data:p}); status(id,String(r.result)+suffix(r));
+      const p=summary(); if(kind==='weekly'){const d=date(),dow=new Date(d+'T12:00:00').getDay();p.weekly_control_date=shift(d,-((dow+6)%7));p.weekly_period={start:shift(p.weekly_control_date,-7),end:shift(p.weekly_control_date,-1)};} if(selected)p.selected_exercise=$('exercisePick').value;
+      const r=await call(kind,{data:p}); renderFormatted($(id),String(r.result)+suffix(r)); if(kind==='weekly'){let d=date(),dow=new Date(d+'T12:00:00').getDay();window.asiaWeeklyAI={control:shift(d,-((dow+6)%7)),at:d,text:String(r.result)};try{localStorage.setItem('asia-weekly-ai-v4',JSON.stringify(window.asiaWeeklyAI))}catch{};window.refreshWeeklyV4?.();}
     });
   }
   $('aiDiet').onclick=()=>sendAnalysis('diet','aiDietResult');
   $('aiWeekly').onclick=()=>sendAnalysis('weekly','aiDietResult');
   $('aiTraining').onclick=()=>sendAnalysis('training','aiTrainingResult',true);
-  function renderChat(){const el=$('aiChatResult');el.replaceChildren();for(const item of chat){const a=document.createElement('article');a.className=item.role;const b=document.createElement('strong');b.textContent=item.role==='user'?'Vos':'Entrenador IA';const p=document.createElement('p');p.textContent=item.text;a.append(b,p);el.append(a);}}
-  $('aiClearChat').onclick=()=>{chat=[];renderChat();};
+  // Minimal safe Markdown renderer: creates DOM text and elements, never interprets arbitrary HTML.
+  function inline(el,t){const re=/(\*\*[^*\n]+\*\*|`[^`\n]+`|\*[^*\n]+\*)/g;let i=0;for(const m of t.matchAll(re)){el.append(document.createTextNode(t.slice(i,m.index)));let v=m[0],n=document.createElement(v.startsWith('**')?'strong':v.startsWith('`')?'code':'em');n.textContent=v.slice(v.startsWith('**')?2:1,v.startsWith('**')?-2:-1);el.append(n);i=m.index+v.length}el.append(document.createTextNode(t.slice(i)));}
+  function renderFormatted(el,t){el.replaceChildren();let list=null,table=null;for(let line of String(t).split('\n')){line=line.trim();if(!line){list=null;table=null;continue}if(/^\|.*\|$/.test(line)){list=null;let cells=line.slice(1,-1).split('|').map(x=>x.trim());if(cells.every(x=>/^:?-+:?$/.test(x)))continue;if(!table){let wrap=document.createElement('div');wrap.className='ai-table';table=document.createElement('table');wrap.append(table);el.append(wrap)}let row=table.insertRow();for(const cell of cells)inline(row.insertCell(),cell);continue}table=null;let h=line.match(/^#{1,6}\s+(.*)$/),b=line.match(/^[-*]\s+(.*)$/),o=line.match(/^\d+[.)]\s+(.*)$/);if(b||o){let tag=b?'UL':'OL';if(!list||list.tagName!==tag){list=document.createElement(tag.toLowerCase());el.append(list)}let li=document.createElement('li');inline(li,(b||o)[1]);list.append(li);continue}list=null;let p=document.createElement(h?'h3':'p');inline(p,h?h[1]:line);el.append(p)}}
+  function renderChat(){const el=$('aiChatResult');el.replaceChildren();for(const item of chat){const a=document.createElement('article');a.className=item.role;const b=document.createElement('strong');b.textContent=item.role==='user'?'Vos':'Entrenador IA';const p=document.createElement('div');if(item.role==='assistant')renderFormatted(p,item.text);else p.textContent=item.text;a.append(b,p);el.append(a);}}
+  $('aiClearChat').onclick=()=>{chat=[];saveChat();renderChat();};
   $('aiAsk').onclick=()=>{
     const question=$('aiQuestion').value.trim(); if(!question)return;
     if(!confirm('Se enviará tu consulta, el resumen de registros y las últimas respuestas a OpenAI. ¿Continuar?'))return;
     task('aiChatResult','Consultando al entrenador…',async()=>{
       const p=summary(); p.question=question;p.conversation=chat.slice(-6).map(x=>({role:x.role,text:x.text.slice(0,850)}));
-      const r=await call('chat',{data:p});chat.push({role:'user',text:question},{role:'assistant',text:String(r.result)+suffix(r)});chat=chat.slice(-12);$('aiQuestion').value='';renderChat();
+      const r=await call('chat',{data:p});chat.push({role:'user',text:question},{role:'assistant',text:String(r.result)+suffix(r)});chat=chat.slice(-12);saveChat();$('aiQuestion').value='';renderChat();
     });
   };
+  renderChat(); window.refreshWeeklyV4?.();
   const mapping={weight_kg:'weight',bmi:'bmi',body_fat_pct:'fat',fat_mass_kg:'fatMass',muscle_mass_kg:'muscle',skeletal_muscle_kg:'skeletal',visceral_fat:'visceral',water_pct:'water',protein_pct:'protein',bone_mass_kg:'bone',basal_metabolism_kcal:'bmr',body_age:'bodyAge',body_score:'bodyScore'};
   function resetReview(){pending=null;$('aiReview').hidden=true;$('aiReview').replaceChildren();}
   $('report').addEventListener('change',()=>{resetReview();status('aiScanStatus','');});
