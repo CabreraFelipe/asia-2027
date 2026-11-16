@@ -124,3 +124,17 @@ main .uiHelp8322{margin:5px 0 10px}
 #adaptiveNutrition823>button{width:100%;margin:5px 0}
 #adaptiveNutrition823 button:disabled{opacity:.55}
 @media(max-width:350px){main section>.card.sectionfold>summary,main section>.card .foldToggle51{font-size:15px}}
+
+/* V8.5 — shared presentation layer; no change to theme colors or user ordering. */
+.viewTools85{display:flex;justify-content:flex-end;gap:6px;margin:2px 0 8px;flex-wrap:wrap}
+.viewTools85 button{font-size:12px;min-height:44px;flex:0 1 auto;min-width:0;padding:7px 10px;white-space:normal;border:1px solid var(--edge);box-shadow:none}
+main section>.card{margin:9px 0;min-width:0}
+main section>.card.sectionfold:not([open]),main section>.card.folded51{padding-block:7px}
+main section>.card.sectionfold>summary,main section>.card .foldToggle51{min-height:44px;line-height:1.35;letter-spacing:0}
+main section>.card.sectionfold>summary:after,main section>.card .foldToggle51:after{width:24px;text-align:center;flex:none}
+main .gymMini571>summary,main .uiHelp8322>summary,main .mini573>summary,main .layout51>summary{min-height:44px;line-height:1.35}
+main .gymMini571,main .mini573{margin:8px 0}
+main .card :is(p.meta,p.tiny){overflow-wrap:anywhere}
+main .card :is(button,input,textarea,select,summary):focus-visible,nav button:focus-visible{outline:2px solid var(--accent-text,var(--teal));outline-offset:2px}
+nav button[aria-current=page]{font-weight:750}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}

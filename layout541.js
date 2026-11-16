@@ -35,6 +35,7 @@ for(const [id,title,items] of specs){
 window.asiaRevealPanel541=target=>{window.asiaRevealHome51?.(target);for(let n=target;n&&n!==main;n=n.parentElement){const reveal=revealByNode.get(n);if(reveal)reveal();}};
 window.asiaScrollTo541=(target,options)=>{if(!target)return;window.asiaRevealPanel541(target);target.scrollIntoView(options);};
 function show(t){for(const [name,panel] of organizerByTab)panel.classList.toggle('hide',name!==t);}
+window.asiaInitialView85=t=>resetByTab.get(t)?.();
 const previousTab=tab;tab=function(t){previousTab(t);show(t);resetByTab.get(t)?.();};
 const active=[['home','home42'],['diet','diet'],['training','training'],['health','health'],['progress','progress54']].find(([,id])=>!el(id)?.classList.contains('hide'));
 show(active?.[0]||'home');resetByTab.get(active?.[0]||'home')?.();
