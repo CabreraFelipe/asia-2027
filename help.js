@@ -1,9 +1,10 @@
-/* V5.0.2 — presentation only. Move static guidance, never form fields/status/results. */
+/* V5.0.3 — presentation only. Move static guidance, never form fields/status/results. */
 (()=>{'use strict';
 const byId=id=>document.getElementById(id);
 const home=byId('home42'), coach=byId('coach50'), vacation=byId('vacation44'), badges=byId('badges44');
-// Existing nodes retain all listeners and state. Keep the coach last among dashboard cards.
-if(home&&coach&&vacation&&badges){home.append(vacation,badges,coach);badges.open=false;}
+// Existing nodes retain all listeners and state. Keep backup last among dashboard cards.
+const backup=byId('backupNow42')?.closest('.card');
+if(home&&coach&&vacation&&badges){home.append(vacation,badges,coach);if(backup&&backup.parentElement===home)home.append(backup);badges.open=false;}
 const main=document.querySelector('main');if(!main)return;
 const help=document.createElement('details');help.className='card sectionfold help502';help.id='help502';
 const summary=document.createElement('summary');summary.textContent='Ayuda y guía de uso';help.append(summary);
