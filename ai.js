@@ -23,6 +23,7 @@
     const access = getToken();
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 120000);
+    let diagnosticHTTP=false;
     try {
       const response = await fetch(route, {
         method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+access},
@@ -30,11 +31,13 @@
       });
       let body; try { body = await response.json(); } catch { throw Error('Respuesta no válida del servidor.'); }
       if (!response.ok || body.ok !== true) {
+        diagnosticHTTP=true;window.asiaDiagEvent56?.('openai', 'error', response.status, body.upstream_status);
         const code = body.upstream_status ? ' (OpenAI HTTP '+body.upstream_status+')' : ' (HTTP '+response.status+')';
         throw Error((body.error || 'No se pudo completar la consulta')+code);
       }
+      window.asiaDiagEvent56?.('openai', 'ok');
       return body;
-    } catch(e) { if(e.name === 'AbortError') throw Error('La solicitud demoró demasiado. Probá nuevamente.'); throw e; }
+    } catch(e) { if(!diagnosticHTTP)window.asiaDiagEvent56?.('openai','error');if(e.name === 'AbortError') throw Error('La solicitud demoró demasiado. Probá nuevamente.'); throw e; }
     finally { clearTimeout(timer); }
   }
   async function task(id, message, fn) {
@@ -86,6 +89,30 @@
   // Minimal safe Markdown renderer: creates DOM text and elements, never interprets arbitrary HTML.
   function inline(el,t){const re=/(\*\*[^*\n]+\*\*|`[^`\n]+`|\*[^*\n]+\*)/g;let i=0;for(const m of t.matchAll(re)){el.append(document.createTextNode(t.slice(i,m.index)));let v=m[0],n=document.createElement(v.startsWith('**')?'strong':v.startsWith('`')?'code':'em');n.textContent=v.slice(v.startsWith('**')?2:1,v.startsWith('**')?-2:-1);el.append(n);i=m.index+v.length}el.append(document.createTextNode(t.slice(i)));}
   function renderFormatted(el,t){el.replaceChildren();let list=null,table=null;for(let line of String(t).split('\n')){line=line.trim();if(!line){list=null;table=null;continue}if(/^\|.*\|$/.test(line)){list=null;let cells=line.slice(1,-1).split('|').map(x=>x.trim());if(cells.every(x=>/^:?-+:?$/.test(x)))continue;if(!table){let wrap=document.createElement('div');wrap.className='ai-table';table=document.createElement('table');wrap.append(table);el.append(wrap)}let row=table.insertRow();for(const cell of cells)inline(row.insertCell(),cell);continue}table=null;let h=line.match(/^#{1,6}\s+(.*)$/),b=line.match(/^[-*]\s+(.*)$/),o=line.match(/^\d+[.)]\s+(.*)$/);if(b||o){let tag=b?'UL':'OL';if(!list||list.tagName!==tag){list=document.createElement(tag.toLowerCase());el.append(list)}let li=document.createElement('li');inline(li,(b||o)[1]);list.append(li);continue}list=null;let p=document.createElement(h?'h3':'p');inline(p,h?h[1]:line);el.append(p)}}
+  // V5.6 diagnostic routes: no personal information leaves the device for the optional AI test.
+  window.asiaDiagAIHasAccess56=()=>/^[a-fA-F0-9]{64}$/.test(token);
+  window.asiaDiagAIRead56=async(kind)=>{
+    const routes={cloud:'/',health:'/health',workouts:'/workouts',backup:'/backup'};
+    if(!Object.hasOwn(routes,kind))throw Error('Invalid diagnostic route');
+    if(kind!=='cloud'&&!window.asiaDiagAIHasAccess56())return {configured:false};
+    const c=new AbortController(),t=setTimeout(()=>c.abort(),12000);
+    try{
+      const r=await fetch(new URL(routes[kind],endpoint),{cache:'no-store',redirect:'error',signal:c.signal,headers:kind==='cloud'?{}:{Authorization:'Bearer '+token}});
+      if(!r.ok)return {http:r.status};
+      if(kind==='cloud')return {http:r.status,ok:true};
+      const x=await r.json();
+      if(x.ok!==true)return {http:r.status,invalid:true};
+      const list=kind==='health'?x.records:kind==='workouts'?x.workouts:x.versions;
+      if(!Array.isArray(list))return {http:r.status,invalid:true};
+      const latest=list.reduce((v,row)=>{const n=Date.parse(kind==='backup'?row?.created_at:row?.updated_at);return Number.isFinite(n)?Math.max(v,n):v},0);
+      return {ok:true,http:r.status,count:list.length,latest};
+    }finally{clearTimeout(t)}
+  };
+  window.asiaDiagAITest56=async()=>{
+    if(!window.asiaDiagAIHasAccess56())return {configured:false};
+    if(busy)return {busy:true};
+    setBusy(true);try{await call('chat',{data:{question:'Respondé solamente OK. Prueba técnica sin datos personales.'}});return {ok:true};}finally{setBusy(false)}
+  };
   window.asiaCoachRequest50=payload=>call('coach',payload,endpoint.replace(/\/api$/,'/coach'));
   window.asiaBackupRequest42=async(method='GET',payload=null,id=null)=>{const access=getToken(),controller=new AbortController(),timer=setTimeout(()=>controller.abort(),25000);try{const url=endpoint.replace(/\/api$/,'/backup')+(id===null?'':'?id='+encodeURIComponent(id));const response=await fetch(url,{method,headers:{Authorization:'Bearer '+access,...(payload?{'Content-Type':'application/json'}:{})},body:payload?JSON.stringify(payload):undefined,signal:controller.signal,cache:'no-store',redirect:'error'});let r;try{r=await response.json()}catch{throw Error('Respuesta no válida (HTTP '+response.status+').')}if(!response.ok||r.ok!==true){let e=Error(r.error||'HTTP '+response.status);e.status=response.status;throw e}return r}finally{clearTimeout(timer)}};
   window.asiaHealthHasAccess=()=>/^[a-fA-F0-9]{64}$/.test(token);
