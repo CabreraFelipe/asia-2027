@@ -41,7 +41,7 @@ function render(){
  for(const point of seq){let column=document.createElement('div');column.className='healthColumn';let bar=document.createElement('div');bar.className='healthBarTrack';let fill=document.createElement('div');fill.className=point.v===null?'healthMissing':'healthBarFill';fill.style.height=point.v===null?'100%':Math.max(point.v===0?2:4,point.v/max*100)+'%';bar.append(fill);let label=document.createElement('small');label.textContent=n===7||(+point.day.slice(-2)%5===0)||point===seq.at(-1)?labelDate(point.day):'·';column.title=point.day+': '+(point.v===null?'Sin datos':tf(point.v,defs[k][2])+' '+defs[k][1]);column.append(bar,label);graph.append(column)}
  const body=$h('healthHistory');body.replaceChildren();for(const point of seq.slice().reverse()){let tr=body.insertRow();tr.insertCell().textContent=point.day;tr.insertCell().textContent=point.v===null?'—':tf(point.v,defs[k][2])+' '+defs[k][1]}
  const last=Array.from(rows.keys()).filter(x=>get(x,'vo2_max')!==null).sort().at(-1);$h('healthVo2').textContent=last?'Último VO₂ máx.: '+tf(get(last,'vo2_max'),1)+' ml/kg/min · '+last:'VO₂ máx.: todavía no hay mediciones recibidas.';
- $h('healthReadAt').textContent=lastRead?'Consulta a Cloudflare: '+new Date(lastRead).toLocaleString('es-UY')+'. Último guardado informado: '+(lastSync?new Date(lastSync).toLocaleString('es-UY'):'—')+'.':'Todavía no se consultó Cloudflare.';
+ $h('healthReadAt').textContent=lastRead?'Consulta a Cloudflare: '+new Date(lastRead).toLocaleString('es-UY')+'. Último guardado informado: '+(lastSync?new Date(lastSync).toLocaleString('es-UY'):'—')+'.':'Todavía no se consultó Cloudflare.';window.asiaRenderHome42?.();
 }
 function reset(){generation++;flight=null;rows.clear();lastRead=lastSync=0;loaded=false;$h('healthShare').checked=false;$h('healthAnalysis').replaceChildren();$h('healthRefresh').disabled=false;status('Conectá con tu clave personal para consultar Salud.');render()}
 async function refreshHealth(force=false){
@@ -56,7 +56,7 @@ function summaryHealth(){
  const end=date(),start=shift(end,-28),days=Array.from(rows.keys()).filter(d=>d>=start&&d<=end).sort();
  const metrics=Object.keys(defs);return {source:'Apple Health via Health Auto Export',read_at:new Date(lastRead).toISOString(),units:Object.fromEntries(metrics.map(k=>[k,defs[k][1]])),daily:days.map(d=>({date:d,...Object.fromEntries(metrics.filter(k=>get(d,k)!==null).map(k=>[k,Math.round(get(d,k)*100)/100]))})),note:'Ausencia de métrica = sin datos; hoy puede estar incompleto. Los valores de energía son estimaciones, no calorías ingeridas; no sumar ejercicio o pasos manuales a los de Salud.'};
 }
-window.asiaHealthRefresh=refreshHealth;window.asiaHealthReset=reset;window.asiaHealthSummary=summaryHealth;
+window.asiaHealthDay42=d=>({steps:get(d,'step_count'),active:get(d,'active_energy'),basal:get(d,'basal_energy_burned'),readAt:lastRead,syncAt:lastSync});window.asiaHealthRefresh=refreshHealth;window.asiaHealthReset=reset;window.asiaHealthSummary=summaryHealth;
 $h('healthDay').value=date();for(const [k,[name]] of Object.entries(defs)){$h('healthMetric').add(new Option(name,k))}
 for(const id of ['healthDay','healthMetric','healthRange'])$h(id).onchange=render;
 $h('healthRefresh').onclick=()=>refreshHealth(true);
