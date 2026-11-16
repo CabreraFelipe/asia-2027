@@ -22,6 +22,33 @@ function normalize(r){
  return {day:r.day,metric:r.metric,qty:q,updated_at:r.updated_at};
 }
 function get(d,k){return rows.get(d)?.[k]??null}
+// V8.5.5: descriptive comparisons on closed days. Read-only, no new requests.
+const descriptors855=[['hrv','VFC','ms',1],['restingHR','FC en reposo','lpm',1],['sleep','Sueño registrado','h',1],['steps','Pasos · Apple Salud','pasos',0],['series','Series efectivas · Gym','series',0]];
+const number855=(v,min,max)=>{if(typeof v==='string'&&/^\d+(?:\.\d+)?$/.test(v.trim()))v=Number(v);return typeof v==='number'&&Number.isFinite(v)&&v>=min&&v<=max?v:null;};
+function buildRecovery855(reference){
+ if(!validDay(reference)||reference>date())return null;
+ const from=shift(reference,-14),end=shift(reference,-1),counts=new Map();
+ for(const [k,w] of Object.entries(data.work||{})){
+  const d=k.slice(0,10);if(!validDay(d)||d<from||d>end||!window.asiaGym826?.slotOK(k,data.settings))continue;
+  let n=0;for(const sets of Object.values(w?.ex||{}))if(Array.isArray(sets))for(const a of sets)if(a?.done===true&&typeof a.kg==='number'&&number855(a.kg,0,1000)!==null&&Number.isInteger(a.reps)&&a.reps>=1&&a.reps<=100)n++;
+  if(n)counts.set(d,(counts.get(d)||0)+n);
+ }
+ const days=Array.from({length:14},(_,i)=>{const day=shift(from,i);return {day,hrv:number855(get(day,'heart_rate_variability'),0.000001,Infinity),restingHR:number855(get(day,'resting_heart_rate'),0.000001,Infinity),sleep:number855(data.diet?.[day]?.sleep,0,24),steps:number855(get(day,'step_count'),0,Infinity),series:counts.get(day)??null};});
+ const summary=(seq,k)=>{const values=seq.map(x=>x[k]).filter(x=>x!==null);return {n:values.length,value:values.length?values.reduce((a,b)=>a+b,0)/(k==='series'?1:values.length):null};};
+ return {days,metrics:descriptors855.map(([key,label,unit,digits])=>({key,label,unit,digits,prior:summary(days.slice(0,7),key),recent:summary(days.slice(7),key)}))};
+}
+function renderRecovery855(){
+ const panel=$h('healthRecovery855');if(!panel)return;
+ const cards=$h('healthRecoveryCards855'),tbody=$h('healthRecoveryDays855'),status=$h('healthRecoveryDates855');cards.replaceChildren();tbody.replaceChildren();
+ const report=buildRecovery855($h('healthDay').value);if(!report){status.textContent='Elegí una fecha válida hasta hoy.';return;}
+ const {days,metrics}=report;status.textContent=`${labelDate(days[7].day)}–${labelDate(days[13].day)} vs. ${labelDate(days[0].day)}–${labelDate(days[6].day)} · 7 días cerrados por período. Excluye la fecha elegida.`;
+ const node=(tag,text,cls)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;};
+ for(const {key,label,unit,digits,prior,recent} of metrics){const box=node('div',undefined,'metric healthCompare855');box.dataset.metric=key;const shown=x=>x.value===null?'—':tf(x.value,digits)+' '+unit;box.append(node('small',label),node('b',shown(recent)),node('small',`Anterior: ${shown(prior)}`),node('small',`${recent.n}/7 días · anterior ${prior.n}/7`));cards.append(box);}
+ for(const d of days.slice(7).reverse()){const tr=tbody.insertRow();tr.insertCell().textContent=labelDate(d.day);for(const {key,digits} of metrics)tr.insertCell().textContent=d[key]===null?'—':tf(d[key],digits);}
+}
+const historyCard=$h('healthHistory').closest('.card');
+const panel855=document.createElement('details');panel855.id='healthRecovery855';panel855.className='gymMini571';panel855.innerHTML=`<summary>Recuperación · últimas dos semanas</summary><p class="meta" id="healthRecoveryDates855"></p><div class="grid" id="healthRecoveryCards855"></div><details><summary>Ver descanso y carga por día</summary><div class="scroll"><table class="v4table"><thead><tr><th>Fecha</th><th>VFC (ms)</th><th>FC (lpm)</th><th>Sueño (h)</th><th>Pasos</th><th>Series</th></tr></thead><tbody id="healthRecoveryDays855"></tbody></table></div></details><details><summary>Cómo interpretar los datos</summary><p class="tiny">Promedios de los días registrados; series efectivas = suma de series de Gym guardadas y válidas. Los días sin datos no son cero ni descanso confirmado. El sueño proviene del registro manual, no del Apple Watch. Las métricas de Apple Salud corresponden a la última consulta de esta sesión. No se suman pasos manuales ni entrenamientos de Apple Watch a las series de Gym. VFC y frecuencia cardíaca varían por múltiples factores; la coincidencia temporal no demuestra causalidad ni confirma aptitud para entrenar. No se calcula un puntaje clínico.</p></details>`;
+historyCard.append(panel855);panel855.addEventListener('toggle',()=>{if(panel855.open)renderRecovery855()});
 function render(){
  const d=$h('healthDay').value||date(),k=$h('healthMetric').value,n=+$h('healthRange').value;
  const grid=$h('healthCards');grid.replaceChildren();
@@ -41,11 +68,11 @@ function render(){
  for(const point of seq){let column=document.createElement('div');column.className='healthColumn';let bar=document.createElement('div');bar.className='healthBarTrack';let fill=document.createElement('div');fill.className=point.v===null?'healthMissing':'healthBarFill';fill.style.height=point.v===null?'100%':Math.max(point.v===0?2:4,point.v/max*100)+'%';bar.append(fill);let label=document.createElement('small');label.textContent=n===7||(+point.day.slice(-2)%5===0)||point===seq.at(-1)?labelDate(point.day):'·';column.title=point.day+': '+(point.v===null?'Sin datos':tf(point.v,defs[k][2])+' '+defs[k][1]);column.append(bar,label);graph.append(column)}
  const body=$h('healthHistory');body.replaceChildren();for(const point of seq.slice().reverse()){let tr=body.insertRow();tr.insertCell().textContent=point.day;tr.insertCell().textContent=point.v===null?'—':tf(point.v,defs[k][2])+' '+defs[k][1]}
  const last=Array.from(rows.keys()).filter(x=>get(x,'vo2_max')!==null).sort().at(-1);$h('healthVo2').textContent=last?'Último VO₂ máx.: '+tf(get(last,'vo2_max'),1)+' ml/kg/min · '+last:'VO₂ máx.: todavía no hay mediciones recibidas.';
- $h('healthReadAt').textContent=lastRead?'Consultado: '+new Date(lastRead).toLocaleString('es-UY')+' · Último guardado: '+(lastSync?new Date(lastSync).toLocaleString('es-UY'):'—')+'.':'Todavía no se consultó Cloudflare.';window.asiaRenderHome42?.();
+ $h('healthReadAt').textContent=lastRead?'Consultado: '+new Date(lastRead).toLocaleString('es-UY')+' · Último guardado: '+(lastSync?new Date(lastSync).toLocaleString('es-UY'):'—')+'.':'Todavía no se consultó Cloudflare.';window.asiaRenderHome42?.();renderRecovery855();
 }
 function reset(){generation++;flight=null;rows.clear();lastRead=lastSync=0;loaded=false;$h('healthShare').checked=false;$h('healthAnalysis').replaceChildren();$h('healthRefresh').disabled=false;status('Conectá con tu clave personal para consultar Salud.');render()}
 async function refreshHealth(force=false){
- if(!force&&loaded&&Date.now()-lastRead<120000)return true;
+ if(!force&&loaded&&Date.now()-lastRead<120000){renderRecovery855();return true;}
  if(flight)return flight;
  if(!window.asiaHealthHasAccess?.()){status('Configurá primero tu clave personal en Conexión con IA.');return false}
  const generationAtStart=generation;$h('healthRefresh').disabled=true;status('Consultando Cloudflare…');

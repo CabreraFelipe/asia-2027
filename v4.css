@@ -151,3 +151,6 @@ nav button[aria-current=page]{font-weight:750}
 
 /* V8.5.4: closed-period report, same theme and responsive card controls. */
 #reportTiles854{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:8px 0}#reportTiles854 .metric{padding:8px 6px;min-width:0}#reportTiles854 .metric b{font-size:clamp(15px,4.3vw,23px);overflow-wrap:anywhere}#reportTiles854 .metric small{font-size:11px;overflow-wrap:anywhere}#reportChart854{background:var(--field);border:1px solid var(--edge);border-radius:12px;padding:8px;margin:8px 0;min-width:0}#reportChart854 svg{width:100%;height:auto;display:block}#reportChart854 p{margin:8px;font-size:13px;color:var(--muted)}#reportMetric854{min-height:44px}#reportHelp854{margin-top:8px}
+
+/* V8.5.5: recovery comparison within existing historical activity card */
+#healthRecovery855{margin-top:12px}#healthRecoveryCards855{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:8px 0}#healthRecoveryCards855 .healthCompare855{min-width:0;padding:9px;display:flex;flex-direction:column;gap:4px}#healthRecoveryCards855 .healthCompare855 b{font-size:clamp(17px,5vw,24px);overflow-wrap:anywhere;color:var(--accent-text)}#healthRecoveryCards855 small{overflow-wrap:anywhere}#healthRecovery855 .scroll{max-width:100%;overflow-x:auto}#healthRecovery855 table{min-width:420px}
