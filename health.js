@@ -56,7 +56,7 @@ function summaryHealth(){
  const end=date(),start=shift(end,-28),days=Array.from(rows.keys()).filter(d=>d>=start&&d<=end).sort();
  const metrics=Object.keys(defs);return {source:'Apple Health via Health Auto Export',read_at:new Date(lastRead).toISOString(),units:Object.fromEntries(metrics.map(k=>[k,defs[k][1]])),daily:days.map(d=>({date:d,...Object.fromEntries(metrics.filter(k=>get(d,k)!==null).map(k=>[k,Math.round(get(d,k)*100)/100]))})),note:'Ausencia de métrica = sin datos; hoy puede estar incompleto. Los valores de energía son estimaciones, no calorías ingeridas; no sumar ejercicio o pasos manuales a los de Salud.'};
 }
-window.asiaHealthDay42=d=>({steps:get(d,'step_count'),active:get(d,'active_energy'),basal:get(d,'basal_energy_burned'),readAt:lastRead,syncAt:lastSync});window.asiaHealthRefresh=refreshHealth;window.asiaHealthReset=reset;window.asiaHealthSummary=summaryHealth;
+window.asiaHealthDay42=d=>({steps:get(d,'step_count'),active:get(d,'active_energy'),basal:get(d,'basal_energy_burned'),hrv:get(d,'heart_rate_variability'),restingHR:get(d,'resting_heart_rate'),readAt:lastRead,syncAt:lastSync});window.asiaHealthRefresh=refreshHealth;window.asiaHealthReset=reset;window.asiaHealthSummary=summaryHealth;
 $h('healthDay').value=date();for(const [k,[name]] of Object.entries(defs)){$h('healthMetric').add(new Option(name,k))}
 for(const id of ['healthDay','healthMetric','healthRange'])$h(id).onchange=render;
 $h('healthRefresh').onclick=()=>refreshHealth(true);

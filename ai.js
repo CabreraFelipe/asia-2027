@@ -50,13 +50,13 @@
     const old = token; token = candidate;
     try {
       const r = await call('chat',{data:{question:'Respondé solamente: Conexión correcta. Prueba sin datos personales.'}});
-      if(old!==token){window.asiaHealthReset?.();window.asiaBackupReset42?.();}
+      if(old!==token){window.asiaHealthReset?.();window.asiaBackupReset42?.();window.asiaWatchReset43?.();}
       try { if ($('aiRemember').checked) localStorage.setItem(tokenKey, token); else localStorage.removeItem(tokenKey); }
       catch { status('aiConnection','Conexión correcta. No se pudo guardar la clave; se usará durante esta sesión.'); $('aiToken').value=''; return; }
       $('aiToken').value=''; status('aiConnection','Conexión correcta. '+r.model+' · '+r.remaining+' consultas de chat disponibles hoy.');
     } catch(e) { token = old; throw e; }
   });
-  $('aiDisconnect').onclick=()=>{ window.asiaHealthReset?.(); window.asiaBackupReset42?.(); token=''; $('aiToken').value=''; $('aiRemember').checked=false; try{localStorage.removeItem(tokenKey)}catch{}; status('aiConnection','Clave olvidada en este dispositivo.'); };
+  $('aiDisconnect').onclick=()=>{ window.asiaHealthReset?.(); window.asiaBackupReset42?.(); window.asiaWatchReset43?.(); token=''; $('aiToken').value=''; $('aiRemember').checked=false; try{localStorage.removeItem(tokenKey)}catch{}; status('aiConnection','Clave olvidada en este dispositivo.'); };
   // Solo se transfieren datos numéricos/estados de registros recientes; no fotos guardadas ni notas libres.
   const ordered = (obj, n) => Object.entries(obj||{}).sort(([a],[b])=>a.localeCompare(b)).slice(-n);
   function bodySummary(n=42) { return ordered(data.body,n).map(([d,b])=>({date:d,...Object.fromEntries(fields.map(([k])=>[k,b[k]]).filter(([,v])=>valid(v)))})); }
@@ -92,6 +92,7 @@
     try{const response=await fetch(endpoint.replace(/\/api$/,'/health'),{method:'GET',headers:{Authorization:'Bearer '+access},signal:controller.signal,cache:'no-store',redirect:'error'});let body;try{body=await response.json()}catch{throw Error('Respuesta no válida (HTTP '+response.status+').')}if(!response.ok||body.ok!==true||!Array.isArray(body.records))throw Error('No se pudieron leer los datos (HTTP '+response.status+').');return body.records;}
     finally{clearTimeout(timer)}
   };
+  window.asiaWorkoutsGet43=async()=>{const access=getToken(),controller=new AbortController(),timer=setTimeout(()=>controller.abort(),25000);try{const res=await fetch(endpoint.replace(/\/api$/,'/workouts'),{headers:{Authorization:'Bearer '+access},signal:controller.signal,cache:'no-store',redirect:'error'});let x;try{x=await res.json()}catch{throw Error('Respuesta inválida (HTTP '+res.status+')')}if(!res.ok||x.ok!==true||!Array.isArray(x.workouts))throw Error(x.error||'HTTP '+res.status);return x.workouts}finally{clearTimeout(timer)}};
   window.asiaHealthAnalyze=health=>task('healthAnalysis','Analizando actividad…',async()=>{
     const r=await call('chat',{data:{question:'Analizá mis indicadores de Apple Salud: actividad, tendencias, recuperación y gasto energético estimado. Señalá cobertura, datos faltantes y días parciales; no diagnostiques ni recomiendes ajustar calorías solo por el reloj.',apple_health:health}});renderFormatted($('healthAnalysis'),String(r.result)+suffix(r));
   });
