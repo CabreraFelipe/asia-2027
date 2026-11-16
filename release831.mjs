@@ -1,0 +1,12 @@
+// R31: bridge only. No parallel diary is mounted in the main application.
+import {openStore} from './store84.mjs';
+import {validateGym} from './gym84.mjs';
+import {preparePhoto84,captureFrame84} from './vision84.mjs';
+window.asia84RestEnabled=false;
+window.asiaVisual824=Object.freeze({enabled:false,prepare:preparePhoto84,capture:captureFrame84,request:()=>Promise.reject(Error('Servicio visual múltiple todavía no habilitado'))});
+const out=document.getElementById('releaseStatus831'),cache=document.getElementById('cacheStatus831'),button=document.getElementById('cache831');
+export async function checkLegacyGym831(open=openStore){const store=await open();try{const r=await store.read('gym');if(!r||!Number.isSafeInteger(r.revision)||r.revision<0)throw Error('Revisión Gym inválida');if(!r.revision){if(Object.keys(r.payload||{}).length)throw Error('Registro inicial incompatible');return {active:false,watchIds:[]};}const g=validateGym(r.payload);return {active:!!g.active,watchIds:g.sessions.map(s=>s.watchId84).filter(Boolean)};}finally{store.close();}}
+export function local831(loc){return loc.protocol==='https:'&&loc.hostname==='cabrerafelipe.github.io';}
+async function boot(){if(!local831(location))return;try{const result=await checkLegacyGym831();window.asiaGym84Active=result.active;window.asiaGym84WatchIds=result.watchIds;window.asiaGym84Ready=true;out.textContent=result.active?'Hay una sesión PRO activa. Finalizala desde Herramientas avanzadas antes de entrenar.':'Historial local disponible. No se montó un diario PRO paralelo.';}catch{window.asiaGym84Ready=false;out.textContent='No se pudo comprobar Gym PRO. Inicio de sesiones bloqueado; revisá Herramientas avanzadas.';}}
+if(out)boot();
+if(button){const sw=navigator.serviceWorker;const target=new URL('sw.js',location.href).href;const own=r=>[r.installing,r.waiting,r.active].filter(Boolean).every(w=>w.scriptURL===target);button.disabled=!local831(location)||!sw;button.onclick=async()=>{button.disabled=true;try{let reg=await sw.getRegistration();if(reg&&!own(reg))throw Error('Existe otro Service Worker inesperado. No se reemplazó.');if(!reg)reg=await sw.register(target,{updateViaCache:'none'});else await reg.update();cache.textContent=reg.waiting?'Actualización verificada en espera: guardá y cerrá todas las ventanas.':'Caché solicitada. La instalación solo se activa si todos los archivos coinciden; cerrá y reabrí la app para usarla.';}catch(e){cache.textContent=e.message;}finally{button.disabled=false;}};}

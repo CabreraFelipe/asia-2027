@@ -1,0 +1,13 @@
+/* R29: reprogramación explícita de rutinas nativas, sin tocar sesiones. */
+(function(root){'use strict';
+const day=d=>typeof d==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(d)&&Number.isFinite(Date.parse(d))&&new Date(d).toISOString().slice(0,10)===d;
+const add=(d,n)=>new Date(Date.parse(d)+n*86400000).toISOString().slice(0,10),weekday=d=>new Date(d+'T00:00:00Z').getUTCDay();
+const active=d=>day(d)&&d>='2026-11-23'&&d<'2027-03-08'&&!(d>='2026-12-26'&&d<='2027-01-07');
+const base=d=>active(d)?({1:0,2:1,4:2,5:3}[weekday(d)]??null):null;
+const monday=d=>add(d,-((weekday(d)+6)%7));
+const check=(ok,msg)=>{if(!ok)throw Error(msg)};
+function clean(settings){const rows=settings?.schedule829??[];check(Array.isArray(rows)&&rows.length<=60,'Agenda inválida');const sources=new Set(),destinations=new Set();for(const r of rows){check(r&&Object.keys(r).length===2&&base(r.from)!==null&&active(r.to)&&r.from!==r.to&&monday(r.from)===monday(r.to)&&base(r.to)===null&&!sources.has(r.from)&&!destinations.has(r.to),'Reprogramación incompatible');sources.add(r.from);destinations.add(r.to);}return rows.map(r=>({from:r.from,to:r.to})).sort((a,b)=>a.from.localeCompare(b.from));}
+function planned(d,settings){const rows=clean(settings),m=rows.find(r=>r.to===d);return m?base(m.from):rows.some(r=>r.from===d)?null:base(d);}
+function move(data,from,to,today){check(active(from)&&active(to)&&day(today)&&from>=today&&to>=today&&from!==to&&monday(from)===monday(to),'Solo fechas no pasadas de una misma semana activa');const rows=clean(data.settings),old=rows.find(r=>r.to===from),source=old?.from??from;check(planned(from,data.settings)!==null,'No hay rutina prevista');check(to===source||base(to)===null,'El destino debe ser un día originalmente libre');check(planned(to,data.settings)===null,'El destino ya tiene una rutina');check(!Object.keys(data.work||{}).some(k=>[from,to,source].includes(k.slice(0,10))),'Existe un entrenamiento guardado en alguna fecha afectada');check(source>=today,'No se cambia una fecha original pasada');const next=rows.filter(r=>r.from!==source);if(to!==source)next.push({from:source,to});return clean({schedule829:next});}
+const api={base,clean,planned,move};root.asiaSchedule829=Object.freeze(api);if(typeof module!=='undefined'&&module.exports)module.exports=api;
+})(globalThis);

@@ -102,3 +102,25 @@ nav{padding:7px 8px calc(7px + env(safe-area-inset-bottom));gap:3px;background:#
 #progress54 .datePill601:focus-within{outline:2px solid var(--accent-text);outline-offset:2px}
 #progress54 .datePill601 #end54{position:absolute;inset:0;width:100%;min-width:0;max-width:100%;height:100%;min-height:0;box-sizing:border-box;margin:0;padding:0;border:0;opacity:0;cursor:pointer;font-size:16px;z-index:1}
 #progress54 .datePill601 #end54::-webkit-calendar-picker-indicator{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;cursor:pointer}
+
+/* R22: presentation only, unchanged palette and tab navigation. */
+.personalHidden822,.personalEmpty822{display:none!important}.homeGrid42.personalCompact822{gap:6px}.homeGrid42.personalCompact822 .metric{padding:7px}.headerQuick505.personalCompact822 button{min-height:36px;padding-block:5px}.headerQuick505 button[id^="quick822_"]{overflow-wrap:anywhere;min-width:0}#personal822 .row{flex-wrap:wrap}#personal822 .layoutLabel51 input{width:auto}#personal822 h3{margin-top:14px}
+
+/* R32.2 — card hierarchy, consistent disclosure headers and mobile touch targets. */
+main section>.card.sectionfold>summary,main section>.card .foldToggle51{font-size:16px;font-weight:720;line-height:1.35;min-height:44px;color:var(--ink);letter-spacing:-.1px}
+main section>.card.sectionfold>summary::after,main section>.card .foldToggle51::after{font-size:20px;color:var(--teal);flex:none}
+main section>.card.sectionfold>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px}
+main section>.card.sectionfold>summary::-webkit-details-marker{display:none}
+main section>.card.sectionfold:not([open])>summary{margin-bottom:0}
+main section>.card.sectionfold[open]>summary{margin-bottom:9px}
+main .gymMini571>summary,main .uiHelp8322>summary{min-height:44px;line-height:1.35}
+main .gymMini571>summary{font-size:14px;font-weight:650;color:var(--ink)}
+main .uiHelp8322{margin:5px 0 10px}
+#adaptiveNutrition823 .grid{grid-template-columns:repeat(2,minmax(0,1fr));margin:10px 0}
+#adaptiveNutrition823 .metric b{font-size:clamp(16px,4.8vw,23px);overflow-wrap:anywhere}
+#adaptiveNutrition823 .adaptiveTable8322{table-layout:fixed;width:100%;margin:10px 0;font-size:12px}
+#adaptiveNutrition823 .adaptiveTable8322 th,#adaptiveNutrition823 .adaptiveTable8322 td{overflow-wrap:anywhere;padding:8px 4px;text-align:right}
+#adaptiveNutrition823 .adaptiveTable8322 th:first-child{text-align:left;width:42%}
+#adaptiveNutrition823>button{width:100%;margin:5px 0}
+#adaptiveNutrition823 button:disabled{opacity:.55}
+@media(max-width:350px){main section>.card.sectionfold>summary,main section>.card .foldToggle51{font-size:15px}}
