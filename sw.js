@@ -1,19 +1,19 @@
-// Asia 2027 V5.0.5 — coherent offline app shell; keep the existing registration.
-const CACHE = 'asia-2027-v505-20261116';
+// Asia 2027 V5.1 — coherent offline app shell; keep the existing registration.
+const CACHE = 'asia-2027-v51-20261116';
 const ROOT = self.registration.scope;
 const url = path => new URL(path, ROOT).href;
 const ENTRY = url('index.html');
-const ASSETS = [ENTRY, ...['v4.css','push.js','exercise-images.js','v4.js','ai.js','health.js','v42.js','v43.js','v44.js','coach.js','help.js'].map(x=>url(x+'?v=505')), ...['manifest.json','asia-icon-v4-180.png','asia-icon-v4-192.png','asia-icon-v4-512.png'].map(url)];
+const ASSETS = [ENTRY, ...['v4.css','push.js','exercise-images.js','v4.js','ai.js','health.js','v42.js','v43.js','v44.js','coach.js','help.js','ux51.js'].map(x=>url(x+'?v=51')), ...['manifest.json','asia-icon-v4-180.png','asia-icon-v4-192.png','asia-icon-v4-512.png'].map(url)];
 const SHELL = new Set(ASSETS);
-const HASHES = {"index.html": "bd6ca77d8fea315c0fa30caf6d9ee53ee77ae78f9c267368237844e94139053c", "v4.css": "3af7dc5bc98a60135af620658c344309caf1b1effd6544b0d21e6a5aa3de1b0c", "push.js": "3e188fde35db3397e3beca7d12eb8d5b2fba967de5e2b7b6b01f90da8a3e90d2", "exercise-images.js": "f73d197863be42076d417c78d38618b3b3dc7d71b04315731e2ace29af7090fe", "v4.js": "417b74b9c80db090aef10a15e4907fb678ace2636ac10fcf82ab5de7946ad904", "ai.js": "2784db66c542b78fd12422ff794d60f4fc61efaeb04dde61785655f1d3145d79", "health.js": "1dc7df778d56fb7061479e9438865e50e1b14f6c66d8933552e2ad1de35fca72", "v42.js": "23cabfd0e86077d05ba4639eb69427816fca22730eb11234105bb982d588bd96", "v43.js": "794d5477872109d768a05638a02dcebb1d9b93321375d4fceb2215d557bcabda", "v44.js": "f83371165375dd9b6e827c750b5b680be5f66a609ea328465036d5e8cf537f6e", "manifest.json": "0b309b0aafc889912bdc654e09528c2a9948618936c762f3c789e070dab1b79f", "asia-icon-v4-180.png": "06a1cf81a2ad003bcbf176284d352e8366829df84c323c46bc571e4a052a3cbc", "asia-icon-v4-192.png": "57dde001dc33d2f0345420b087975e290a8d22e124ca8070cd727731aaa8d82e", "asia-icon-v4-512.png": "2a3bd96ae2d39d21b5e0191ca92b4662bad123150e9eab9a701f234fab810d8b", "coach.js": "9644ad76da2635bdf93d04e33da30fcd44a5e950799edcdad45afe04d1e634bf", "help.js": "7b5cb32df22e3903cc6f97c457ca6ade33fe810365848da4724a683589b99c32"};
-const PREVIOUS = "asia-2027-v504-20261116";
+const HASHES = {"index.html": "96fdda9939ccfca533148571b043dd54562bb149c07d7c49ea17826e8166bffa", "v4.css": "4dcb8932ae706645eb3250c2e659685d79e8d9922e3ab541c85f8bdf64ee5750", "push.js": "3e188fde35db3397e3beca7d12eb8d5b2fba967de5e2b7b6b01f90da8a3e90d2", "exercise-images.js": "f73d197863be42076d417c78d38618b3b3dc7d71b04315731e2ace29af7090fe", "v4.js": "e3a4e7face066c821d66826e6c36012a00d7b9613a8884f2597b389d7d33e496", "ai.js": "2784db66c542b78fd12422ff794d60f4fc61efaeb04dde61785655f1d3145d79", "health.js": "1dc7df778d56fb7061479e9438865e50e1b14f6c66d8933552e2ad1de35fca72", "v42.js": "23cabfd0e86077d05ba4639eb69427816fca22730eb11234105bb982d588bd96", "v43.js": "794d5477872109d768a05638a02dcebb1d9b93321375d4fceb2215d557bcabda", "v44.js": "f83371165375dd9b6e827c750b5b680be5f66a609ea328465036d5e8cf537f6e", "manifest.json": "0b309b0aafc889912bdc654e09528c2a9948618936c762f3c789e070dab1b79f", "asia-icon-v4-180.png": "06a1cf81a2ad003bcbf176284d352e8366829df84c323c46bc571e4a052a3cbc", "asia-icon-v4-192.png": "57dde001dc33d2f0345420b087975e290a8d22e124ca8070cd727731aaa8d82e", "asia-icon-v4-512.png": "2a3bd96ae2d39d21b5e0191ca92b4662bad123150e9eab9a701f234fab810d8b", "coach.js": "8e2c44a7f671d6b43798a9c2d016b1f4c14dfa7e973df66fae361b7a292313bd", "help.js": "5bb3d674cdd2d7835fc298e1ae5b634e9c0877a6610500781d5c20f47ce67f57", "ux51.js": "6f1305b43155d970766d23d44b6d5496a0aa06b4cc020dd19655b6dc700e793a"};
+const PREVIOUS = "asia-2027-v505-20261116";
 self.addEventListener('install', event => event.waitUntil((async()=>{
   // Fetch without relying on the browser HTTP cache. Do not activate a partial release.
   const fetched = await Promise.all(ASSETS.map(async asset => {
     const response = await fetch(new Request(asset,{cache:'reload'}));
     if (!response.ok || response.redirected) throw new Error('Missing app asset: '+asset);
     const type = response.headers.get('content-type') || '';
-    if (asset === ENTRY && !(await response.clone().text()).includes('ASIA 2027 · V5.0.5')) throw new Error('HTML not yet published');
+    if (asset === ENTRY && !(await response.clone().text()).includes('ASIA 2027 · V5.1')) throw new Error('HTML not yet published');
     if (/\.js\?/.test(asset) && /text\/html/i.test(type)) throw new Error('Wrong JS response');
     const name=new URL(asset).pathname.split('/').pop();
     const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',await response.clone().arrayBuffer())),x=>x.toString(16).padStart(2,'0')).join('');
@@ -43,7 +43,7 @@ self.addEventListener('fetch', event => {
     })());
   } else {
     // Old clients or non-shell files: don't pollute the versioned cache.
-    event.respondWith((async()=>{if(requestUrl.searchParams.get('v')==='504'){const old=await caches.open(PREVIOUS);const cached=await old.match(req.url);if(cached)return cached}return fetch(req,{cache:'no-cache'})})());
+    event.respondWith((async()=>{if(requestUrl.searchParams.get('v')==='505'){const old=await caches.open(PREVIOUS);const cached=await old.match(req.url);if(cached)return cached}return fetch(req,{cache:'no-cache'})})());
   }
 });
 self.addEventListener('push',e=>{let p={};try{p=e.data?.json()||{}}catch{}e.waitUntil(self.registration.showNotification(p.title||'Asia 2027 · Mi progreso',{body:p.body||'Es hora de pesarte y registrar tu progreso.',icon:'./asia-icon-v4-192.png',tag:'asia-daily',data:{url:'./'}}))});self.addEventListener('notificationclick',e=>{e.notification.close();e.waitUntil(self.clients.matchAll({type:'window',includeUncontrolled:true}).then(cs=>{for(let c of cs)if(c.url.startsWith(self.registration.scope))return c.focus();return self.clients.openWindow('./')}))});
