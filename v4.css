@@ -125,7 +125,7 @@ main .uiHelp8322{margin:5px 0 10px}
 #adaptiveNutrition823 button:disabled{opacity:.55}
 @media(max-width:350px){main section>.card.sectionfold>summary,main section>.card .foldToggle51{font-size:15px}}
 
-/* V8.5 — shared presentation layer; no change to theme colors or user ordering. */
+/* V8.5.1 — shared presentation layer; no change to theme colors or user ordering. */
 .viewTools85{display:flex;justify-content:flex-end;gap:6px;margin:2px 0 8px;flex-wrap:wrap}
 .viewTools85 button{font-size:12px;min-height:44px;flex:0 1 auto;min-width:0;padding:7px 10px;white-space:normal;border:1px solid var(--edge);box-shadow:none}
 main section>.card{margin:9px 0;min-width:0}
