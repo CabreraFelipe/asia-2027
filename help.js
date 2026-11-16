@@ -32,7 +32,7 @@ const rules=[
  ['Series efectivas · 1–3 RIR','Gym y recuperación','1–3 RIR · 5–10 min de calentamiento.'],
  ['Analiza tus sesiones guardadas','Gym y recuperación',''],
  ['Verde = al menos una serie','Gym y recuperación','Tocá un día para abrir la rutina.'],
- ['Los relojes se actualizan al volver','Gym y recuperación','El aviso de descanso requiere la app abierta.'],
+ ['Los relojes se actualizan al volver','Gym y recuperación','Aviso local: app abierta. Apple Watch: conexión a internet y avisos activados.'],
  ['Series completadas asignadas','Gym y recuperación','Series por grupo principal; no mide activación.'],
  ['Orientación personal, no aptitud','Gym y recuperación','Índice orientativo, no médico · sueño manual.'],
  ['Datos diarios recibidos desde','Apple Salud','Actualizar consulta Cloudflare; no fuerza la exportación.'],
@@ -56,3 +56,17 @@ const appearance=group('Apariencia');
 const themeButton=byId('themeV4');if(themeButton)appearance.append(themeButton);
 main.append(help);
 })();
+
+/* V5.7.0: contextual disclosures for static guidance added after the original help module. */
+document.addEventListener('DOMContentLoaded',()=>{
+ const rules=[
+ ['Guardá preferencias y decisiones que quieras recordar.','Memoria: solo se comparte con tu permiso. No incluyas claves ni datos identificativos.','Privacidad de la memoria'],
+ ['El resumen mensual y las decisiones se recalculan','Los recuerdos y el historial se gestionan por separado.','Cómo funciona la memoria'],
+ ['Usá la misma vista, distancia, iluminación y postura.','Misma postura y luz. Fotos privadas, solo en este dispositivo.','Consejos para comparar fotos'],
+ ['Añadí los ingredientes desde el editor anterior','Añadí ingredientes y número de porciones.','Cómo crear una receta'],
+ ['No se suman a los totales previos.','Los totales reemplazan los del día; revisalos antes de guardar.','Cómo se trasladan los totales'],
+ ['Los relojes se actualizan al volver','Aviso local: app abierta. Aviso al reloj: requiere internet y configuración.','Cómo funcionan los relojes']
+ ];
+ const staticParas=[...document.querySelectorAll('main p')].filter(p=>!p.id&&!p.hasAttribute('role')&&!p.querySelector('input,button,select,textarea')&&!p.closest('#help502'));
+ for(const [prefix,short,title] of rules){const p=staticParas.find(x=>x.textContent.trim().startsWith(prefix));if(!p||!p.parentNode)continue; const d=document.createElement('details');d.className='context57';const sum=document.createElement('summary');sum.textContent=title;const lead=document.createElement('p');lead.className='meta compact502';lead.textContent=short;p.before(lead,d);d.append(sum,p);}
+});
