@@ -29,19 +29,19 @@ function render(){
   const el=document.createElement('div');el.className='metric healthTile';
   const title=document.createElement('small');title.textContent=label;
   const b=document.createElement('b'),v=get(d,key);b.textContent=v===null?'—':tf(v,digits);
-  const caption=document.createElement('small');caption.textContent=v===null?'Sin datos':unit;
+  el.classList.toggle('noData573',v===null); const caption=document.createElement('small');caption.textContent=v===null?'Sin datos':unit;
   el.append(title,b,caption);grid.append(el);
  }
  const active=get(d,'active_energy'),basal=get(d,'basal_energy_burned');
  $h('healthTotal').textContent=active!==null&&basal!==null?tf(active+basal)+' kcal':'—';
  const seq=Array.from({length:n},(_,i)=>{let day=shift(d,i-n+1);return {day,v:get(day,k)}}),known=seq.filter(x=>x.v!==null),max=Math.max(1,...known.map(x=>x.v));
  $h('healthAverage').textContent=known.length?tf(known.reduce((a,x)=>a+x.v,0)/known.length,defs[k][2])+' '+defs[k][1]:'—';
- $h('healthCoverage').textContent=known.length+' de '+n+' días con datos · incluye la fecha seleccionada';
+ $h('healthCoverage').textContent=known.length+' de '+n+' días con datos';
  const graph=$h('healthGraph');graph.replaceChildren();
  for(const point of seq){let column=document.createElement('div');column.className='healthColumn';let bar=document.createElement('div');bar.className='healthBarTrack';let fill=document.createElement('div');fill.className=point.v===null?'healthMissing':'healthBarFill';fill.style.height=point.v===null?'100%':Math.max(point.v===0?2:4,point.v/max*100)+'%';bar.append(fill);let label=document.createElement('small');label.textContent=n===7||(+point.day.slice(-2)%5===0)||point===seq.at(-1)?labelDate(point.day):'·';column.title=point.day+': '+(point.v===null?'Sin datos':tf(point.v,defs[k][2])+' '+defs[k][1]);column.append(bar,label);graph.append(column)}
  const body=$h('healthHistory');body.replaceChildren();for(const point of seq.slice().reverse()){let tr=body.insertRow();tr.insertCell().textContent=point.day;tr.insertCell().textContent=point.v===null?'—':tf(point.v,defs[k][2])+' '+defs[k][1]}
  const last=Array.from(rows.keys()).filter(x=>get(x,'vo2_max')!==null).sort().at(-1);$h('healthVo2').textContent=last?'Último VO₂ máx.: '+tf(get(last,'vo2_max'),1)+' ml/kg/min · '+last:'VO₂ máx.: todavía no hay mediciones recibidas.';
- $h('healthReadAt').textContent=lastRead?'Consulta a Cloudflare: '+new Date(lastRead).toLocaleString('es-UY')+'. Último guardado informado: '+(lastSync?new Date(lastSync).toLocaleString('es-UY'):'—')+'.':'Todavía no se consultó Cloudflare.';window.asiaRenderHome42?.();
+ $h('healthReadAt').textContent=lastRead?'Consultado: '+new Date(lastRead).toLocaleString('es-UY')+' · Último guardado: '+(lastSync?new Date(lastSync).toLocaleString('es-UY'):'—')+'.':'Todavía no se consultó Cloudflare.';window.asiaRenderHome42?.();
 }
 function reset(){generation++;flight=null;rows.clear();lastRead=lastSync=0;loaded=false;$h('healthShare').checked=false;$h('healthAnalysis').replaceChildren();$h('healthRefresh').disabled=false;status('Conectá con tu clave personal para consultar Salud.');render()}
 async function refreshHealth(force=false){
