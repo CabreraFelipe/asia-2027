@@ -1,6 +1,6 @@
-/* Asia 2027 V5.6 — read-only connection diagnostics; no secrets or health content in reports. */
+/* Asia 2027 V5.6.1 — read-only connection diagnostics; no secrets or health content in reports. */
 (()=>{'use strict';
-const VERSION='5.6',CACHE='asia-2027-v56-20261116',KEY='asia-diagnostic-v56';
+const VERSION='5.6.1',CACHE='asia-2027-v561-20261116',KEY='asia-diagnostic-v56';
 const by=id=>document.getElementById(id),main=document.querySelector('main'),help=by('help502');if(!main||!help)return;
 const labels={internet:'Conexión al servidor',cloud:'Cloudflare AI',openai:'OpenAI',health:'Apple Salud',workouts:'Entrenamientos del Apple Watch',rest:'Avisos de descanso',push:'Notificaciones de pesaje',backup:'Copias de seguridad',storage:'Almacenamiento local',version:'Versión y caché'};
 const codes={unchecked:'Sin comprobar',checking:'Comprobando…',ok:'Comprobado',warning:'Requiere atención',error:'Error',off:'Sin configurar',unknown:'No confirmado'};
@@ -11,7 +11,7 @@ function clean(x){if(!x||!Object.hasOwn(labels,x.id)||!Object.hasOwn(codes,x.sta
 try{const old=JSON.parse(localStorage.getItem(KEY)||'[]');if(Array.isArray(old))for(const item of old.slice(-60)){const r=clean(item);if(r){history.push(r);statuses[r.id]=r;}}}catch{}
 function make(tag,text,cls){const n=document.createElement(tag);if(text!=null)n.textContent=text;if(cls)n.className=cls;return n}
 function btn(text,fn,cls='secondary'){const b=make('button',text,cls);b.type='button';b.addEventListener('click',fn);return b}
-const root=make('details',null,'card sectionfold diag56');root.id='diagnostics56';root.append(make('summary','⚙ Sincronización y diagnóstico'));
+const root=make('details',null,'card layout51 diag56');root.id='diagnostics56';root.append(make('summary','⚙ Sincronización y diagnóstico'));
 root.append(make('p','Comprobaciones de solo lectura. No envían avisos ni modifican registros.','tiny'));
 const controls=make('div',null,'row'),all=btn('Diagnóstico completo',()=>runAll(),'');controls.append(all);root.append(controls);
 const list=make('div'),historyBox=make('details'),historyList=make('div');historyBox.append(make('summary','Historial de comprobaciones'),historyList);
