@@ -34,7 +34,8 @@ function substitute(j){if(active&&!running())return notify('Revisá la alternati
 function decorate(){const ri=+el('routine').value,es=exs();[...list.children].forEach((b,j)=>{const original=routines[ri].ex[j][0],alt=alternatives53[original];if(!alt)return;const button=document.createElement('button');button.type='button';button.className='secondary rest-inline';button.textContent=es[j][0]===original?'Alternativa: '+alt[0]:'Volver a '+original;button.onclick=()=>substitute(j);b.insertBefore(button,b.querySelector('.series'));if(es[j][0]!==original){const p=document.createElement('p');p.className='meta';p.textContent='Sustituye a '+original+' · carga independiente';b.insertBefore(p,button)}});if(active&&!current())viewIndex=Math.max(0,Math.min(exs().length-1,viewIndex));sync()}
 const load=loadWork;loadWork=function(){load();decorate()};el('routine').onchange=loadWork;el('trainDay').onchange=()=>{el('routine').value=wk(el('trainDay').value);loadWork()};decorate();
 // R32.2: open the active training view without starting or recording a session.
-el('quickGym505').onclick=()=>{
+function openToday870(){
+ if(window.asiaGym84Active===true)return notify('Finalizá el entrenamiento avanzado antes de cambiar de rutina.');
  const d=date(), planned=window.asiaSchedule829.planned(d,data.settings), target=String(planned??wk(d));
  // A pending session (including a reset clock) must never be replaced by a shortcut.
  if(a){const [day,ri]=a.key.split('_');if(!routines[Number(ri)])return notify('Revisá la sesión pendiente en Gym.');if(!current()){active=false;sync();el('trainDay').value=day;el('routine').value=ri;loadWork();}tab('training');openView();return;}
@@ -42,6 +43,16 @@ el('quickGym505').onclick=()=>{
  if(el('trainDay').value!==d||el('routine').value!==target){if(!confirm('¿Abrir la rutina de hoy? Los cambios sin guardar en otro entrenamiento podrían perderse.'))return;active=false;sync();el('trainDay').value=d;el('routine').value=target;loadWork();}
  tab('training');openView();
  if(planned===null)notify('Hoy no hay una rutina obligatoria. Esta es una sesión opcional.');
+}
+// All current-day entry points share the same active preview without starting a timer.
+el('quickGym505').onclick=openToday870;
+const oldHomeGym870=el('homeGym42').onclick;
+el('homeGym42').onclick=()=>{if(!a&&!window.asiaClassicRunning532?.()&&window.asiaVacationContext44?.().active)return oldHomeGym870();return openToday870();};
+window.asiaOpenPlannedToday870=(d,r)=>{
+ if(d!==date()||window.asiaSchedule829.planned(d,data.settings)!==r)return false;
+ if(a&&a.key!==d+'_'+r){notify('Hay otra sesión pendiente. Retomala desde Entreno hoy antes de cambiar de rutina.');return true;}
+ if(!a&&window.asiaGymHasSession532?.()){notify('Finalizá la sesión activa antes de cambiar de rutina.');return true;}
+ openToday870();return true;
 };
 // The existing muscle map supplies the same group attribution, now with drill-down.
 window.asiaMuscleRender53=(start,end,groups)=>{volume={start,end,groups};showMuscle()};

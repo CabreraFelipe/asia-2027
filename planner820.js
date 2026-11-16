@@ -24,7 +24,7 @@ const name=i=>routines[i]?.name||'Rutina '+(i+1),status={yes:'Cumplido',partial:
 function reveal(tabName,id){tab(tabName);const node=el(id);if(!node)return;for(let p=node;p;p=p.parentElement)if(p.tagName==='DETAILS')p.open=true;(window.asiaScrollTo541||((n,o)=>n.scrollIntoView(o)))(node,{block:'start'});}
 function confirmOpen(){if(window.asiaGymHasSession532?.()){notify('Finalizá o descartá la sesión activa antes de cambiar de registro.');return false;}return confirm('¿Abrir otro registro? Los cambios sin guardar en los formularios podrían perderse.');}
 function action(parent,text,fn){const b=make('button',text,'secondary');b.type='button';b.onclick=fn;parent.append(b);return b;}
-function openGym(d,r){if(!confirmOpen())return;el('trainDay').value=d;el('routine').value=String(r);loadWork();reveal('training','workV4');}
+function openGym(d,r){if(window.asiaOpenPlannedToday870?.(d,r))return;if(window.asiaClassicRunning532?.()||window.asiaGym84Active===true){notify('Finalizá la sesión activa antes de cambiar de rutina.');return;}if(!confirmOpen())return;el('trainDay').value=d;el('routine').value=String(r);loadWork();reveal('training','workV4');}
 function openDiet(d){if(!confirmOpen())return;el('day').value=d;loadDiet();reveal('diet','dailyV4');}
 function openReport(d){if(!confirmOpen())return;el('weeklyDate').value=d;el('weeklyDate').dispatchEvent(new Event('change'));reveal('diet','weeklyV4');}
 function render(){body.replaceChildren();let a;try{a=agenda(data,input.value,date());}catch{body.append(make('p','Elegí una fecha válida.','meta'));return;}
