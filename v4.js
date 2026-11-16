@@ -15,7 +15,7 @@ const fixed=(n,d=1)=>valid(n)?fmt(n,d):'—';
 const knownNum=v=>v!==''&&v!=null&&Number.isFinite(+v)?+v:null;
 const limitDate=()=>date();
 // Header and jump navigation.
-document.querySelector('header').innerHTML='<div class="brand"><img src="asia-icon-v4-180.png" alt="Asia 2027"><div><small>PROYECTO PERSONAL · V4.2</small><h1>Mi progreso</h1><div>Meta 72 kg · 8 mar 2027</div></div></div><div class="countdown"><strong id="countdown"></strong><span id="countdownLabel">días para Asia</span></div><button id="themeV4" class="secondary" type="button">Cambiar tema</button>';
+document.querySelector('header').innerHTML='<div class="brand"><img src="asia-icon-v4-180.png" alt="Asia 2027"><div><small>PROYECTO PERSONAL · V4.2.1</small><h1>Mi progreso</h1><div>Meta 72 kg · 8 mar 2027</div></div></div><div class="countdown"><strong id="countdown"></strong><span id="countdownLabel">días para Asia</span></div><button id="themeV4" class="secondary" type="button">Cambiar tema</button>';
 let light=false;try{light=localStorage.getItem('asia-theme-v4')==='light'}catch{};const theme=()=>{document.documentElement.classList.toggle('light',light);$('themeV4').textContent=light?'Modo oscuro':'Modo claro'};theme();$('themeV4').onclick=()=>{light=!light;theme();try{localStorage.setItem('asia-theme-v4',light?'light':'dark')}catch{}};
 function countdown(){let d=dayDiff('2027-03-08',date());$('countdown').textContent=Math.max(0,d);$('countdownLabel').textContent=d>0?'días para Asia':d===0?'¡Día del viaje!':'Fecha del viaje cumplida'}countdown();setInterval(countdown,60000);
 const dietCards=[...$('diet').children],trainCards=[...$('training').children];
