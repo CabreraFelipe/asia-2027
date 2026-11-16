@@ -125,7 +125,7 @@ main .uiHelp8322{margin:5px 0 10px}
 #adaptiveNutrition823 button:disabled{opacity:.55}
 @media(max-width:350px){main section>.card.sectionfold>summary,main section>.card .foldToggle51{font-size:15px}}
 
-/* V8.5.1 — shared presentation layer; no change to theme colors or user ordering. */
+/* V8.5.2 — shared presentation layer; no change to theme colors or user ordering. */
 .viewTools85{display:flex;justify-content:flex-end;gap:6px;margin:2px 0 8px;flex-wrap:wrap}
 .viewTools85 button{font-size:12px;min-height:44px;flex:0 1 auto;min-width:0;padding:7px 10px;white-space:normal;border:1px solid var(--edge);box-shadow:none}
 main section>.card{margin:9px 0;min-width:0}
@@ -138,3 +138,10 @@ main .card :is(p.meta,p.tiny){overflow-wrap:anywhere}
 main .card :is(button,input,textarea,select,summary):focus-visible,nav button:focus-visible{outline:2px solid var(--accent-text,var(--teal));outline-offset:2px}
 nav button[aria-current=page]{font-weight:750}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* V8.5.2 — quick entry; never changes the saved workout or timer. */
+#workV4 .gymQuick852[hidden],#workV4 .gymRepeat852[hidden]{display:none!important}
+#workV4 .gymQuick852{margin:6px 0}
+#workV4 .gymRepeat852{width:100%;min-height:44px;font-size:13px;white-space:normal;overflow-wrap:anywhere}
+#workV4 .series.gymNext852>small:first-child{font-weight:800;color:var(--accent-text,var(--teal));border-inline-start:3px solid var(--accent-text,var(--teal));border-radius:3px}
+#workV4 .series.gymDone852>small:first-child{font-weight:700;color:var(--muted)}
