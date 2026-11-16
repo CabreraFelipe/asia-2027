@@ -3,7 +3,7 @@ import {openStore} from './store84.mjs';
 import {validateGym} from './gym84.mjs';
 import {preparePhoto84,captureFrame84} from './vision84.mjs';
 window.asia84RestEnabled=false;
-window.asiaVisual824=Object.freeze({enabled:false,prepare:preparePhoto84,capture:captureFrame84,request:()=>Promise.reject(Error('Servicio visual múltiple todavía no habilitado'))});
+window.asiaVisual824=Object.freeze({enabled:location.protocol==='https:'&&location.hostname==='cabrerafelipe.github.io'&&location.pathname.startsWith('/asia-2027/'),prepare:preparePhoto84,capture:captureFrame84,request:(mode,q,images)=>window.asiaVisionRequest84(mode,q,images)});
 const out=document.getElementById('releaseStatus831'),cache=document.getElementById('cacheStatus831'),button=document.getElementById('cache831');
 export async function checkLegacyGym831(open=openStore){const store=await open();try{const r=await store.read('gym');if(!r||!Number.isSafeInteger(r.revision)||r.revision<0)throw Error('Revisión Gym inválida');if(!r.revision){if(Object.keys(r.payload||{}).length)throw Error('Registro inicial incompatible');return {active:false,watchIds:[]};}const g=validateGym(r.payload);return {active:!!g.active,watchIds:g.sessions.map(s=>s.watchId84).filter(Boolean)};}finally{store.close();}}
 export function local831(loc){return loc.protocol==='https:'&&loc.hostname==='cabrerafelipe.github.io';}
