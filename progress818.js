@@ -26,5 +26,15 @@ const labels=[['weight','Peso medio','kg'],['fat','Grasa corporal media','%'],['
 function csv(report){const head=['desde','hasta','dias','dias_nutricion_completos',...labels.flatMap(([k])=>[k,k+'_dias_con_datos'])];return [head,...report.groups.map(r=>[r.start,r.end,r.days,r.complete,...labels.flatMap(([k])=>[r[k].value===null?'':Number(r[k].value.toFixed(2)),r[k].count])])].map(r=>r.join(',')).join('\r\n')+'\r\n';}
 // Apple Health is a session-only cache; use at most one source per day, never add steps.
 function steps828(data,start,end,health){if(!day(start)||!day(end)||start>end||days(start,end)>3660)throw Error('Período inválido');const manualValues=[],appleValues=[],chosen=[];let overlap=0,conflicts=0;for(let i=0;i<days(start,end);i++){const d=shift(start,i),m=val(manual(data.diet?.[d]?.steps),0,100000),a=val(health?.(d)?.steps,0,100000);if(m!==null)manualValues.push(m);if(a!==null)appleValues.push(a);if(a!==null&&m!==null){overlap++;if(a!==m)conflicts++;}if(a!==null||m!==null)chosen.push(a??m);}return {manual:metric(manualValues),apple:metric(appleValues),preferred:metric(chosen),overlap,conflicts};}
-const api={build,csv,labels,windowReport,steps828};if(typeof module==='object'&&module.exports)module.exports=api;else root.asiaProgress818=api;
+// Same closed-day aggregation for Coach; manual data only, no text or imported Health.
+function coach28(data,end,today){
+ if(!day(end)||!day(today)||end>=today)throw Error('Período de Coach inválido');
+ const compact=m=>({n:m.count,mean:m.value===null?null:Number(m.value.toFixed(2))});
+ const weeks=Array.from({length:4},(_,i)=>{const w=windowReport(data,shift(end,-27+i*7),shift(end,-21+i*7));return {start:w.start,end:w.end,weight_kg:compact(w.weight),intake_kcal:compact(w.kcal),protein_g:compact(w.protein),manual_sessions:w.sessions.value,completed_sets:w.sets.value,training_days:w.sessions.count};});
+ const first=windowReport(data,shift(end,-27),shift(end,-14)),last=windowReport(data,shift(end,-13),end);
+ // Require at least one weigh-in in each of the four blocks; never infer missing weeks.
+ const comparable=weeks.every(w=>w.weight_kg.n>0);
+ return {start:weeks[0].start,end,weeks,weight_change_14d_kg:comparable?Number((last.weight.value-first.weight.value).toFixed(2)):null,weight_coverage:{previous_14:first.weight.count,recent_14:last.weight.count}};
+}
+const api={build,csv,labels,windowReport,steps828,coach28};if(typeof module==='object'&&module.exports)module.exports=api;else root.asiaProgress818=api;
 })(typeof window==='object'?window:globalThis);
