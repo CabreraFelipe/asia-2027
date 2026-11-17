@@ -195,12 +195,12 @@ nav button[aria-current=page]{font-weight:750}
 #planner820 .plannerPrimary858{font-weight:700}#planner820 .plannerMore858{margin:8px 0}#planner820 .plannerMore858>summary{min-height:44px;display:flex;align-items:center;gap:6px;cursor:pointer}#planner820 .plannerMore858>summary:before{content:'›';display:inline-block}#planner820 .plannerMore858[open]>summary:before{transform:rotate(90deg)}
 @media(min-width:650px){#planner820 .plannerDays858{grid-template-columns:repeat(7,minmax(0,1fr))}}
 
-/* V8.7: one entry point per tab, inline editor; preserve native disclosure and controls. */
+/* V8.7.1: one entry point per tab, inline editor; preserve native disclosure and controls. */
 .inlineOrganizer863:not([open]){display:none!important}
 .inlineOrganizer863[open]{margin-top:0;scroll-margin-top:12px}
 .viewTools85 button[aria-expanded="true"]{border-color:var(--teal);color:var(--teal)}
 
-/* V8.7 — touch targets and keyboard accessibility, without changing layouts or data. */
+/* V8.7.1 — touch targets and keyboard accessibility, without changing layouts or data. */
 .srOnly864{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip-path:inset(50%);white-space:nowrap;border:0!important}
 #workV4 .series,#workV4.gymActive53 .series{grid-template-columns:20px minmax(0,1fr) minmax(0,1fr) 44px;gap:5px}
 #workV4 .series input[type=checkbox],#workV4.gymActive53 .series input[type=checkbox]{width:44px;height:44px;min-width:44px;min-height:44px;margin:0;justify-self:center;cursor:pointer;box-sizing:border-box}
@@ -211,3 +211,6 @@ main .card :is(button,input,textarea,select,summary,a):focus-visible,header :is(
 main :is(input,select,textarea):focus-visible{scroll-margin-block:20px 110px}
 #dietForm :is(input:not([type=checkbox]),select,textarea),#bodyForm :is(input:not([type=checkbox]),select,textarea),#workV4 :is(input[type=number],input[type=date],select,textarea){font-size:16px}
 @media(prefers-reduced-motion:reduce){html:focus-within{scroll-behavior:auto!important}}
+
+/* V8.7.1: keep the daily goal summary within the original registration card. */
+#dietGoals871 .metric{min-width:0}#dietGoals871 progress{display:block;width:100%;height:8px;margin-top:6px;accent-color:var(--teal)}#dietGoals871 progress[hidden]{display:none!important}
