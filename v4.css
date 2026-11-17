@@ -214,3 +214,18 @@ main :is(input,select,textarea):focus-visible{scroll-margin-block:20px 110px}
 
 /* V8.7.1: keep the daily goal summary within the original registration card. */
 #dietGoals871 .metric{min-width:0}#dietGoals871 progress{display:block;width:100%;height:8px;margin-top:6px;accent-color:var(--teal)}#dietGoals871 progress[hidden]{display:none!important}
+
+/* V8.8: consistent top-level closed cards, not nested controls. */
+main>section>.card.sectionfold:not([open]),main>section>.card.folded51{box-sizing:border-box!important;min-height:62px!important;height:62px!important;padding:8px 14px!important;margin:9px 0!important;align-content:center!important}
+main>section>.card.sectionfold:not([open])>summary,main>section>.card.folded51>.foldHeader51,main>section>.card.folded51>.foldHeader51 .foldToggle51{box-sizing:border-box!important;min-height:44px!important;height:44px!important;margin:0!important;padding:0!important;line-height:1.2!important;align-items:center!important;font-size:16px!important}
+main>section>.card.folded51>.foldHeader51 h2{margin:0!important;min-width:0}
+main>section>.card.folded51>.foldHeader51 .pill{align-self:center!important;flex:none!important;max-width:100px;white-space:nowrap;font-size:10px;padding:4px 7px;margin:0!important}
+main>section>.card.folded51>.foldHeader51.row{flex-wrap:nowrap!important;gap:6px!important}
+main>section>.card.sectionfold:not([open])>summary,main>section>.card.folded51>.foldHeader51 .foldToggle51{overflow-wrap:anywhere}
+@media(max-width:350px){main>section>.card.sectionfold:not([open])>summary,main>section>.card.folded51>.foldHeader51 .foldToggle51{font-size:14px!important}}
+#water52 .waterDate880{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}#waterDate52{min-width:0;width:100%;box-sizing:border-box;min-height:44px}#water52 .waterMetric880{margin:10px 0;text-align:center}#water52 .waterMetric880 b{font-size:29px}#water52 .waterButtons880{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:8px 0}#water52 .waterButtons880 button{min-height:44px;min-width:0;padding:8px 2px;font-size:14px}#waterStatus880:empty,#mealStatus880:empty{display:none}
+#mealDiary880 .mealTabs880{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:10px 0}#mealDiary880 .mealTabs880 button{min-height:44px;min-width:0}#mealDiary880 .mealTabs880 button[aria-pressed=true]{background:var(--soft-button);color:var(--accent-text);box-shadow:inset 0 0 0 1px var(--accent-text)}#mealDiary880 .metric{margin:8px 0}#mealDiary880 #platePortions880:not(:empty){padding:10px;border:1px solid var(--edge);border-radius:12px;margin:8px 0}#mealDiary880 #mealRows880{margin:12px 0}#mealDiary880 button{min-height:44px}#mealDiary880 #dietGoals871{padding-top:0;border:0;margin-top:0}
+
+/* Shared global cards below sections use the same closed geometry. */
+main>details.card:is(.sectionfold,.diag56):not([open]){box-sizing:border-box!important;height:62px!important;min-height:62px!important;margin:9px 0!important;padding:8px 14px!important;align-content:center!important}main>details.card:is(.sectionfold,.diag56):not([open])>summary{box-sizing:border-box!important;min-height:44px!important;height:44px!important;display:flex;align-items:center;margin:0!important;padding:0!important;font-size:16px!important;line-height:1.2!important}
+@media(max-width:350px){main>details.card:is(.sectionfold,.diag56):not([open])>summary{font-size:14px!important}}
