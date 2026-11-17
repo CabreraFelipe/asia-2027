@@ -229,3 +229,22 @@ main>section>.card.sectionfold:not([open])>summary,main>section>.card.folded51>.
 /* Shared global cards below sections use the same closed geometry. */
 main>details.card:is(.sectionfold,.diag56):not([open]){box-sizing:border-box!important;height:62px!important;min-height:62px!important;margin:9px 0!important;padding:8px 14px!important;align-content:center!important}main>details.card:is(.sectionfold,.diag56):not([open])>summary{box-sizing:border-box!important;min-height:44px!important;height:44px!important;display:flex;align-items:center;margin:0!important;padding:0!important;font-size:16px!important;line-height:1.2!important}
 @media(max-width:350px){main>details.card:is(.sectionfold,.diag56):not([open])>summary{font-size:14px!important}}
+
+/* V8.8.3 — safe nested layout for smart reminders; no changes to scheduler. */
+#pushReminders845{min-width:0;overflow-wrap:normal}
+#pushReminders845 .pushDashboard883{display:grid;gap:8px;margin:8px 0 12px;min-width:0}
+#pushReminders845 .pushHero883,#pushReminders845 .pushMetric883{background:var(--surface-raised);border:1px solid var(--edge);border-radius:12px;padding:12px;min-width:0;display:flex;flex-direction:column;gap:5px}
+#pushReminders845 .pushHero883 small,#pushReminders845 .pushMetric883 small{color:var(--muted);font-size:12px;line-height:1.35}
+#pushReminders845 .pushHero883 strong{font-size:clamp(20px,5vw,27px);line-height:1.25;color:var(--accent-text);overflow-wrap:normal;font-variant-numeric:tabular-nums}
+#pushReminders845 .pushStats883{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;min-width:0}
+#pushReminders845 .pushMetric883 strong{font-size:25px;font-variant-numeric:tabular-nums}
+#pushReminders845 .pushDashboard883 p{margin:0;line-height:1.45;overflow-wrap:normal}
+#pushReminders845 .pushWeight883{display:flex;align-items:center;gap:9px;min-height:44px;font-size:14px;margin:8px 0;line-height:1.4}
+#pushReminders845 .pushWeight883 input{flex:none;width:23px;height:23px;min-height:23px;margin:0;accent-color:var(--accent-text)}
+#pushReminders845 .pushActions883{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-items:stretch;margin:12px 0;min-width:0}
+#pushReminders845 .pushActions883 button{width:100%;min-width:0;max-width:100%;min-height:48px;box-sizing:border-box;margin:0;padding:9px 5px;font-size:14px;line-height:1.3;white-space:normal;overflow-wrap:normal;word-break:normal;hyphens:none}
+#pushReminders845 .pushActions883 .pushCancel883{grid-column:1/-1}
+#pushReminders845 .pushTechnical883,#pushReminders845 .pushHistory883{margin:8px 0;min-width:0}
+#pushReminders845 .pushTechnical883 p,#pushReminders845 .pushHistory883 p{overflow-wrap:anywhere;line-height:1.45}
+#pushReminders845 p:empty{display:none}
+@media(max-width:355px){#pushReminders845 .pushActions883{grid-template-columns:minmax(0,1fr)}#pushReminders845 .pushActions883 button{font-size:14px}}
