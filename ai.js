@@ -3,6 +3,12 @@
   const endpoint = 'https://asia-2027-ai.cabrerafelipe2003.workers.dev/api';
   const tokenKey = 'asia-ai-access-v1';
   let token = '', busy = false, chat = [], pending = null;
+  // One inference flight across legacy chat, Coach, OCR, nutrition and visual analysis. No queue or automatic retries.
+  let inference874=false;
+  async function singleInference874(fn){
+    if(inference874)throw Error('Ya hay una consulta de IA en curso. Esperá a que termine; no se envió otra.');
+    inference874=true;try{return await fn();}finally{inference874=false;}
+  }
   try { const saved=JSON.parse(localStorage.getItem('asia-chat-v4')||'[]'); if(Array.isArray(saved)) chat=saved.filter(x=>['user','assistant'].includes(x.role)&&typeof x.text==='string').slice(-12); }catch{}
   function saveChat(){try{localStorage.setItem('asia-chat-v4',JSON.stringify(chat))}catch{}}
   try { window.asiaWeeklyAI=JSON.parse(localStorage.getItem('asia-weekly-ai-v4')||'null'); }catch{}
@@ -20,6 +26,9 @@
     return token;
   }
   async function call(kind, payload, route=endpoint) {
+    return singleInference874(()=>callTransport874(kind,payload,route));
+  }
+  async function callTransport874(kind,payload,route) {
     const access = getToken();
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 120000);
@@ -27,17 +36,19 @@
     try {
       const response = await fetch(route, {
         method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+access},
-        body:JSON.stringify(kind==='coach'?payload:{kind,...payload}), signal:controller.signal, redirect:'error', cache:'no-store'
+        body:JSON.stringify(kind==='coach'?payload:{kind,...payload}), signal:controller.signal, redirect:'error', cache:'no-store', credentials:'omit'
       });
       let body; try { body = await response.json(); } catch { throw Error('Respuesta no válida del servidor.'); }
-      if (!response.ok || body.ok !== true) {
-        diagnosticHTTP=true;window.asiaDiagEvent56?.('openai', 'error', response.status, body.upstream_status);
-        const code = body.upstream_status ? ' (OpenAI HTTP '+body.upstream_status+')' : ' (HTTP '+response.status+')';
-        throw Error((body.error || 'No se pudo completar la consulta')+code);
+      if (!response.ok || body?.ok !== true) {
+        diagnosticHTTP=true;const upstream=Number.isInteger(body?.upstream_status)&&body.upstream_status>=100&&body.upstream_status<=599?body.upstream_status:null;
+        window.asiaDiagEvent56?.('openai', 'error', response.status, upstream);
+        const code=' (HTTP '+response.status+(upstream?'; OpenAI HTTP '+upstream:'')+')';
+        const message=response.status===429?'Límite de consultas alcanzado. Revisá el cupo del servicio':response.status===401||response.status===403?'Acceso rechazado. Revisá la clave personal':response.status===503?'Servicio temporalmente no disponible':'No se pudo completar la consulta';
+        throw Error(message+code);
       }
       window.asiaDiagEvent56?.('openai', 'ok');
       return body;
-    } catch(e) { if(!diagnosticHTTP)window.asiaDiagEvent56?.('openai','error');if(e.name === 'AbortError') throw Error('La solicitud demoró demasiado. Probá nuevamente.'); throw e; }
+    } catch(e) { if(!diagnosticHTTP)window.asiaDiagEvent56?.('openai','error');if(e.name === 'AbortError') throw Error('Tiempo de espera agotado. No se reenvió automáticamente la consulta.'); if(e instanceof TypeError)throw Error('No se pudo conectar a la IA. Revisá la conexión.'); throw e; }
     finally { clearTimeout(timer); }
   }
   async function task(id, message, fn) {
@@ -48,6 +59,7 @@
   }
   const suffix = r => '\n\n'+r.model+' · '+r.remaining+' solicitudes de este tipo disponibles hoy (UTC).';
   $('aiConnect').onclick = () => task('aiConnection','Probando conexión…',async()=>{
+    if(inference874)throw Error('Hay una consulta de IA en curso. No se cambió la clave.');
     const candidate = $('aiToken').value.trim() || token;
     if(!/^[a-fA-F0-9]{64}$/.test(candidate)) throw Error('La clave debe contener 64 caracteres hexadecimales.');
     const old = token; token = candidate;
@@ -59,7 +71,7 @@
       $('aiToken').value=''; status('aiConnection','Conexión correcta. '+r.model+' · '+r.remaining+' consultas de chat disponibles hoy.');
     } catch(e) { token = old; throw e; }
   });
-  $('aiDisconnect').onclick=()=>{ window.asiaHealthReset?.(); window.asiaBackupReset42?.(); window.asiaWatchReset43?.();window.asiaCoachReset50?.(); token=''; $('aiToken').value=''; $('aiRemember').checked=false; try{localStorage.removeItem(tokenKey)}catch{}; status('aiConnection','Clave olvidada en este dispositivo.'); };
+  $('aiDisconnect').onclick=()=>{ if(inference874||busy){status('aiConnection','Hay una consulta en curso. Esperá a que termine antes de olvidar la clave.');return;} window.asiaHealthReset?.(); window.asiaBackupReset42?.(); window.asiaWatchReset43?.();window.asiaCoachReset50?.(); token=''; $('aiToken').value=''; $('aiRemember').checked=false; try{localStorage.removeItem(tokenKey)}catch{}; status('aiConnection','Clave olvidada en este dispositivo.'); };
   // Solo se transfieren datos numéricos/estados de registros recientes; no fotos guardadas ni notas libres.
   const ordered = (obj, n) => Object.entries(obj||{}).sort(([a],[b])=>a.localeCompare(b)).slice(-n);
   function bodySummary(n=42) { return ordered(data.body,n).map(([d,b])=>({date:d,...Object.fromEntries(fields.map(([k])=>[k,b[k]]).filter(([,v])=>valid(v)))})); }
@@ -110,7 +122,7 @@
   };
   window.asiaDiagAITest56=async()=>{
     if(!window.asiaDiagAIHasAccess56())return {configured:false};
-    if(busy)return {busy:true};
+    if(busy||inference874)return {busy:true};
     setBusy(true);try{await call('chat',{data:{question:'Respondé solamente OK. Prueba técnica sin datos personales.'}});return {ok:true};}finally{setBusy(false)}
   };
   window.asiaCoachRequest50=payload=>call('coach',payload,endpoint.replace(/\/api$/,'/coach'));
@@ -130,10 +142,14 @@
   $('aiClearChat').onclick=()=>{chat=[];saveChat();renderChat();};
   $('aiAsk').onclick=()=>{
     const question=$('aiQuestion').value.trim(); if(!question)return;
-    if(!confirm('Se enviará tu consulta, el resumen de registros (incluida Salud si activaste esa opción) y las últimas respuestas a OpenAI. ¿Continuar?'))return;
+    const share=$('healthShare').checked;
+    const history=chat.filter(x=>x.shared===false||(share&&x.shared===true)).slice(-6).map(x=>({role:x.role,text:x.text.slice(0,850)}));
+    if(!confirm('Se enviará a Cloudflare y OpenAI tu consulta, el resumen de registros'+(share?' (con Salud si hay datos disponibles)':' (sin datos importados de Salud)')+' y hasta '+history.length+' mensajes anteriores compatibles con el permiso actual. Los mensajes antiguos sin permiso identificado no se reenvían. ¿Continuar?'))return;
     task('aiChatResult','Consultando al entrenador…',async()=>{
-      const p=summary(); p.question=question;p.conversation=chat.slice(-6).map(x=>({role:x.role,text:x.text.slice(0,850)}));
-      const r=await call('chat',{data:p});chat.push({role:'user',text:question},{role:'assistant',text:String(r.result)+suffix(r)});chat=chat.slice(-12);saveChat();$('aiQuestion').value='';renderChat();
+      const p=summary(); if(!share)delete p.apple_health; p.question=question;p.conversation=history;
+      while(JSON.stringify(p).length>24500&&p.conversation.length)p.conversation.shift();
+      if(JSON.stringify(p).length>24500)throw Error('Resumen demasiado extenso. Reducí la pregunta o revisá los registros.');
+      const r=await call('chat',{data:p});chat.push({role:'user',text:question,shared:share},{role:'assistant',text:String(r.result)+suffix(r),shared:share});chat=chat.slice(-12);saveChat();if($('aiQuestion').value.trim()===question)$('aiQuestion').value='';renderChat();
     });
   };
   renderChat(); window.refreshWeeklyV4?.();
@@ -150,8 +166,8 @@
       const c=document.createElement('canvas'),scale=Math.min(1,1900/Math.max(im.width,im.height));c.width=Math.max(1,Math.round(im.width*scale));c.height=Math.max(1,Math.round(im.height*scale));const ctx=c.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);ctx.drawImage(im,0,0,c.width,c.height);let result=c.toDataURL('image/jpeg',0.86);if(result.length>3500000)result=c.toDataURL('image/jpeg',0.65);if(result.length>3500000)throw Error('La imagen sigue siendo demasiado grande.');return result;
     } finally{URL.revokeObjectURL(url);}
   }
-  window.asiaVisionRequest84=async(mode,question,images)=>{const access=getToken();const {requestVision84}=await import('./vision84.mjs');return requestVision84(endpoint.replace(/\/api$/,'/vision84'),access,mode,question,images);};
-  window.asiaNutritionScan52=async(mode,file)=>{getToken();if(!['meal','label'].includes(mode))throw Error('Modo inválido');const image=await imageForAI(file);return call('nutrition52',{mode,image},endpoint.replace(/\/api$/,'/nutrition'));};
+  window.asiaVisionRequest84=async(mode,question,images)=>singleInference874(async()=>{const access=getToken();const {requestVision84}=await import('./vision84.mjs');return requestVision84(endpoint.replace(/\/api$/,'/vision84'),access,mode,question,images);});
+  window.asiaNutritionScan52=async(mode,file,stillAuthorized)=>singleInference874(async()=>{getToken();if(!['meal','label'].includes(mode))throw Error('Modo inválido');const image=await imageForAI(file);if(typeof stillAuthorized!=='function'||!stillAuthorized())throw Error('Cambió la selección o el permiso. No se envió la imagen.');return callTransport874('nutrition52',{mode,image},endpoint.replace(/\/api$/,'/nutrition'));});
   function showReview(r,file,chosenDate){
     if($('report').files[0]!==file||$('measureDay').value!==chosenDate)throw Error('La captura o fecha cambió durante el análisis. Volvé a escanear.');
     const v=r.result;if(!v||typeof v!=='object')throw Error('El servidor no devolvió datos estructurados.');
@@ -171,7 +187,7 @@
     const file=$('report').files[0],chosenDate=$('measureDay').value;
     if(!file){status('aiScanStatus','Primero seleccioná una captura del informe Xiaomi.');return;}
     if(!confirm('La captura seleccionada se enviará a OpenAI. Verificá que no muestre nombres ni otros identificadores. ¿Continuar?'))return;
-    resetReview();task('aiScanStatus','Leyendo el informe Xiaomi…',async()=>{getToken();const image=await imageForAI(file);const r=await call('scan',{image,data:{report:'Xiaomi S400',expected_units:'kg, %, kcal, nivel',request:'La fecha debe ser YYYY-MM-DD si es legible. No inferir ningún dato que no esté visible.'}});showReview(r,file,chosenDate);});
+    resetReview();task('aiScanStatus','Leyendo el informe Xiaomi…',async()=>{getToken();const image=await imageForAI(file);if($('report').files[0]!==file||$('measureDay').value!==chosenDate)throw Error('Cambió la captura o fecha. No se envió la imagen.');const r=await call('scan',{image,data:{report:'Xiaomi S400',expected_units:'kg, %, kcal, nivel',request:'La fecha debe ser YYYY-MM-DD si es legible. No inferir ningún dato que no esté visible.'}});showReview(r,file,chosenDate);});
   };
   $('bodyForm').addEventListener('submit',()=>{resetReview();status('aiScanStatus','');});
 })();
