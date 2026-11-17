@@ -1,4 +1,4 @@
-/* Asia 2027 V4.1 — Apple Health; authenticated, read-only, session memory only. */
+/* Asia 2027 V4.1 — Apple Health; authenticated; only daily steps are persisted, other metrics session-only. */
 (() => {
 'use strict';
 const $h=id=>document.getElementById(id);
@@ -11,7 +11,7 @@ function normalize(r){
  if(!r||!Object.hasOwn(defs,r.metric)||!validDay(r.day)||typeof r.qty!=='number'||!Number.isFinite(r.qty)||r.qty<0||typeof r.units!=='string')return null;
  let q=r.qty,u=r.units.toLowerCase().replace(/\s/g,'');
  switch(r.metric){
- case 'step_count':if(u!=='count')return null;q=Math.round(q);break;
+ case 'step_count':if(u!=='count'||q>100000)return null;q=Math.round(q);break;
  case 'active_energy':case 'basal_energy_burned':if(u==='kj')q/=4.184;else if(u==='j')q/=4184;else if(u!=='kcal'&&u!=='cal')return null;else if(u==='cal')q/=1000;break;
  case 'walking_running_distance':if(u==='m')q/=1000;else if(u==='mi')q*=1.609344;else if(u!=='km')return null;break;
  case 'apple_exercise_time':if(u==='s')q/=60;else if(u==='h'||u==='hr')q*=60;else if(u!=='min')return null;break;
@@ -22,6 +22,23 @@ function normalize(r){
  return {day:r.day,metric:r.metric,qty:q,updated_at:r.updated_at};
 }
 function get(d,k){return rows.get(d)?.[k]??null}
+// Keep the Apple total and manual fallback separate. No summing, no writes to food or exercise fields.
+const stepValue881=v=>typeof v==='string'&&/^\d+(?:\.\d+)?$/.test(v.trim())?stepValue881(Number(v)):Number.isFinite(v)&&v>=0&&v<=100000?v:null;
+function savedApple881(r){const a=r?.stepsApple881;return a&&Number.isInteger(a.count)&&stepValue881(a.count)!==null&&Number.isSafeInteger(a.updatedAt)&&a.updatedAt>0?{count:a.count,updatedAt:a.updatedAt}:null;}
+window.asiaCleanSteps881=savedApple881;
+window.asiaEffectiveSteps881=d=>{const r=data.diet[d]||{},a=savedApple881(r),m=stepValue881(r.steps);return {value:a?.count??m,source:a?'Apple Salud':m!==null?'Registro manual':'Sin datos',updatedAt:a?.updatedAt??null};};
+let stepSync881='Todavía no se consultaron los pasos.';
+function renderSteps881(){const d=$h('day').value,x=window.asiaEffectiveSteps881(d),e=$h('dailySteps881');if(e)e.textContent='Pasos del día: '+(x.value===null?'—':tf(x.value))+' · '+x.source+(x.updatedAt?' · recibido '+new Date(x.updatedAt).toLocaleString('es-UY'):'')+(d===date()?' · hoy puede ser parcial':'');const s=$h('stepsSync881');if(s)s.textContent=stepSync881;}
+window.asiaRenderSteps881=renderSteps881;
+function storeSteps881(next){const today=date(),changes=[];
+ for(const [d,a] of next){if(!validDay(d)||d>today)continue;const old=data.diet[d],prior=savedApple881(old);if(prior&&prior.updatedAt>=a.updatedAt)continue;changes.push([d,old,a]);}
+ if(!changes.length){stepSync881=next.size?'Pasos al día. Se conservan los datos guardados.':'No se recibieron pasos válidos; se conservan los registros.';renderSteps881();return;}
+ if(blocked600||localStorage.getItem(key)!==disk600){stepSync881='No se guardaron los pasos: el diario cambió en otra ventana o requiere recuperación. Recargá antes de sincronizar.';renderSteps881();return;}
+ for(const [d,old,a] of changes)data.diet[d]={...old,stepsApple881:a};
+ if(!persist()){for(const [d,old] of changes){if(old)data.diet[d]=old;else delete data.diet[d];}stepSync881='No se pudieron guardar los pasos. Se conservan los registros anteriores.';}
+ else stepSync881=changes.length+' '+(changes.length===1?'día actualizado':'días actualizados')+' automáticamente · '+new Date().toLocaleString('es-UY');
+ renderSteps881();
+}
 // V8.5.5: descriptive comparisons on closed days. Read-only, no new requests.
 const descriptors855=[['hrv','VFC','ms',1],['restingHR','FC en reposo','lpm',1],['sleep','Sueño registrado','h',1],['steps','Pasos · Apple Salud','pasos',0],['series','Series efectivas · Gym','series',0]];
 const number855=(v,min,max)=>{if(typeof v==='string'&&/^\d+(?:\.\d+)?$/.test(v.trim()))v=Number(v);return typeof v==='number'&&Number.isFinite(v)&&v>=min&&v<=max?v:null;};
@@ -70,13 +87,13 @@ function render(){
  const last=Array.from(rows.keys()).filter(x=>get(x,'vo2_max')!==null).sort().at(-1);$h('healthVo2').textContent=last?'Último VO₂ máx.: '+tf(get(last,'vo2_max'),1)+' ml/kg/min · '+last:'VO₂ máx.: todavía no hay mediciones recibidas.';
  $h('healthReadAt').textContent=lastRead?'Consultado: '+new Date(lastRead).toLocaleString('es-UY')+' · Último guardado: '+(lastSync?new Date(lastSync).toLocaleString('es-UY'):'—')+'.':'Todavía no se consultó Cloudflare.';window.asiaRenderHome42?.();renderRecovery855();
 }
-function reset(){generation++;flight=null;rows.clear();lastRead=lastSync=0;loaded=false;$h('healthShare').checked=false;$h('healthAnalysis').replaceChildren();$h('healthRefresh').disabled=false;status('Conectá con tu clave personal para consultar Salud.');render()}
+function reset(){generation++;flight=null;rows.clear();lastRead=lastSync=0;loaded=false;stepSync881='Conexión reiniciada. Se conservan los pasos guardados; no se recibirán nuevos datos hasta reconectar.';renderSteps881();$h('healthShare').checked=false;$h('healthAnalysis').replaceChildren();$h('healthRefresh').disabled=false;status('Conectá con tu clave personal para consultar Salud.');render()}
 async function refreshHealth(force=false){
  if(!force&&loaded&&Date.now()-lastRead<120000){renderRecovery855();return true;}
  if(flight)return flight;
  if(!window.asiaHealthHasAccess?.()){status('Configurá primero tu clave personal en Conexión con IA.');return false}
  const generationAtStart=generation;$h('healthRefresh').disabled=true;status('Consultando Cloudflare…');
- flight=(async()=>{try{const records=await window.asiaHealthGet();if(generationAtStart!==generation)return false;let next=new Map(),skipped=0,sync=0;for(const raw of records){const r=normalize(raw);if(!r){skipped++;continue}if(!next.has(r.day))next.set(r.day,{});next.get(r.day)[r.metric]=r.qty;let t=Date.parse(r.updated_at);if(Number.isFinite(t))sync=Math.max(sync,t)}rows=next;lastRead=Date.now();lastSync=sync;loaded=true;status(rows.size?`${rows.size} ${rows.size===1?'día':'días'} con datos de Salud.${skipped?' '+skipped+' registros omitidos por formato o unidad no admitida.':''}`:'No hay métricas compatibles guardadas todavía.');render();return true}catch(e){if(generationAtStart===generation)status('No se pudo consultar: '+e.message+(loaded?' · Se muestran los últimos datos consultados en esta sesión.':''));return false}finally{if(generationAtStart===generation){flight=null;$h('healthRefresh').disabled=false}}})();return flight;
+ flight=(async()=>{try{const records=await window.asiaHealthGet();if(generationAtStart!==generation)return false;let next=new Map(),steps881=new Map(),skipped=0,sync=0;for(const raw of records){const r=normalize(raw);if(!r){skipped++;continue}if(!next.has(r.day))next.set(r.day,{});next.get(r.day)[r.metric]=r.qty;let t=Date.parse(r.updated_at);if(Number.isFinite(t))sync=Math.max(sync,t);if(r.metric==='step_count'&&r.day<=date()&&Number.isSafeInteger(t)&&t>0&&(!steps881.has(r.day)||t>steps881.get(r.day).updatedAt))steps881.set(r.day,{count:r.qty,updatedAt:t})}rows=next;lastRead=Date.now();lastSync=sync;loaded=true;storeSteps881(steps881);status(rows.size?`${rows.size} ${rows.size===1?'día':'días'} con datos de Salud.${skipped?' '+skipped+' registros omitidos por formato o unidad no admitida.':''}`:'No hay métricas compatibles guardadas todavía.');render();return true}catch(e){if(generationAtStart===generation){status('No se pudo consultar: '+e.message+(loaded?' · Se muestran los últimos datos consultados en esta sesión.':''));stepSync881='No se pudo actualizar. Se conservan los pasos guardados.';renderSteps881();}return false}finally{if(generationAtStart===generation){flight=null;$h('healthRefresh').disabled=false}}})();return flight;
 }
 function summaryHealth(){
  if(!loaded||!$h('healthShare').checked)return null;
@@ -89,8 +106,11 @@ for(const id of ['healthDay','healthMetric','healthRange'])$h(id).onchange=rende
 $h('healthRefresh').onclick=()=>refreshHealth(true);
 $h('healthSetup').onclick=()=>window.asiaOpenSettings?.();
 $h('healthToday').onclick=()=>{$h('healthDay').value=date();render()};
-$h('healthStepsCopy').onclick=()=>{const d=$h('day').value,v=get(d,'step_count');if(v===null)return notify('No hay pasos de Salud para la fecha del registro diario.');if($h('steps').value!==''&&!confirm('¿Reemplazar los pasos del formulario por '+tf(v)+' de Salud?'))return;$h('steps').value=String(v);notify('Pasos copiados. Guardá el día para confirmarlos.')};
+$h('healthStepsCopy').onclick=()=>refreshHealth(true);
 $h('healthAnalyze').onclick=async()=>{if(!await refreshHealth())return;if(!rows.size)return notify('No hay datos de Salud para analizar.');if(!confirm('¿Enviar a Cloudflare y OpenAI los indicadores de Salud de los últimos 28 días y hoy? Tu proyecto tiene activado el uso compartido para mejora de modelos.'))return;const prior=$h('healthShare').checked;$h('healthShare').checked=true;const payload=summaryHealth();$h('healthShare').checked=prior;if(payload?.daily.length)window.asiaHealthAnalyze?.(payload);else notify('No hay datos recientes para analizar.')};
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!$h('health').classList.contains('hide'))refreshHealth()});
+// Read on return to any tab and every five minutes only while visible. Reuse the existing flight/cache.
+let timer881=null;
+function foreground881(){clearTimeout(timer881);timer881=null;if(document.hidden)return;if(window.asiaHealthHasAccess?.())refreshHealth();timer881=setTimeout(foreground881,300000);}
+document.addEventListener('visibilitychange',foreground881);window.addEventListener('online',foreground881);window.addEventListener('pageshow',foreground881);timer881=setTimeout(foreground881,300000);
 render();
 })();
