@@ -1,11 +1,11 @@
 /* V8.5.8: agenda semanal compacta. Conserva las reglas R20/R29 y el diario original. */
 (function(){'use strict';
-const START='2026-11-23',END='2027-03-08',VAC_START='2026-12-26',VAC_END='2027-01-07';
+const PREP='2026-11-16',START='2026-11-23',END='2027-03-08',VAC_START='2026-12-26',VAC_END='2027-01-07';
 const day=d=>typeof d==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(d)&&Number.isFinite(Date.parse(d))&&new Date(d).toISOString().slice(0,10)===d;
 function add(d,n){if(!day(d)||!Number.isInteger(n))throw Error('Fecha inválida');const x=new Date(Date.parse(d)+n*86400000);const s=x.toISOString().slice(0,10);if(!day(s))throw Error('Fecha fuera de rango');return s;}
 const weekday=d=>new Date(d+'T00:00:00Z').getUTCDay();
 function monday(d){if(!day(d))throw Error('Fecha inválida');return add(d,-((weekday(d)+6)%7));}
-function phase(d){return d<START?'preparation':d>=END?'finished':d>=VAC_START&&d<=VAC_END?'vacation':'active';}
+function phase(d){return d<PREP?'outside':d<START?'preparation':d>=END?'finished':d>=VAC_START&&d<=VAC_END?'vacation':'active';}
 const schedule=typeof module!=='undefined'&&module.exports?require('./schedule829.js'):window.asiaSchedule829;
 const planned=(d,settings)=>schedule.planned(d,settings);
 const finite=(x,min,max)=>typeof x==='number'&&Number.isFinite(x)&&x>=min&&x<=max;
@@ -20,11 +20,12 @@ const el=id=>document.getElementById(id),make=(tag,text,cls)=>{const e=document.
 const root=el('trainCalendarV4');if(!root)return;const panel=make('details',undefined,'gymMini571');panel.id='planner820';panel.append(make('summary','Planificador semanal'));root.append(panel);
 const controls=make('div',undefined,'row'),prev=make('button','‹ Anterior','secondary'),next=make('button','Siguiente ›','secondary'),now=make('button','Hoy','secondary'),label=make('label','Ir a una fecha'),input=make('input');input.type='date';input.id='plannerDay820';label.htmlFor=input.id;input.value=date();for(const b of [prev,next,now])b.type='button';controls.classList.add('plannerNav858');controls.append(prev,now,next);const body=make('div');body.id='plannerBody820';const jump=make('details',undefined,'plannerMore858');jump.append(make('summary','Elegir otra fecha'),label,input);panel.append(controls,jump,body);
 const fmtDay=d=>new Date(d+'T12:00:00').toLocaleDateString('es-UY',{weekday:'short',day:'numeric',month:'short'});
-const name=i=>routines[i]?.name||'Rutina '+(i+1),status={yes:'Cumplido',partial:'Parcial',no:'No seguido',vac:'Vacaciones'},phases={preparation:'Preparación',finished:'Fuera del plan',vacation:'Vacaciones · flexible',active:'Plan activo'};
+const name=i=>routines[i]?.name||'Rutina '+(i+1),status={yes:'Cumplido',partial:'Parcial',no:'No seguido',vac:'Vacaciones'},phases={outside:'Fuera del plan',preparation:'Preparación',finished:'Fuera del plan',vacation:'Vacaciones · flexible',active:'Plan activo'};
 function reveal(tabName,id){tab(tabName);const node=el(id);if(!node)return;for(let p=node;p;p=p.parentElement)if(p.tagName==='DETAILS')p.open=true;(window.asiaScrollTo541||((n,o)=>n.scrollIntoView(o)))(node,{block:'start'});}
 function confirmOpen(){if(window.asiaGymHasSession532?.()){notify('Finalizá o descartá la sesión activa antes de cambiar de registro.');return false;}return confirm('¿Abrir otro registro? Los cambios sin guardar en los formularios podrían perderse.');}
 function action(parent,text,fn){const b=make('button',text,'secondary');b.type='button';b.onclick=fn;parent.append(b);return b;}
 function openGym(d,r){if(window.asiaOpenPlannedToday870?.(d,r))return;if(window.asiaClassicRunning532?.()||window.asiaGym84Active===true){notify('Finalizá la sesión activa antes de cambiar de rutina.');return;}if(!confirmOpen())return;el('trainDay').value=d;el('routine').value=String(r);loadWork();reveal('training','workV4');}
+window.asiaOpenCalendarGym884=openGym;
 function openDiet(d){if(!confirmOpen())return;el('day').value=d;loadDiet();reveal('diet','dailyV4');}
 function openReport(d){if(!confirmOpen())return;el('weeklyDate').value=d;el('weeklyDate').dispatchEvent(new Event('change'));reveal('diet','weeklyV4');}
 function render(){body.replaceChildren();let a;try{a=agenda(data,input.value,date());}catch{body.append(make('p','Elegí una fecha válida.','meta'));return;}
