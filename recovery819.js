@@ -34,8 +34,30 @@ function render(target,reference,isGym){if(!target)return;const body=target.quer
  for(const g of r.groups){const row=make('tr');row.dataset.group=g.name;const name=make('th',g.name+(g.planned?' *':''));name.scope='row';name.style.textAlign='left';name.style.overflowWrap='anywhere';row.append(name);for(const v of [String(g.recent),String(g.previous),String(g.current),g.daysSince===null?'—':g.daysSince===0?'Fecha elegida':`${g.daysSince} d`]){const td=make('td',v);td.style.overflowWrap='anywhere';row.append(td);}tb.append(row);}
  table.append(tb);body.append(table,make('p',`Días con series válidas: ${r.coverage.recent}/7 previos · ${r.coverage.previous}/7 anteriores. ${r.coverage.invalid} series marcadas sin carga/reps válidas; ${r.coverage.unmapped} series sin grupo asignado en los 14 días previos y la fecha elegida.`,'tiny'),make('p','7 d prev.: días −7 a −1; 7 d ant.: −14 a −8. Fecha: series guardadas el día elegido (puede ser parcial). Último estímulo: días calendario desde la última serie registrada, no horas ni tiempo fisiológico de recuperación. 0 significa sin series válidas registradas, no descanso confirmado. Grupos principales; una serie puede contar para varios grupos. No se suman sesiones Apple Watch ni PRO. '+(isGym?'* Grupo principal de la rutina seleccionada. No incluye series aún no guardadas.':''),'tiny'));
 }
-function update(){render(gym,el('trainDay').value,true);render(home,el('recoveryDay43').value,false);}
-const oldRefresh=refresh;refresh=function(){oldRefresh();update();};const oldLoad=loadWork;loadWork=function(){oldLoad();render(gym,el('trainDay').value,true);};el('routine').onchange=loadWork;el('trainDay').onchange=()=>{el('routine').value=wk(el('trainDay').value);loadWork();};el('recoveryDay43').addEventListener('change',()=>render(home,el('recoveryDay43').value,false));
+// V8.7.2: read-only context in the active session, using the same muscle calculations.
+const activeHost=el('gymActive53'),activeContext=make('details',undefined,'gymMini571');activeContext.id='gymRecovery872';
+const activeBody=make('div',undefined,'recoveryBody819');activeContext.append(make('summary','Recuperación y carga reciente'),activeBody);el('gymPhase53').after(activeContext);
+function activeRecovery872(){
+ if(!activeContext.open||activeHost.hidden)return;
+ const d=el('trainDay').value;activeBody.replaceChildren();
+ if(!day(d)||d>date()){activeBody.append(make('p','Sin contexto de recuperación para una fecha futura o inválida.','meta'));return;}
+ const muscle=build(data,d,date(),window.asiaMuscleGroups819(),workExercises53(Number(el('routine').value),data.work[workKey()]).map(e=>e[0])),w=muscle.wellbeing,h=window.asiaHealthDay42(d);
+ const fmt=(v,u)=>v===null?'Sin datos':v.toLocaleString('es-UY',{maximumFractionDigits:1})+' '+u;
+ const positive=v=>num(v,0.000001,Infinity);
+ activeBody.append(make('p','Fecha de sesión: '+d+(d===date()?' · hoy puede estar incompleto.':''),'meta'));
+ const grid=make('div',undefined,'grid');
+ for(const [label,value,source] of [['Sueño',fmt(w.sleep,'h'),'Manual'],['Fatiga',w.fatigue===null?'Sin datos':w.fatigue+'/5','Manual'],['VFC',fmt(positive(h.hrv),'ms'),'Apple Salud'],['FC en reposo',fmt(positive(h.restingHR),'lpm'),'Apple Salud']]){const tile=make('div',undefined,'metric');tile.append(make('small',label),make('b',value),make('small',source));grid.append(tile);}activeBody.append(grid);
+ activeBody.append(make('p',h.readAt?'Última consulta de Salud: '+new Date(h.readAt).toLocaleString('es-UY'):'Salud aún no consultada en esta sesión.','tiny'));
+ const groups=muscle.groups.filter(g=>g.planned);activeBody.append(make('p','Grupos principales de esta rutina · series válidas guardadas en los 7 días previos:','meta'));
+ if(groups.length)for(const g of groups)activeBody.append(make('p',g.name+' · '+g.recent+' series · '+(g.daysSince===null?'sin estímulo registrado':g.daysSince===0?'último estímulo: fecha elegida':'último estímulo: hace '+g.daysSince+' d calendario'),'tiny'));
+ else activeBody.append(make('p','Sin grupos principales identificados.','tiny'));
+ activeBody.append(make('p',advice(muscle),'tiny'),make('p','Cobertura de Gym: '+muscle.coverage.recent+'/7 días con series válidas. Sin datos no equivale a reposo; no se suman sesiones del reloj ni se estima aptitud para entrenar. No cambia la rutina.','tiny'));
+}
+activeContext.addEventListener('toggle',activeRecovery872);
+const priorHome872=window.asiaRenderHome42;window.asiaRenderHome42=()=>{priorHome872?.();activeRecovery872()};
+window.asiaRenderActiveRecovery872=activeRecovery872;
+function update(){render(gym,el('trainDay').value,true);render(home,el('recoveryDay43').value,false);activeRecovery872();}
+const oldRefresh=refresh;refresh=function(){oldRefresh();update();};const oldLoad=loadWork;loadWork=function(){oldLoad();render(gym,el('trainDay').value,true);activeRecovery872();};el('routine').onchange=loadWork;el('trainDay').onchange=()=>{el('routine').value=wk(el('trainDay').value);loadWork();};el('recoveryDay43').addEventListener('change',()=>render(home,el('recoveryDay43').value,false));
 // Health links to the existing recovery card; no second diary/card or requests.
 const health=el('healthRefresh')?.closest('.card');if(health&&home){const b=make('button','Ver recuperación muscular','secondary');b.type='button';b.id='recoveryLink819';b.onclick=()=>{tab('home');const d=el('healthDay')?.value;if(day(d)&&d<=date())el('recoveryDay43').value=d;el('recoveryDay43').dispatchEvent(new Event('change'));for(let p=home;p;p=p.parentElement)if(p.tagName==='DETAILS')p.open=true;(window.asiaScrollTo541||((n,o)=>n.scrollIntoView(o)))(home,{block:'center'});};health.append(b);}
 update();
