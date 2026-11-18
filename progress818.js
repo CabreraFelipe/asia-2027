@@ -63,6 +63,25 @@ function control887(data,start,end,today,planned){
  return {start,end,report,eligible,vacation,outside,adherence,legacy,evaluated,legacyCount,historicalGoals,pending:eligible-evaluated-legacyCount,planned:plannedCount,matched,optional,sessions,cardio:metric(cardio,true),recovery:metric(recovery),fatigue:metric(fatigue)};
 }
 function weekly887(data,control,today,planned){if(!day(control)||!day(today)||monday887(control)!==control||control>today) return null;const current=control887(data,shift(control,-7),shift(control,-1),today,planned),prior=windowReport(data,shift(control,-14),shift(control,-8));return {control,current,prior,weightChange:current.report.weight.count>=3&&prior.weight.count>=3?current.report.weight.value-prior.weight.value:null};}
+
+function stall887(data,asOf,goalKg=72){
+ if(!day(asOf))throw Error('Fecha inválida para estancamiento');
+ const end=shift(asOf,-1),recentStart=shift(end,-6),previousStart=shift(end,-13),previousEnd=shift(end,-7);
+ const weights=(start,finish)=>Object.entries(data?.body||{}).filter(([d,b])=>day(d)&&d>=start&&d<=finish&&val(b?.weight,20,300)!==null).sort(([a],[b])=>a.localeCompare(b)).map(([,b])=>b.weight);
+ const recent=weights(recentStart,end),previous=weights(previousStart,previousEnd),recentMean=avg(recent),previousMean=avg(previous),delta=recentMean===null||previousMean===null?null:Number((recentMean-previousMean).toFixed(2));
+ let complete14=0,adherent14=0;for(let d=previousStart;d<=end;d=shift(d,1)){const r=data?.diet?.[d]||{};if(r.intakeComplete===true&&val(r.intakeKcal,0,15000)!==null&&val(r.proteinG,0,1000)!==null)complete14++;if(['yes','partial'].includes(nutritionStatus887(d,r)))adherent14++;}
+ const base={recentMean,previousMean,delta,weighinsRecent:recent.length,weighinsPrevious:previous.length,complete14,adherent14};
+ if(recent.length<3||previous.length<3)return {...base,status:'insufficient',badge:'Aún no evaluable',summary:`Faltan pesajes suficientes para estimar una meseta real. Necesitás al menos 3 pesajes en cada uno de los dos últimos bloques de 7 días cerrados; hoy hay ${recent.length}/3 y ${previous.length}/3.`};
+ const aboveGoal=goalKg===null?true:recentMean>goalKg+0.4;
+ if(!aboveGoal)return {...base,status:'near_goal',badge:'Muy cerca del objetivo',summary:`La media reciente es ${recentMean.toFixed(1)} kg y ya está muy cerca del objetivo. Un cambio pequeño (${signedDelta(delta)}) no se interpreta como estancamiento por sí solo.`};
+ if(delta!==null&&delta<=-0.25)return {...base,status:'moving',badge:'Sin señal de estancamiento',summary:`La media reciente sigue bajando (${signedDelta(delta)} frente al bloque previo). No hay una señal compatible con estancamiento en este momento.`};
+ if(delta!==null&&Math.abs(delta)<0.15&&complete14>=8)return {...base,status:'likely',badge:'Señal compatible',summary:`La media de 7 días cambió ${signedDelta(delta)} frente al bloque previo, con ${recent.length}/7 y ${previous.length}/7 pesajes, y ${complete14}/14 días cerrados con nutrición completa. Esto sí parece una meseta descriptiva: revisá adherencia, pasos, sueño y recuperación antes de tocar metas.`};
+ if(delta!==null&&Math.abs(delta)<0.30)return {...base,status:'watch',badge:'Vigilar',summary:`El peso viene casi estable (${signedDelta(delta)} entre semanas). Puede ser una pausa normal o una cobertura todavía corta (${complete14}/14 días completos). Conviene seguir mirando la tendencia antes de concluir que hay estancamiento.`};
+ if(delta!==null&&delta>=0.30)return {...base,status:'up',badge:'Rebote reciente',summary:`La media de 7 días subió ${signedDelta(delta)} frente al bloque previo. No es un estancamiento: revisá registro, pasos y contexto (fin de semana, sodio, descanso, vacaciones o desorden del diario).`};
+ return {...base,status:'moving',badge:'Sin señal clara',summary:`La variación reciente fue ${signedDelta(delta)}. Por ahora no hay una señal consistente de estancamiento.`};
+}
+function signedDelta(n){return n===null||!Number.isFinite(n)?'—':`${n>0?'+':''}${Math.abs(n)<1?n.toFixed(2):n.toFixed(1)} kg`;}
+
 function trajectory887(body,asOf,end=shift(asOf,-1)){
  if(!day(asOf)||!day(end)||end>=asOf)throw Error('Fecha de trayectoria inválida');
  const pts=Object.entries(body||{}).filter(([d,b])=>day(d)&&d<=end&&d>=shift(end,-41)&&val(b?.weight,20,300)!==null).sort(([a],[b])=>a.localeCompare(b));
@@ -75,5 +94,5 @@ function trajectory887(body,asOf,end=shift(asOf,-1)){
  const vacDays=Array.from({length:remaining},(_,i)=>shift(asOf,i+1)).filter(vac887).length,active=remaining-vacDays,projected=base+slope*remaining,scenario=base+slope*active,unsteady=Math.abs(slope*7)>1||val(projected,20,300)===null||val(scenario,20,300)===null;
  return {...baseInfo,base,slope,projected,scenario,vacDays,active,unsteady};
 }
-const api={build,csv,labels,windowReport,steps828,coach28,control887,weekly887,trajectory887,nutritionStatus887};if(typeof module==='object'&&module.exports)module.exports=api;else root.asiaProgress818=api;
+const api={build,csv,labels,windowReport,steps828,coach28,control887,weekly887,trajectory887,stall887,nutritionStatus887};if(typeof module==='object'&&module.exports)module.exports=api;else root.asiaProgress818=api;
 })(typeof window==='object'?window:globalThis);
