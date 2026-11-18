@@ -379,3 +379,6 @@ main .scroll{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain}
 .coachDaily89 .checkinActions89{margin-top:10px}
 .coachDaily89>button,.coachDaily89 #checkin89 details button{width:100%;margin-top:5px}
 @media(max-width:340px){.coachDaily89 .checkinGrid89,.coachDaily89 .checkinActions89{grid-template-columns:1fr}}
+
+/* V8.9.1 — voice meal review */
+#mealMode8810{grid-template-columns:repeat(2,minmax(0,1fr))}#mealMode8810 button{font-size:13px;padding:8px;min-height:44px}#mealPane8810-voice textarea{width:100%;max-width:100%;min-width:0;box-sizing:border-box;font-size:16px;resize:vertical}#mealPane8810-voice [hidden]{display:none!important}.voiceActions891,.voiceMacros891{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.voiceActions891 button,.voiceHead891 button{min-height:44px;min-width:0;white-space:normal;word-break:normal}#voiceSave891,#voiceClear891{width:100%;min-height:44px;margin-top:8px}.voiceRow891{border:1px solid var(--edge);border-radius:12px;padding:10px;margin:8px 0;background:var(--field);min-width:0}.voiceHead891{display:flex;align-items:center;gap:8px;justify-content:space-between}.voiceHead891 b{min-width:0;overflow-wrap:anywhere}.voiceHead891 button{flex:0 0 auto;width:auto!important}.voiceMacros891>div{min-width:0}#voiceReview891 h3{font-size:15px}#voiceTarget891{color:var(--accent-text);font-weight:700}
