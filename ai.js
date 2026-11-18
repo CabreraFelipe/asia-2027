@@ -138,18 +138,19 @@
   window.asiaHealthAnalyze=health=>task('healthAnalysis','Analizando actividad…',async()=>{
     const r=await call('chat',{data:{question:'Analizá mis indicadores de Apple Salud: actividad, tendencias, recuperación y gasto energético estimado. Señalá cobertura, datos faltantes y días parciales; no diagnostiques ni recomiendes ajustar calorías solo por el reloj.',apple_health:health}});renderFormatted($('healthAnalysis'),String(r.result)+suffix(r));
   });
+  const classicStatus8813=document.createElement('p');classicStatus8813.id='classicStatus8813';classicStatus8813.className='meta';classicStatus8813.setAttribute('role','status');$('aiChatResult').after(classicStatus8813);
   function renderChat(){const el=$('aiChatResult');el.replaceChildren();for(const item of chat){const a=document.createElement('article');a.className=item.role;const b=document.createElement('strong');b.textContent=item.role==='user'?'Vos':'Entrenador IA';const p=document.createElement('div');if(item.role==='assistant')renderFormatted(p,item.text);else p.textContent=item.text;a.append(b,p);el.append(a);}}
-  $('aiClearChat').onclick=()=>{chat=[];saveChat();renderChat();};
+  $('aiClearChat').onclick=()=>{if(!confirm('¿Borrar solo las conversaciones del chat clásico? El chat principal y su memoria se conservan.'))return;chat=[];saveChat();renderChat();classicStatus8813.textContent='Chat clásico eliminado.';};
   $('aiAsk').onclick=()=>{
     const question=$('aiQuestion').value.trim(); if(!question)return;
     const share=$('healthShare').checked;
     const history=chat.filter(x=>x.shared===false||(share&&x.shared===true)).slice(-6).map(x=>({role:x.role,text:x.text.slice(0,850)}));
     if(!confirm('Se enviará a Cloudflare y OpenAI tu consulta, el resumen de registros'+(share?' (con Salud si hay datos disponibles)':' (sin datos importados de Salud)')+' y hasta '+history.length+' mensajes anteriores compatibles con el permiso actual. Los mensajes antiguos sin permiso identificado no se reenvían. ¿Continuar?'))return;
-    task('aiChatResult','Consultando al entrenador…',async()=>{
+    task('classicStatus8813','Consultando en modo clásico…',async()=>{
       const p=summary(); if(!share)delete p.apple_health; p.question=question;p.conversation=history;
       while(JSON.stringify(p).length>24500&&p.conversation.length)p.conversation.shift();
       if(JSON.stringify(p).length>24500)throw Error('Resumen demasiado extenso. Reducí la pregunta o revisá los registros.');
-      const r=await call('chat',{data:p});chat.push({role:'user',text:question,shared:share},{role:'assistant',text:String(r.result)+suffix(r),shared:share});chat=chat.slice(-12);saveChat();if($('aiQuestion').value.trim()===question)$('aiQuestion').value='';renderChat();
+      const r=await call('chat',{data:p});chat.push({role:'user',text:question,shared:share},{role:'assistant',text:String(r.result)+suffix(r),shared:share});chat=chat.slice(-12);saveChat();if($('aiQuestion').value.trim()===question)$('aiQuestion').value='';renderChat();classicStatus8813.textContent='Respuesta recibida.';const last=$('aiChatResult').lastElementChild;if(last?.getClientRects().length)last.scrollIntoView({block:'start',behavior:'auto'});
     });
   };
   renderChat(); window.refreshWeeklyV4?.();

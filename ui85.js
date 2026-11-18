@@ -1,4 +1,4 @@
-/* V8.8.12 — cross-app task navigation and presentation. Reuse original controls and preferences. */
+/* V8.8.13 — cross-app task navigation and presentation. Reuse original controls and preferences. */
 (()=>{'use strict';
 const specs=[['home','home42','layout51','tabHome'],['diet','diet','layout541-diet','tabDiet'],['training','training','layout541-training','tabTrain'],['health','health','layout541-health','tabHealth'],['progress','progress54','layout541-progress54','tabProgress54']];
 const by=id=>document.getElementById(id);
@@ -18,14 +18,15 @@ const tasks=[
  ['exercisePick','Analizar fuerza','progresión pesos cargas marcas'],
  ['healthRefresh','Actualizar Apple Salud','reloj watch sincronizar pasos datos'],
  ['healthMetric','Histórico de actividad','frecuencia cardíaca vfc sueño gráficos pasos'],
- ['coachQuestion50','Conversar con el Coach','preguntar inteligencia artificial asesoramiento chat'],
+ ['coachQuestion50','Conversar con el Coach','preguntar inteligencia artificial asesoramiento chat entrenador ia'],
  ['reportPeriod818','Informe de evolución','revisión semanal controles progreso exportar csv'],
  ['weeklyV4','Informe semanal de dieta','control lunes pdf nutrición'],
  ['before54','Comparar fotos de evolución','imagen antes después cuerpo'],
  ['pushReminders845','Avisos inteligentes','notificaciones push pesar recordatorio alarma'],
  ['backup844','Respaldo integral cifrado','copia seguridad recuperar restaurar datos nube'],
  ['diagnostics56','Sincronización y diagnóstico','ver versión cache offline error actualizar'],
- ['aiToken','Conexión con IA','token clave cloudflare configuración']
+ ['aiToken','Conexión con IA','token clave cloudflare configuración permisos privacidad'],
+ ['aiChatResult','Historial del entrenador anterior','mi entrenador ia chat clásico conversaciones antiguas']
 ];
 const norm=x=>String(x).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
 function cardVisible(n){return !!n&&!n.hidden&&!n.matches('.hide,.hiddenPanel51,.personalHidden822,.personalEmpty822,.layout51');}
@@ -57,7 +58,7 @@ for(const [key,id,oid] of specs){
 function active(){for(const [,id,,nav] of specs){const b=by(nav),root=by(id);if(!b||!root)continue;if(!root.classList.contains('hide'))b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');}}
 const previous=tab;tab=function(t){for(const clear of resetSearch)clear();previous(t);active();};active();
 // Make existing buttons self-explanatory without replacing nodes or their listeners.
-const labels={homeLog42:'Registrar comida',homeRefresh42:'Actualizar Salud',healthRefresh:'Actualizar Salud',healthSetup:'Configurar conexión',healthStepsCopy:'Sincronizar pasos ahora',backupNow42:'Guardar copia clásica',backupList42:'Ver copias guardadas',backupDownload42:'Descargar copia elegida',backupRestore42:'Restaurar copia elegida',aiDisconnect:'Olvidar clave del dispositivo',aiClearChat:'Limpiar conversación',gymOther53:'Retomar sesión pendiente',gymFinish53:'Guardar y finalizar sesión',saveWorkout:'Guardar sesión',export818:'Exportar informe CSV',nutReturn8810:'Volver al diario'};
+const labels={homeLog42:'Registrar comida',homeRefresh42:'Actualizar Salud',healthRefresh:'Actualizar Salud',healthSetup:'Configurar conexión',healthStepsCopy:'Sincronizar pasos ahora',backupNow42:'Guardar copia clásica',backupList42:'Ver copias guardadas',backupDownload42:'Descargar copia elegida',backupRestore42:'Restaurar copia elegida',aiDisconnect:'Olvidar clave del dispositivo',aiClearChat:'Borrar chat clásico',gymOther53:'Retomar sesión pendiente',gymFinish53:'Guardar y finalizar sesión',saveWorkout:'Guardar sesión',export818:'Exportar informe CSV',nutReturn8810:'Volver al diario'};
 for(const [id,label] of Object.entries(labels)){const n=by(id);if(n&&n.tagName==='BUTTON'&&!n.querySelector('svg'))n.textContent=label;}
 // Group only static instructions, never consent, status, input, or medical warnings.
 const routineInfo=by('routineInfo');const routineHelp=routineInfo?.nextElementSibling;if(routineHelp?.tagName==='P'&&routineHelp.classList.contains('tiny')&&routineHelp.textContent.includes('Registrá el peso con el mismo criterio')){const d=document.createElement('details'),summary=document.createElement('summary');d.className='context57 guidance8811';summary.textContent='Cómo registrar cargas y RIR';routineHelp.before(d);d.append(summary,routineHelp);}

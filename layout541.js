@@ -6,8 +6,8 @@ const make=(tag,text,cls)=>{const n=document.createElement(tag);if(text!=null)n.
 const button=(text,fn,cls='secondary')=>{const b=make('button',text,cls);b.type='button';b.addEventListener('click',fn);return b;};
 const specs=[['diet','Dieta',[['overview','lastWeight'],['daily','dailyV4'],['adaptive','adaptiveNutrition823'],['foods','foods44'],['nutrition','nutrition52'],['water','water52'],['measure','measureV4'],['charts','chartsV4'],['history','historyV4'],['compare','compareV4'],['calendar','dietCalendarV4'],['photos','photosV4'],['weekly','weeklyV4']]],['training','Gym',[['work','workV4'],['strength','strengthV4'],['sessions','sessionsV4'],['calendar','trainCalendarV4'],['muscle','muscleV4']]],['health','Salud',[['health','healthRefresh'],['history','healthMetric'],['coach','healthAnalyze'],['daily','healthStepsCopy'],['watch','watch43'],['transfer','healthTransfer828'],['sources','healthSources828']]],['progress54','Progreso',[['overview','range54'],['stats','category54'],['photos','view54'],['report','reportPeriod818'],['simulator','simulator825']]]];
 const organizerByTab=new Map([['home',home]]),revealByNode=new Map(),resetByTab=new Map([['home',()=>window.asiaResetHomeFold51?.()]]);
-// These three shared panels belong to the whole application, rather than one tab.
-for(const id of ['coachV4','configV4','settingsV4']){const n=el(id);if(n?.parentElement===main)main.insertBefore(n,help);}
+// Shared data/settings remain accessible from every tab. AI panels are consolidated in Asia Coach below.
+for(const id of ['settingsV4']){const n=el(id);if(n?.parentElement===main)main.insertBefore(n,help);}
 main.insertBefore(home,help);
 for(const [id,title,items] of specs){
  const root=el(id);if(!root)continue;
@@ -40,6 +40,30 @@ window.asiaInitialView85=t=>resetByTab.get(t)?.();
 const previousTab=tab;tab=function(t){previousTab(t);show(t);resetByTab.get(t)?.();};
 const active=[['home','home42'],['diet','diet'],['training','training'],['health','health'],['progress','progress54']].find(([,id])=>!el(id)?.classList.contains('hide'));
 show(active?.[0]||'home');resetByTab.get(active?.[0]||'home')?.();
+// V8.8.13 — one AI hub, with legacy history isolated by its original consent and storage.
+const hub=el('coach50'),hubInfo=el('coachInfo8810'),classic=el('coachV4'),connection=el('configV4');
+if(hub&&hubInfo&&classic&&connection){
+ function nest(panel,title){panel.classList.remove('card','sectionfold');panel.classList.add('coachDisclosure8810','aiHubSection8813');panel.querySelector(':scope > summary').textContent=title;panel.open=false;hubInfo.append(panel);}
+ hubInfo.querySelector(':scope > summary').textContent='Metas, memoria, historial y configuración';
+ nest(connection,'Conexión con IA · clave y privacidad');
+ nest(classic,'Chat clásico · historial anterior');
+ const intro=el('aiCoach').querySelector('p.meta');
+ intro.textContent='Tus conversaciones anteriores se conservan aquí. Si querés retomarlas, el modo clásico mantiene su contexto y permisos originales. No se mezclan con el chat principal.';
+ const legacyResult=el('aiChatResult'),legacyQuestion=el('aiQuestion');legacyQuestion.before(legacyResult);legacyResult.setAttribute('role','log');legacyResult.setAttribute('aria-live','polite');legacyQuestion.setAttribute('aria-label','Pregunta para el chat clásico');el('aiClearChat').parentElement.after(el('classicStatus8813'));
+ const privacy=make('p','Las consultas clásicas envían un resumen reciente y hasta seis mensajes anteriores compatibles con el permiso de Salud. Los mensajes con permiso desconocido no se reenvían.','tiny');intro.after(privacy);
+ const back=button('Ir al chat principal',()=>{hubInfo.open=false;window.asiaOpenCoachHub8813('coachQuestion50');});classic.append(back);
+ const healthNote=make('p','El chat principal permite elegir su contexto en cada consulta. La conexión es compartida con el escáner de alimentos, etiquetas, Xiaomi y otras funciones de IA.','tiny');connection.append(healthNote);
+ function openHub(targetId='coach50'){
+  const target=el(targetId);if(!target||!hub.contains(target)&&target!==hub)return false;
+  if(!el('coachDialog51')?.open){if(el('home42').classList.contains('hide'))tab('home');window.asiaRevealPanel541(hub);}
+  for(let n=target;n&&n!==hub;n=n.parentElement)if(n.tagName==='DETAILS')n.open=true;
+  requestAnimationFrame(()=>{if(target.getClientRects().length)target.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});});return true;
+ }
+ window.asiaOpenCoachHub8813=openHub;
+ window.asiaOpenSettings=()=>openHub('configV4');
+ // A dedicated link still permits connection setup from shared settings if the Coach was hidden.
+ const settings=el('settingsV4');if(settings){const b=button('Configurar conexión con IA',()=>openHub('configV4'));b.id='aiHubSettings8813';settings.querySelector(':scope > summary').after(b);}
+}
 // Existing history-edit buttons sometimes navigate without scrolling.
 document.addEventListener('click',e=>{const b=e.target.closest('button');if(b?.dataset.workEdit)window.asiaRevealPanel541(el('workV4'));});
 })();
