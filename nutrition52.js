@@ -89,7 +89,7 @@ let meal880='Desayuno', edit880=null, shownDay880=null;
 const group8810=(tag,id,cls)=>{const n=node(tag);n.id=id;n.className=cls;return n;};
 const fold8810=(id,title)=>{const n=group8810('details',id,'taskFold8810');n.append(node('summary',title));return n;};
 const moveRange8810=(from,to,into)=>{let n=from;while(n){const next=n.nextElementSibling;into.append(n);if(n===to)break;n=next;}};
-const composer8810=fold8810('mealComposer8810','+ Añadir a esta comida');
+const composer8810=fold8810('mealComposer8810','Añadir a esta comida');
 const modeLine8810=group8810('div','mealMode8810','mealMode8810');
 const modes8810=[['food','Alimento'],['plate','Plato habitual'],['tools','Foto / IA / más']];
 const panes8810={};
