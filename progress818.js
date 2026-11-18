@@ -83,6 +83,8 @@ function stall887(data,asOf,goalKg=72){
 }
 function signedDelta(n){return n===null||!Number.isFinite(n)?'—':`${n>0?'+':''}${Math.abs(n)<1?n.toFixed(2):n.toFixed(1)} kg`;}
 
+// Sorted valid daily weights: a seven-day sliding window; preserves missing-day semantics.
+function rollingWeight90(weights){const out=[];let left=0,sum=0;for(let right=0;right<weights.length;right++){const [d,b]=weights[right],cut=shift(d,-6);sum+=b.weight;while(weights[left][0]<cut){sum-=weights[left][1].weight;left++;}out.push([d,sum/(right-left+1)]);}return out;}
 function trajectory887(body,asOf,end=shift(asOf,-1)){
  if(!day(asOf)||!day(end)||end>=asOf)throw Error('Fecha de trayectoria inválida');
  const pts=Object.entries(body||{}).filter(([d,b])=>day(d)&&d<=end&&d>=shift(end,-41)&&val(b?.weight,20,300)!==null).sort(([a],[b])=>a.localeCompare(b));
@@ -95,5 +97,5 @@ function trajectory887(body,asOf,end=shift(asOf,-1)){
  const vacDays=Array.from({length:remaining},(_,i)=>shift(asOf,i+1)).filter(vac887).length,active=remaining-vacDays,projected=base+slope*remaining,scenario=base+slope*active,unsteady=Math.abs(slope*7)>1||val(projected,20,300)===null||val(scenario,20,300)===null;
  return {...baseInfo,base,slope,projected,scenario,vacDays,active,unsteady};
 }
-const api={build,csv,labels,windowReport,steps828,coach28,control887,weekly887,trajectory887,stall887,nutritionStatus887};if(typeof module==='object'&&module.exports)module.exports=api;else root.asiaProgress818=api;
+const api={build,csv,labels,windowReport,steps828,coach28,control887,weekly887,trajectory887,stall887,nutritionStatus887,rollingWeight90};if(typeof module==='object'&&module.exports)module.exports=api;else root.asiaProgress818=api;
 })(typeof window==='object'?window:globalThis);

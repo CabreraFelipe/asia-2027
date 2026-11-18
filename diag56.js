@@ -1,6 +1,6 @@
-/* Asia 2027 V8.9.6 — read-only connection diagnostics; no secrets or health content in reports. */
+/* Asia 2027 V9.0 — read-only connection diagnostics; no secrets or health content in reports. */
 (()=>{'use strict';
-const VERSION='8.9.6',CACHE='asia-2027-v896-20261118',KEY='asia-diagnostic-v56';
+const VERSION='9.0',CACHE='asia-2027-v900-20261118',KEY='asia-diagnostic-v56';
 const by=id=>document.getElementById(id),main=document.querySelector('main'),help=by('help502');if(!main||!help)return;
 const labels={internet:'Conexión al servidor',cloud:'Cloudflare AI',openai:'OpenAI',health:'Apple Salud',workouts:'Entrenamientos del Apple Watch',rest:'Avisos de descanso',push:'Notificaciones de pesaje',backup:'Copias de seguridad',storage:'Almacenamiento local',version:'Versión y caché'};
 const codes={unchecked:'Sin comprobar',checking:'Comprobando…',ok:'Comprobado',warning:'Requiere atención',error:'Error',off:'Sin configurar',unknown:'No confirmado'};
@@ -32,7 +32,7 @@ function record(id,state,detail,extra={}){const r=clean({id,state,detail,at:Date
 window.asiaDiagEvent56=(id,state,http,upstream)=>{if(id==='openai')record(id,state==='ok'?'ok':'error',state==='ok'?'aiOK':'aiError',{http,upstream})};
 const result=(state,detail,extra={})=>({state,detail,...extra});
 async function bounded(p,ms=5000){let t;try{return await Promise.race([p,new Promise((_,reject)=>{t=setTimeout(()=>reject(Error('timeout')),ms)})])}finally{clearTimeout(t)}}
-async function network(url,options={},ms=10000){const c=new AbortController(),t=setTimeout(()=>c.abort(),ms);try{return await fetch(url,{cache:'no-store',redirect:'error',...options,signal:c.signal})}finally{clearTimeout(t)}}
+async function network(url,options={},ms=10000){const c=new AbortController(),t=setTimeout(()=>c.abort(),ms);try{return await fetch(url,{cache:'no-store',redirect:'error',credentials:'omit',...options,signal:c.signal})}finally{clearTimeout(t)}}
 function httpResult(x){if(x.configured===false)return result('off','notConfigured');if(x.http===401||x.http===403)return result('error','auth',{http:x.http});if(x.invalid)return result('error','invalid',{http:x.http});return result('error','http',{http:x.http});}
 async function server(id){const x=await window.asiaDiagAIRead56(id);if(!x.ok)return httpResult(x);if(id==='cloud')return result('ok','cloud',{http:x.http});const e={http:x.http,count:x.count,latest:x.latest};if(!x.count)return result(id==='backup'?'warning':'unknown',id==='backup'?'backupEmpty':'empty',e);if(id==='health'&&x.latest&&Date.now()-x.latest>48*3600000)return result('warning','oldHealth',e);return result('ok',id,e)}
 async function rest(){let token,enabled;try{token=localStorage.getItem('asia-rest533-token');enabled=localStorage.getItem('asia-rest533-enabled')==='1'}catch{}if(!/^[a-fA-F0-9]{64}$/.test(token||''))return result('off','notConfigured');const r=await network('https://asia-2027-rest.cabrerafelipe2003.workers.dev/rest',{headers:{Authorization:'Bearer '+token}});if(!r.ok)return httpResult({http:r.status});const x=await r.json();if(x.ok!==true)return httpResult({http:r.status,invalid:true});const e={http:safeNum(x.http)};if(['failed','expired','unknown'].includes(x.status))return result('error','restFailed',e);if(!enabled)return result('off','restDisabled');if(x.status==='accepted')return result('ok','restAccepted',e);if(['sending','scheduled'].includes(x.status))return result('ok','restScheduled');if(x.status==='cancelled')return result('ok','restCancelled');return result(x.status==='idle'?'ok':'unknown','restIdle')}

@@ -400,7 +400,7 @@ main .scroll{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain}
 .coachHistory89{display:grid;gap:7px;margin-top:8px}.coachHistoryItem89{width:100%;text-align:left;background:#21334a;color:var(--ink);border-radius:12px;border:1px solid var(--edge);font-size:13px;font-weight:650}.coachChat89{width:100%;margin-top:6px}.coachDaily89 .context57{margin-top:10px}
 @media(max-width:420px){.coachShortcuts89,.coachDaily89 .checkinActions89,.coachSecondaryActions89{grid-template-columns:1fr}.coachHeroHead89,.coachStallHead89,.checkinQuestionHead89{display:block}.coachScore89{margin-top:10px;width:max-content}.checkinScale89{gap:6px}.checkinChoice89{min-height:44px;font-size:16px}}
 
-/* V8.9.6 — shared palette tokens, compact cards and full-width scales. */
+/* V9.0 — shared palette tokens, compact cards and full-width scales. */
 .coachDaily89 .checkinGrid89{grid-template-columns:minmax(0,1fr);gap:12px}
 .coachDaily89 .checkinPanel89,.coachDaily89 .coachHero89,.coachDaily89 .coachStall89{background:var(--field);box-shadow:none}
 .coachDaily89 .coachScore89,.coachDaily89 .coachProgress89{background:var(--surface-raised)}
