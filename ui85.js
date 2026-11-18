@@ -1,9 +1,14 @@
-/* V8.9.2 — cross-app task navigation and presentation. Reuse original controls and preferences. */
+/* V8.9.6 — cross-app task navigation and presentation. Reuse original controls and preferences. */
 (()=>{'use strict';
 const specs=[['home','home42','layout51','tabHome'],['diet','diet','layout541-diet','tabDiet'],['training','training','layout541-training','tabTrain'],['health','health','layout541-health','tabHealth'],['progress','progress54','layout541-progress54','tabProgress54']];
 const by=id=>document.getElementById(id);
 function button(label,action){const b=document.createElement('button');b.type='button';b.className='secondary';b.textContent=label;b.addEventListener('click',action);return b;}
 const tasks=[
+ ['adaptive896','Adaptar entrenamiento','tiempo 30 45 60 minutos fatiga alternativa reducir series'],
+ ['weeklyReview896','Revisión semanal con el Coach','reunión objetivos control lunes reflexión'],
+ ['cardio896','Evolución cardiovascular','vo2 frecuencia cardíaca reposo vfc ejercicio aeróbico'],
+ ['milestones896','Mis hitos y medidas corporales','logros perímetros cintura cadera brazo pecho muslo'],
+ ['overlay896','Superposición de fotografías','alineación opacidad comparar fotos'],
  ['checkin89','Check-in diario','energía hambre descanso estrés molestias ánimo bienestar'],
  ['coachDaily89','Estrategia de hoy','coach proactivo consejo diario recomendaciones'],
  ['day','Registrar comida','comer alimentos calorias proteínas desayuno almuerzo merienda cena dieta'],
