@@ -361,3 +361,21 @@ main .scroll{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain}
 #coach50 #aiChatResult:empty,#coach50 #classicStatus8813:empty{display:none}
 #aiHubSettings8813{width:100%;margin:8px 0;min-height:44px}
 @media(max-width:340px){#coach50 #aiCoach>p:has(>button),#coach50 #aiSettings>.row{grid-template-columns:1fr}}
+
+/* V8.9 — daily check-in, respects current palette and fold rules. */
+.coachDaily89{background:var(--field);border:1px solid var(--edge);border-radius:14px;padding:12px;margin:12px 0;min-width:0;max-width:100%;overflow-wrap:break-word}
+.coachDaily89 h3{margin:0 0 6px;font-size:17px;color:var(--ink)}
+.coachDaily89 .coachHeadline89{color:var(--accent-text,var(--teal));font-weight:700;margin:6px 0}
+.coachDaily89 .coachInsights89{display:grid;gap:0;margin:8px 0}
+.coachDaily89 .coachInsight89{min-width:0;padding:9px 0;border-bottom:1px solid var(--edge)}
+.coachDaily89 .coachInsight89 strong{font-size:14px;color:var(--ink)}
+.coachDaily89 .coachInsight89 p{font-size:13px;line-height:1.45;margin:3px 0 0;color:var(--muted)}
+.coachDaily89 .checkinGrid89,.coachDaily89 .checkinActions89{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.coachDaily89 .checkinGrid89>div{min-width:0}
+.coachDaily89 .checkinGrid89 select{width:100%;min-width:0;max-width:100%;font-size:16px}
+.coachDaily89 .checkinDateRow89{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
+.coachDaily89 .checkinDateRow89 input{min-width:0;width:100%;max-width:100%}
+.coachDaily89 button{min-height:44px;min-width:0;white-space:normal;overflow-wrap:break-word;font-size:14px}
+.coachDaily89 .checkinActions89{margin-top:10px}
+.coachDaily89>button,.coachDaily89 #checkin89 details button{width:100%;margin-top:5px}
+@media(max-width:340px){.coachDaily89 .checkinGrid89,.coachDaily89 .checkinActions89{grid-template-columns:1fr}}

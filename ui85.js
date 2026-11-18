@@ -1,9 +1,11 @@
-/* V8.8.13 — cross-app task navigation and presentation. Reuse original controls and preferences. */
+/* V8.9 — cross-app task navigation and presentation. Reuse original controls and preferences. */
 (()=>{'use strict';
 const specs=[['home','home42','layout51','tabHome'],['diet','diet','layout541-diet','tabDiet'],['training','training','layout541-training','tabTrain'],['health','health','layout541-health','tabHealth'],['progress','progress54','layout541-progress54','tabProgress54']];
 const by=id=>document.getElementById(id);
 function button(label,action){const b=document.createElement('button');b.type='button';b.className='secondary';b.textContent=label;b.addEventListener('click',action);return b;}
 const tasks=[
+ ['checkin89','Check-in diario','energía hambre descanso estrés molestias ánimo bienestar'],
+ ['coachDaily89','Estrategia de hoy','coach proactivo consejo diario recomendaciones'],
  ['day','Registrar comida','comer alimentos calorias proteínas desayuno almuerzo merienda cena dieta'],
  ['mealComposer8810','Añadir alimentos','porciones plato morron pollo cantidad comida'],
  ['nutLoadMeal52','Escanear comida o etiqueta','foto cámara codigo barras nutrición ia calorías'],
