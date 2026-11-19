@@ -431,3 +431,44 @@ body>nav button{flex:1 1 0;min-width:0;max-width:160px}
 #coachDaily89 .coachHero89{margin-bottom:6px}#coachDaily89 .coachHeadline89{font-weight:600}
 
 #fillMissing901{width:100%;margin:6px 0;min-height:44px}#fillMissing901[hidden]{display:none!important}#homeCoachDaily901 #coachDaily89{margin:0}#homeCoachDaily901 #coachDaily89 .coachHero89{padding:10px}
+
+
+/* V9.0.2 — Asia Experience: shared visual language, same controls and storage. */
+.experienceGoal902{margin-top:12px;max-width:495px;border:1px solid var(--edge);border-radius:16px;padding:12px 14px;background:var(--surface-raised,var(--panel));color:var(--ink)}
+.experienceGoalLabel902{display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 10px;font-size:11px;font-weight:650;color:var(--muted);letter-spacing:.15px}.experienceGoalLabel902 span:first-child{color:var(--accent-text,var(--teal));letter-spacing:.9px}
+header .experienceGoal902 .countdown{margin:6px 0 0;color:var(--ink);display:flex;align-items:baseline;gap:10px}header .experienceGoal902 .countdown strong{color:var(--accent-text,var(--teal));font-size:clamp(30px,8vw,40px);font-variant-numeric:tabular-nums}header .experienceGoal902 .countdown span{color:var(--muted);font-size:14px}
+.experienceIcon902{display:inline-block;width:19px;height:19px;flex:none;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle}
+#home42 .experienceDay902 .homeGrid42{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-block:10px}
+#home42 .experienceDay902 .experienceMetric902{min-height:106px;padding:12px 10px;background:var(--field);border:1px solid var(--edge);box-shadow:none;justify-content:flex-start;gap:4px;overflow:hidden}
+#home42 .experienceDay902 .experienceMetric902>small:first-child{display:flex;align-items:center;gap:5px;font-size:12px;line-height:1.25;color:var(--muted)}
+.experienceMetric902 .experienceIcon902{color:var(--accent-text,var(--teal));width:17px;height:17px}
+#home42 .experienceDay902 .experienceMetric902 b{font-size:clamp(19px,5vw,27px);line-height:1.2;letter-spacing:-.65px;color:var(--ink);font-variant-numeric:tabular-nums;overflow-wrap:normal}
+#home42 .experienceDay902 .experienceMetric902[data-metric902=weight] b{color:var(--accent-text,var(--teal))}
+#home42 .experienceDay902 .experienceMetric902>small:not(:first-child){font-size:11px;line-height:1.35;color:var(--muted);overflow-wrap:break-word}
+#home42 .experienceDay902 .experienceMetric902:has(.experienceRing902){padding-right:50px}
+.experienceRing902{position:absolute;right:9px;top:35px;width:36px;height:36px;transform:rotate(-90deg);fill:none;stroke-width:4.5;pointer-events:none}
+.experienceRing902 .track902{stroke:var(--edge)}.experienceRing902 .arc902{stroke:var(--accent-text,var(--teal));stroke-linecap:round;stroke-dasharray:var(--progress902,0) 100}
+.experienceRing902[data-unavailable902] .arc902{visibility:hidden}.experienceRing902[data-unavailable902]{opacity:.45}
+#home42 .experienceDay902 .experienceMetric902 .bar{display:none}
+#home42 .experienceDay902 .homeGrid42.personalCompact822 .experienceMetric902{min-height:74px;padding:8px 9px;gap:2px}#home42 .experienceDay902 .homeGrid42.personalCompact822 .experienceRing902{display:none}#home42 .experienceDay902 .homeGrid42.personalCompact822 .experienceMetric902 .bar:not([hidden]){display:block}
+#home42 .experienceDay902 .homeActions857{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:10px 0}
+#home42 .experienceDay902 .homeActions857 button,#homeRefresh42{display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;white-space:normal;word-break:normal;overflow-wrap:normal;line-height:1.25;font-size:13px;padding:8px 5px}
+#home42 .experienceDay902 .homeActions857 #homeLog42{grid-column:1/-1;min-height:48px;font-size:15px}
+#home42 .experienceDay902 .homeActions857 button.secondary .experienceIcon902,#homeRefresh42 .experienceIcon902{color:var(--accent-text,var(--teal))}
+#homeRefresh42{width:100%;margin:7px 0}
+#home42 .experienceDay902 #homeNutritionStatus857{margin:7px 0;color:var(--muted);font-size:12px}
+#home42 .experienceWorkout902 #homeWorkout42{font-size:22px;line-height:1.25;letter-spacing:-.4px;margin:10px 0 4px}
+#home42 .experienceWorkout902 #homeGym42{width:100%;min-height:48px;margin-top:10px}
+.experienceStats902{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:10px 0}.experienceStats902>div{display:flex;flex-direction:column;gap:4px;background:var(--field);border:1px solid var(--edge);border-radius:12px;padding:9px 5px;text-align:center;min-width:0}.experienceStats902 strong{font-size:20px;font-variant-numeric:tabular-nums;color:var(--ink)}.experienceStats902 small{font-size:11px;color:var(--muted);line-height:1.25}
+.experienceNext902{display:grid;gap:6px;padding:12px;background:var(--field);border:1px solid var(--edge);border-radius:14px;margin:10px 0}.experienceNext902 small,.experienceNext902 span{color:var(--muted);font-size:12px}.experienceNext902 strong{font-size:16px;line-height:1.35}.experienceNext902 button{min-height:44px;margin-top:3px}.experienceNext902[hidden],.experienceStats902[hidden]{display:none!important}
+/* Shared modest polish, not a new navigation layout. */
+.viewTools85 button{font-weight:650;min-height:44px}.sectionSearch889{border-radius:12px;min-height:44px}.headerQuick505 button{box-shadow:none}.headerQuick505 button:focus-visible,.homeActions857 button:focus-visible,.viewTools85 button:focus-visible,body>nav button:focus-visible{outline:2px solid var(--accent-text,var(--teal));outline-offset:2px}
+body>nav button{border-radius:14px}body>nav button.active{font-weight:750}
+@media(max-width:420px){#home42 .experienceDay902 .experienceMetric902:has(.experienceRing902){padding-right:10px;padding-bottom:10px} .experienceRing902{width:25px;height:25px;top:8px;right:8px}#home42 .experienceDay902 .experienceMetric902:has(.experienceRing902)>small:first-child{padding-right:20px}#home42 .experienceDay902 .experienceMetric902 b{font-size:clamp(19px,5.5vw,24px)}}
+@media(max-width:350px){#home42 .experienceDay902 .experienceMetric902{padding:9px 7px;min-height:100px}#home42 .experienceDay902 .experienceMetric902>small:first-child{font-size:11px}#home42 .experienceDay902 .homeActions857 button{font-size:12px}.experienceStats902 small{font-size:10px}}
+@media(prefers-reduced-motion:reduce){.experienceRing902,.experienceGoal902,.experienceMetric902{transition:none!important;animation:none!important}}
+
+.experienceFocus902{font-size:12px;color:var(--muted);line-height:1.4;padding:8px 10px;border-inline-start:2px solid var(--accent-text,var(--teal));background:var(--field);border-radius:0 8px 8px 0;margin:6px 0}.experiencePlanner902{width:100%;margin-top:8px;min-height:44px;white-space:normal;font-size:13px;line-height:1.3}
+/* In the full default 5-metric view, the last hydration tile is a compact strip. Reordering/hiding remains respected. */
+#home42 .experienceDay902 .homeGrid42:not(:has(.personalHidden822))>.experienceMetric902[data-metric902=water]:last-child{grid-column:1/-1;min-height:70px;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:3px 10px}
+#home42 .experienceDay902 .homeGrid42:not(:has(.personalHidden822))>.experienceMetric902[data-metric902=water]:last-child b{grid-column:2;grid-row:1/3;text-align:right}#home42 .experienceDay902 .homeGrid42:not(:has(.personalHidden822))>.experienceMetric902[data-metric902=water]:last-child small:last-child{grid-column:1;grid-row:2}

@@ -1,17 +1,17 @@
 /* R22 — Device-local presentation only. Reuses existing Home editor and DOM. */
 (function(){'use strict';
-const metricKeys=['weight','steps','kcal','protein'],shortcutKeys=['gym','diet','xiaomi','planner','reminders','progress','coach'];
+const metricKeys=['weight','steps','kcal','protein','water'],shortcutKeys=['gym','diet','xiaomi','planner','reminders','progress','coach'];
 const specs={metrics:metricKeys,shortcuts:shortcutKeys};
 const defaults=()=>({metrics:{order:[...metricKeys],hidden:[]},shortcuts:{order:[...shortcutKeys],hidden:shortcutKeys.slice(3)},compact:false});
-function normalize(raw){const d=defaults();for(const [g,keys] of Object.entries(specs)){const valid=a=>Array.isArray(a)?[...new Set(a.filter(k=>keys.includes(k)))]:null;const order=valid(raw?.[g]?.order)||[];d[g].order=[...order,...keys.filter(k=>!order.includes(k))];d[g].hidden=valid(raw?.[g]?.hidden)??d[g].hidden;}d.compact=raw?.compact===true;return d;}
+function normalize(raw){const d=defaults();for(const [g,keys] of Object.entries(specs)){const valid=a=>Array.isArray(a)?[...new Set(a.filter(k=>keys.includes(k)))]:null;const order=valid(raw?.[g]?.order)||[];d[g].order=[...order,...keys.filter(k=>!order.includes(k))];d[g].hidden=valid(raw?.[g]?.hidden)??d[g].hidden;if(g==='metrics'&&Array.isArray(raw?.metrics?.order)&&!raw.metrics.order.includes('water')&&['weight','steps','kcal','protein'].every(k=>d.metrics.hidden.includes(k)))d.metrics.hidden.push('water');}d.compact=raw?.compact===true;return d;}
 function change(raw,group,k,action){const p=normalize(raw);if(!Object.hasOwn(specs,group)||!specs[group].includes(k))throw Error('Opción desconocida');const g=p[group],i=g.order.indexOf(k);if(action==='toggle'){g.hidden=g.hidden.includes(k)?g.hidden.filter(x=>x!==k):[...g.hidden,k];}else if(action==='up'||action==='down'){const j=i+(action==='up'?-1:1);if(j>=0&&j<g.order.length)[g.order[i],g.order[j]]=[g.order[j],g.order[i]];}else throw Error('Acción desconocida');return p;}
 function preset(name){const p=defaults();if(name==='essential'){p.metrics.hidden=['steps'];p.shortcuts.hidden=['xiaomi','progress','coach'];p.compact=true;}else if(name==='complete'){p.shortcuts.hidden=[];}else if(name!=='original')throw Error('Vista desconocida');return p;}
 const api={normalize,change,preset,defaults};if(typeof module!=='undefined'&&module.exports){module.exports=api;return;}
 const el=id=>document.getElementById(id),editor=el('layout51'),home=el('home42'),grid=home?.querySelector('.homeGrid42'),quick=document.querySelector('.headerQuick505');if(!editor||!grid||!quick)return;
-const names={weight:'Último peso',steps:'Pasos',kcal:'Calorías',protein:'Proteína',gym:'Entreno hoy',diet:'Registro diario',xiaomi:'Informe Xiaomi',planner:'Planificador',reminders:'Recordatorios',progress:'Progreso',coach:'Coach IA'};
+const names={weight:'Último peso',steps:'Pasos',kcal:'Calorías',protein:'Proteína',water:'Agua registrada',gym:'Entreno hoy',diet:'Registro diario',xiaomi:'Informe Xiaomi',planner:'Planificador',reminders:'Recordatorios',progress:'Progreso',coach:'Coach IA'};
 const make=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};
 function button(text,fn){const b=make('button',text,'secondary');b.type='button';b.addEventListener('click',fn);return b;}
-const metrics=Object.fromEntries(metricKeys.map((k,i)=>[k,el(['homeWeight42','homeSteps42','homeKcal42','homeProtein42'][i])?.closest('.metric')]));
+const metrics=Object.fromEntries(metricKeys.map((k,i)=>[k,el(['homeWeight42','homeSteps42','homeKcal42','homeProtein42','homeWater902'][i])?.closest('.metric')]));
 const shortcuts=Object.fromEntries(shortcutKeys.slice(0,3).map((k,i)=>[k,el(['quickGym505','quickDaily505','quickXiaomi505'][i])]));
 if(Object.values(metrics).some(n=>!n||n.parentElement!==grid)||Object.values(shortcuts).some(n=>!n||n.parentElement!==quick))return;
 function showHome(id){tab('home');const n=el(id);if(!n)return;for(let p=n;p&&p!==home;p=p.parentElement)if(p.tagName==='DETAILS')p.open=true;(window.asiaScrollTo541||((n,o)=>n.scrollIntoView(o)))(n,{block:'start'});}
