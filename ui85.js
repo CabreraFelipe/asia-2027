@@ -1,4 +1,4 @@
-/* V9.2 — cross-app task navigation and presentation. Reuse original controls and preferences. */
+/* V9.3 — cross-app task navigation and presentation. Reuse original controls and preferences. */
 (()=>{'use strict';
 const specs=[['home','home42','layout51','tabHome'],['diet','diet','layout541-diet','tabDiet'],['training','training','layout541-training','tabTrain'],['health','health','layout541-health','tabHealth'],['progress','progress54','layout541-progress54','tabProgress54']];
 const by=id=>document.getElementById(id);
@@ -33,6 +33,7 @@ const tasks=[
  ['waterDate52','Registrar agua','hidratacion beber ml vaso'],
  ['measureDay','Registrar peso y composición','pesaje balanza xiaomi grasa muscular captura'],
  ['recoveryDay43','Recuperación diaria','sueño fatiga descanso energía'],
+ ['gymPerformance93','Rendimiento y récords','1rm fatiga fuerza duración cargas gimnasio'],
  ['gymPro53','Abrir entrenamiento','rutina entreno hoy sesión series pesas'],
  ['plannerDay820','Planificador semanal','calendario reprogramar cambiar día entreno'],
  ['gymTemplates826','Personalizar rutinas','crear ejercicios editar gimnasio'],

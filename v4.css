@@ -526,3 +526,6 @@ body>nav button{min-height:48px;}
 #compose92 button,#barcode92 button,#recipeWeight92 button{min-height:44px;white-space:normal;}
 #compose92 .mealFast901{grid-template-columns:repeat(auto-fit,minmax(110px,1fr));}
 #macro92-fiber{display:block;}
+
+/* V9.3 performance charts */
+.gymChart93{display:grid;gap:8px;margin:10px 0}.gymChartRow93{display:grid;grid-template-columns:44px minmax(0,1fr) 72px;align-items:center;gap:8px}.gymChartBar93{height:10px;background:var(--line);border-radius:8px;overflow:hidden}.gymChartBar93 span{display:block;height:100%;background:var(--gold,#ffb23c);border-radius:8px}#gymPerformance93 .metric{min-width:0;overflow-wrap:anywhere}#barcodeResults92 select{margin:8px 0}#barcodeResults92 a{display:block;overflow-wrap:anywhere}
