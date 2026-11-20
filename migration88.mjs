@@ -1,3 +1,4 @@
+import './core105.js';
 import './extras830.js';
 import './gym826.js';
 import './schedule829.js';

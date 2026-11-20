@@ -1,5 +1,6 @@
 /* R17: shared pure rules for the original daily nutrition record. No storage/network. */
 (function(root){'use strict';
+const core105=globalThis.asiaCore105||(typeof require==='function'?require('./core105.js'):null);
 const limits={kcal:15000,protein:1000,carbs:2000,fat:1000};
 const finite=(v,max)=>typeof v==='number'&&Number.isFinite(v)&&v>=0&&v<=max;
 const round=v=>Math.round(v*10)/10;
@@ -11,7 +12,7 @@ const saved=r=>({intakeKcal:r?.intakeKcal??null,proteinG:r?.proteinG??null,intak
 function same(a,b){return a.intakeKcal===b.intakeKcal&&a.proteinG===b.proteinG;}
 function plan(record,next,form){const before=saved(record);if(!same(before,form)||before.intakeComplete!==form.intakeComplete)throw Error('Hay totales sin guardar en Registro diario. Guardalos o recargá la fecha antes de actualizar.');const old=total(record?.foods52??[]),after=total(next);return {before,after,needsConfirm:!same(before,old)||before.intakeComplete,patch:{foods52:next,intakeKcal:after.intakeKcal,proteinG:after.proteinG,intakeComplete:false}};}
 // V8.8.6: one evaluation rule; historical goal snapshots never silently replaced.
-const goalsOK=g=>finite(g?.calories,2300)&&g.calories>=1900&&finite(g?.protein,170)&&g.protein>=130;
+const goalsOK=core105.recordedTarget;
 function classify(record,g,vacation=false){if(vacation)return 'vac';if(!record?.intakeComplete||!goalsOK(g)||!finite(record.intakeKcal,15000)||!finite(record.proteinG,1000))return '';const k=record.intakeKcal*10,p=record.proteinG*10;return k>=g.calories*9&&k<=g.calories*11&&p>=g.protein*10?'yes':k>=g.calories*8&&k<=g.calories*12&&p>=g.protein*8?'partial':'no';}
 function snapshot(record){const g=record?.nutritionGoal880;if(!goalsOK(g)||!record.intakeComplete||!finite(g.kcal,15000)||!finite(g.proteinG,1000)||g.kcal!==record.intakeKcal||g.proteinG!==record.proteinG||g.ad!==record.ad||!['yes','partial','no','vac'].includes(g.ad))return null;return {calories:g.calories,protein:g.protein,kcal:g.kcal,proteinG:g.proteinG,ad:g.ad,...(sharesOK(g.mealShares103)?{mealShares103:[...g.mealShares103]}:{})};}
 function close(record,form,goals,vacation=false){const t=total(record?.foods52??[]),official=saved(record);if(t.kcal===null||t.protein===null)throw Error('Registrá al menos una ingesta en el detalle.');if(!same(official,t)||!same(official,form)||official.intakeComplete!==form.intakeComplete)throw Error('El detalle no coincide con los totales oficiales o hay cambios sin guardar. Revisá Biblioteca y gestión nutricional.');const old=snapshot(record);if(old)return {already:true,patch:null,goals:old};if(!goalsOK(goals))throw Error('No hay metas válidas para evaluar el día.');const ad=classify({...official,intakeComplete:true},goals,vacation);return {already:false,goals,patch:{intakeComplete:true,ad,nutritionGoal880:{calories:goals.calories,protein:goals.protein,kcal:official.intakeKcal,proteinG:official.proteinG,ad,...(sharesOK(goals.mealShares103)?{mealShares103:[...goals.mealShares103]}:{})}}};}

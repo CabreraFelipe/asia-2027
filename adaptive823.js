@@ -1,8 +1,9 @@
 /* R23: local, explainable proposals for the original diary. Never sends data. */
 (function(){'use strict';
+const core105=globalThis.asiaCore105||(typeof require==='function'?require('./core105.js'):null);
 const day=d=>typeof d==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(d)&&Number.isFinite(Date.parse(d))&&new Date(d).toISOString().slice(0,10)===d;
 const shift=(d,n)=>new Date(Date.parse(d)+n*86400000).toISOString().slice(0,10);
-const active=d=>day(d)&&d>='2026-11-23'&&d<'2027-03-08'&&!(d>='2026-12-26'&&d<='2027-01-07');
+const active=core105.active;
 const num=(n,l,h)=>typeof n==='number'&&Number.isFinite(n)&&n>=l&&n<=h;
 const manual=(n,l,h)=>num(n,l,h)?n:typeof n==='string'&&/^\d+(?:\.\d+)?$/.test(n.trim())&&num(Number(n),l,h)?Number(n):null;
 const mean=a=>a.length?a.reduce((s,x)=>s+x,0)/a.length:null;
@@ -39,13 +40,13 @@ function gym(data,d,ri,ex,increment=2.5){
  return result('hold','Mantené la carga. Para subir se necesitan dos sesiones comparables al máximo del rango y un incremento disponible ≤5%; sin lastre no se propone carga extra.');
 }
 function nutrition(data,d,goals){
- if(!day(d)||!num(goals?.calories,1900,2300)||!num(goals?.protein,130,170))throw Error('Fecha o metas inválidas.');
+ if(!day(d)||!core105.recordedTarget(goals))throw Error('Fecha o metas inválidas.');
  function period(offset){const weights=[],cal=[],pro=[];let vacation=0,adherent=0;for(let i=offset;i<offset+7;i++){const date=shift(d,-i),b=data.body?.[date]||{},r=data.diet?.[date]||{};if(!active(date))vacation++;if(num(b.weight,20,300))weights.push(b.weight);if(r.intakeComplete===true&&num(r.intakeKcal,1,15000)&&num(r.proteinG,0,1000)){cal.push(r.intakeKcal);pro.push(r.proteinG);if(Math.abs(r.intakeKcal-goals.calories)<=150)adherent++;}}return {weight:mean(weights),weights:weights.length,kcal:mean(cal),protein:mean(pro),complete:cal.length,adherent,vacation};}
  const recent=period(1),prior=period(8),delta=recent.weight!==null&&prior.weight!==null?recent.weight-prior.weight:null,pct=delta===null?null:delta/prior.weight*100;
  const sufficient=active(d)&&!recent.vacation&&!prior.vacation&&recent.weights>=3&&prior.weights>=3&&recent.complete>=5&&prior.complete>=5&&recent.adherent>=5&&prior.adherent>=5;
  const result={recent,prior,delta,pct,sufficient,target:null,reason:'Datos insuficientes o fuera de las condiciones de revisión: mantené las metas y verificá los registros.'};
  if(!sufficient)return result;
- if(pct<=-1){result.reason='Descenso medio superior o igual al 1% entre semanas: revisá hidratación, ingesta, síntomas y objetivo con un profesional. No se estima pérdida de grasa.';if(Number.isInteger(goals.calories)&&goals.calories+100<=2300)result.target=goals.calories+100;}
+ if(pct<=-1){result.reason='Descenso medio superior o igual al 1% entre semanas: revisá hidratación, ingesta, síntomas y objetivo con un profesional. No se estima pérdida de grasa.';if(core105.coachTarget(goals)&&goals.calories+100<=core105.coach.calories[1])result.target=goals.calories+100;}
  else if(Math.abs(pct)<.25)result.reason='Peso medio similar entre semanas. Dos semanas no demuestran un estancamiento: revisá cobertura y adherencia antes de modificar metas.';
  else result.reason='Cambio de peso observado; no se propone modificar calorías solo por esta comparación.';
  return result;

@@ -1,5 +1,6 @@
 /* R18: read-only reports from original V6 records. No persistence or network. */
 (function(root){'use strict';
+const core105=globalThis.asiaCore105||(typeof require==='function'?require('./core105.js'):null);
 const day=s=>typeof s==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(s)&&Number.isFinite(Date.parse(s))&&new Date(s).toISOString().slice(0,10)===s;
 const shift=(s,n)=>new Date(Date.parse(s)+86400000*n).toISOString().slice(0,10);
 const days=(a,b)=>Math.round((Date.parse(b)-Date.parse(a))/86400000)+1;
@@ -38,7 +39,7 @@ function coach28(data,end,today){
  return {start:weeks[0].start,end,weeks,weight_change_14d_kg:comparable?Number((last.weight.value-first.weight.value).toFixed(2)):null,weight_coverage:{previous_14:first.weight.count,recent_14:last.weight.count}};
 }
 // V8.8.7: shared closed-day control; no storage, no network, no goal changes.
-const prep887='2026-11-16',trip887='2027-03-08',vac887=d=>d>='2026-12-26'&&d<='2027-01-07';
+const prep887=core105.asia.preparation,trip887=core105.asia.deadline,vac887=core105.vacation;
 const monday887=d=>shift(d,-((new Date(d+'T00:00:00Z').getUTCDay()+6)%7));
 const set887=s=>s?.done===true&&val(s.kg,0,1000)!==null&&Number.isInteger(s.reps)&&val(s.reps,1,100)!==null;
 function nutritionStatus887(d,r){if(!day(d)||d<prep887||d>=trip887||vac887(d)||!['yes','partial','no'].includes(r?.ad)||r.intakeComplete!==true||val(r.intakeKcal,0,15000)===null||val(r.proteinG,0,1000)===null)return null;return r.ad;}
@@ -48,7 +49,7 @@ function control887(data,start,end,today,planned){
  for(let d=start;d<=end;d=shift(d,1)){
   const r=data.diet?.[d]||{},v=vac887(d),inPlan=d>=prep887&&d<trip887;
   if(v)vacation++;else if(!inPlan)outside++;else{eligible++;if(Object.hasOwn(adherence,r.ad)){
-   if(nutritionStatus887(d,r)){adherence[r.ad]++;const g=r.nutritionGoal880;if(g&&val(g.calories,1900,2300)!==null&&val(g.protein,130,170)!==null&&g.kcal===r.intakeKcal&&g.proteinG===r.proteinG&&g.ad===r.ad)historicalGoals++;}
+   if(nutritionStatus887(d,r)){adherence[r.ad]++;const g=r.nutritionGoal880;if(g&&core105.recordedTarget(g)&&g.kcal===r.intakeKcal&&g.proteinG===r.proteinG&&g.ad===r.ad)historicalGoals++;}
    else legacy[r.ad]++;
   }}
   const rec=val(manual(r.recovery),1,5),fat=val(manual(r.fatigue43),1,5);if(rec!==null)recovery.push(rec);if(fat!==null)fatigue.push(fat);
