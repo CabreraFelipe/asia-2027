@@ -1,4 +1,4 @@
-/* V9.0.4 — cross-app task navigation and presentation. Reuse original controls and preferences. */
+/* V9.0.5 — cross-app task navigation and presentation. Reuse original controls and preferences. */
 (()=>{'use strict';
 const specs=[['home','home42','layout51','tabHome'],['diet','diet','layout541-diet','tabDiet'],['training','training','layout541-training','tabTrain'],['health','health','layout541-health','tabHealth'],['progress','progress54','layout541-progress54','tabProgress54']];
 const by=id=>document.getElementById(id);
@@ -68,7 +68,7 @@ for(const [key,id,oid] of specs){
  organizer.addEventListener('toggle',update);update();
 }
 function active(){for(const [,id,,nav] of specs){const b=by(nav),root=by(id);if(!b||!root)continue;if(!root.classList.contains('hide'))b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');}}
-const previous=tab;tab=function(t){for(const clear of resetSearch)clear();previous(t);active();};active();
+const previous=tab;tab=function(t){for(const clear of resetSearch)clear();previous(t);active();if(t==='health')window.asiaHealthOverview905?.();};active();
 // Make existing buttons self-explanatory without replacing nodes or their listeners.
 const labels={homeLog42:'Registrar comida',homeRefresh42:'Actualizar Salud',healthRefresh:'Actualizar Salud',healthSetup:'Configurar conexión',healthStepsCopy:'Sincronizar pasos ahora',backupNow42:'Guardar copia clásica',backupList42:'Ver copias guardadas',backupDownload42:'Descargar copia elegida',backupRestore42:'Restaurar copia elegida',aiDisconnect:'Olvidar clave del dispositivo',aiClearChat:'Borrar chat clásico',gymOther53:'Retomar sesión pendiente',gymFinish53:'Guardar y finalizar sesión',saveWorkout:'Guardar sesión',export818:'Exportar informe CSV',nutReturn8810:'Volver al diario'};
 for(const [id,label] of Object.entries(labels)){const n=by(id);if(n&&n.tagName==='BUTTON'&&!n.querySelector('svg'))n.textContent=label;}
@@ -79,5 +79,6 @@ for(const ids of [['healthRefresh','healthSetup'],['aiConnect','aiDisconnect'],[
 // Associate existing adjacent labels with their actual fields for tap and screen-reader navigation.
 for(const label of document.querySelectorAll('main label:not([for])')){const field=label.nextElementSibling;if(!label.querySelector('input,select,textarea')&&field?.matches('input[id],select[id],textarea[id]')&&field.type!=='hidden'&&!field.labels?.length)label.htmlFor=field.id;}
 const work901=by('workV4'),bar901=by('gymPro53'),timer901=by('timerBlock');if(work901&&bar901&&timer901){const legacy=document.createElement('details');legacy.id='gymClassic901';legacy.className='gymMini571';const title=document.createElement('summary');title.textContent='Cronómetro clásico (opcional)';timer901.before(legacy);legacy.append(title,timer901);legacy.open=!!window.asiaClassicRunning532?.();const info=by('routineInfo');if(info)info.after(bar901);}
+const priorRefresh905=refresh;refresh=function(){const out=priorRefresh905();if(!by('health')?.classList.contains('hide'))window.asiaHealthOverview905?.();return out;};
 const nav=document.querySelector('nav');if(nav)nav.setAttribute('aria-label','Secciones principales');
 })();
