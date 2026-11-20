@@ -23,7 +23,7 @@ export function inspectLegacy88(x){
  check(size(x)<=MAX_V6_BYTES,'Respaldo superior a 25 MB.');
  for(const [d,b] of Object.entries(x.body)){check(dayOK(d)&&object(b)&&finite(b.weight)&&b.weight>=20&&b.weight<=300,'Medición anterior inválida.');check(b.photo==null||b.photo===''||image(b.photo),'Foto Xiaomi inválida.');}
  for(const [d,r] of Object.entries(x.diet)){check(dayOK(d)&&object(r),'Día anterior inválido.');for(const k of ['foods52','substitutions44'])if(Object.hasOwn(r,k))check(Array.isArray(r[k])&&r[k].every(object),'Detalle anterior inválido.');}
- if(x.settings?.routines826!==undefined)globalThis.asiaGym826.templates(x.settings);
+ globalThis.asiaGym826.templates(x.settings);globalThis.asiaGym826.photos104(x.settings);
  if(x.settings?.schedule829!==undefined)globalThis.asiaSchedule829.clean(x.settings);globalThis.asiaSchedule829.programmes(x.settings);
  for(const [k,w] of Object.entries(x.work)){check((x.settings?.routines826!==undefined?globalThis.asiaGym826.slotOK(k,x.settings):/^\d{4}-\d{2}-\d{2}_[0-3]$/.test(k))&&dayOK(k.slice(0,10))&&object(w)&&object(w.ex),'Sesión anterior inválida.');for(const sets of Object.values(w.ex)){check(Array.isArray(sets)&&sets.length<=30,'Series anteriores inválidas.');for(const a of sets)check(object(a)&&(a.kg==null||finite(a.kg)&&a.kg>=0)&&(a.reps==null||finite(a.reps)&&a.reps>=0)&&(!Object.hasOwn(a,'done')||typeof a.done==='boolean')&&(!Object.hasOwn(a,'rir828')||Number.isInteger(a.rir828)&&a.rir828>=0&&a.rir828<=10),'Serie anterior inválida.');}}
  for(const [k,p] of Object.entries(x.photos||{}))check(object(p)&&dayOK(p.date)&&['Frente','Perfil','Espalda','Otra'].includes(p.view)&&k===p.date+'_'+p.view&&image(p.img),'Foto de evolución inválida.');

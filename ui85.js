@@ -1,9 +1,10 @@
-/* V10.3 — cross-app task navigation and presentation. Reuse original controls and preferences. */
+/* V10.4 — cross-app task navigation and presentation. Reuse original controls and preferences. */
 (()=>{'use strict';
 const specs=[['home','home42','layout51','tabHome'],['diet','diet','layout541-diet','tabDiet'],['training','training','layout541-training','tabTrain'],['health','health','layout541-health','tabHealth'],['progress','progress54','layout541-progress54','tabProgress54']];
 const by=id=>document.getElementById(id);
 function button(label,action){const b=document.createElement('button');b.type='button';b.className='secondary';b.textContent=label;b.addEventListener('click',action);return b;}
 const tasks=[
+ ['exerciseLibrary104','Biblioteca de ejercicios','personalizado catálogo mancuernas técnica fotografía grupos musculares'],
  ['nutrition103','Mi estrategia nutricional','plan nutrición gasto energético metabolismo calorías proteína macros etapas historial objetivos alimentación estimación'],
  ['training102','Crear programa de entrenamiento','programas rutinas días frecuencia gimnasio equipamiento calendario'],
  ['goals101','Mis metas','objetivos fechas plazos motivación historial principal crear metas personales'],
