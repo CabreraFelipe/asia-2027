@@ -1,4 +1,4 @@
-/* V9.0.6 — cross-app task navigation and presentation. Reuse original controls and preferences. */
+/* V9.1 — cross-app task navigation and presentation. Reuse original controls and preferences. */
 (()=>{'use strict';
 const specs=[['home','home42','layout51','tabHome'],['diet','diet','layout541-diet','tabDiet'],['training','training','layout541-training','tabTrain'],['health','health','layout541-health','tabHealth'],['progress','progress54','layout541-progress54','tabProgress54']];
 const by=id=>document.getElementById(id);
@@ -18,6 +18,7 @@ const tasks=[
  ['voiceMode891','Registrar comida por voz','dictar micrófono narrar transcribir almorcé describir alimentos'],
  ['mealComposer8810','Añadir alimentos','porciones plato morron pollo cantidad comida'],
  ['historyMeal903','Frecuentes y repetir comida','historial porción anterior copiar desayuno almuerzo merienda cena repetir'],
+ ['memory55','Memoria del Coach y estrategias','recuerdos aprendizaje hipótesis decisiones seguimiento resultados'],
  ['voiceFast901','Describir comida con IA','texto descripción dictado ingredientes estimar macros'],
  ['healthOverview905','Bienestar y recuperación','salud sueño energía descanso indicadores fecha'],
  ['healthRecovery855','Tendencias de recuperación','comparación vfc frecuencia reposo sueño'],

@@ -507,3 +507,13 @@ html{scroll-padding-bottom:calc(82px + env(safe-area-inset-bottom));}
 body>nav button{min-height:48px;}
 .searchResults889 button:focus-visible{outline-offset:-2px;}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}}
+
+/* V9.1 reviewed memory and strategy follow-up. */
+#memory55 .metric{margin:8px 0;overflow-wrap:anywhere;}
+#memory55 .metric .row{flex-wrap:wrap;gap:6px;}
+#strategyFields91:not([hidden]){margin:8px 0;padding:10px;border:1px solid var(--edge);border-radius:12px;}
+#strategyFields91 .grid>*{min-width:0;}
+#strategyFields91 input[type=date]{width:100%;min-width:0;}
+#memory55 button{min-height:44px;white-space:normal;}
+
+#suggestions91 button{display:block;width:100%;margin:6px 0;text-align:left;overflow-wrap:anywhere;}
