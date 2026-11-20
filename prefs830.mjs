@@ -1,6 +1,6 @@
 import {encrypt84,decrypt84,checksum84} from './model84.mjs';
 const lists={
- 'asia-layout-v51': ['day','dailyCoach','workout','recovery','weight','energy','advice','reminders','vacation','badges','coach','backup'],
+ 'asia-layout-v51': ['day','dailyCoach','workout','recovery','weight','energy','advice','reminders','vacation','badges','coach','backup','calendar96'],
  'asia-layout-v541-diet':['overview','daily','adaptive','foods','nutrition','water','measure','charts','history','compare','calendar','photos','weekly'],
  'asia-layout-v541-training':['work','strength','sessions','calendar','performance','muscle'],
  'asia-layout-v541-health':['health','history','coach','daily','watch','transfer','sources'],
