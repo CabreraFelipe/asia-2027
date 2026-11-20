@@ -1,4 +1,4 @@
-/* V9.0.2 — cross-app task navigation and presentation. Reuse original controls and preferences. */
+/* V9.0.3 — cross-app task navigation and presentation. Reuse original controls and preferences. */
 (()=>{'use strict';
 const specs=[['home','home42','layout51','tabHome'],['diet','diet','layout541-diet','tabDiet'],['training','training','layout541-training','tabTrain'],['health','health','layout541-health','tabHealth'],['progress','progress54','layout541-progress54','tabProgress54']];
 const by=id=>document.getElementById(id);
@@ -17,6 +17,7 @@ const tasks=[
  ['day','Registrar comida','comer alimentos calorias proteínas desayuno almuerzo merienda cena dieta'],
  ['voiceMode891','Registrar comida por voz','dictar micrófono narrar transcribir almorcé describir alimentos'],
  ['mealComposer8810','Añadir alimentos','porciones plato morron pollo cantidad comida'],
+ ['historyMeal903','Frecuentes y repetir comida','historial porción anterior copiar desayuno almuerzo merienda cena repetir'],
  ['photoFast901','Escanear comida o etiqueta','foto cámara codigo barras nutrición ia calorías'],
  ['toolsMode901','Crear un alimento con IA','ingrediente huevo frito biblioteca alimento nuevo'],
  ['nutSearch817','Buscar en biblioteca','favoritos recetas alimento guardado'],
