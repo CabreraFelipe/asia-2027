@@ -1,6 +1,6 @@
-/* Asia 2027 V9.1 — read-only connection diagnostics; no secrets or health content in reports. */
+/* Asia 2027 V9.2 — read-only connection diagnostics; no secrets or health content in reports. */
 (()=>{'use strict';
-const VERSION='9.1',CACHE='asia-2027-v910-20261120',KEY='asia-diagnostic-v56';
+const VERSION='9.2',CACHE='asia-2027-v920-20261120',KEY='asia-diagnostic-v56';
 const by=id=>document.getElementById(id),main=document.querySelector('main'),help=by('help502');if(!main||!help)return;
 const labels={internet:'Conexión al servidor',cloud:'Cloudflare AI',openai:'OpenAI',health:'Apple Salud',workouts:'Entrenamientos del Apple Watch',rest:'Avisos de descanso',push:'Notificaciones de pesaje',backup:'Copias de seguridad',storage:'Almacenamiento local',version:'Versión y caché'};
 const codes={unchecked:'Sin comprobar',checking:'Comprobando…',ok:'Comprobado',warning:'Requiere atención',error:'Error',off:'Sin configurar',unknown:'No confirmado'};

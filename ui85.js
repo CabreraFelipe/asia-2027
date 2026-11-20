@@ -1,4 +1,4 @@
-/* V9.1 — cross-app task navigation and presentation. Reuse original controls and preferences. */
+/* V9.2 — cross-app task navigation and presentation. Reuse original controls and preferences. */
 (()=>{'use strict';
 const specs=[['home','home42','layout51','tabHome'],['diet','diet','layout541-diet','tabDiet'],['training','training','layout541-training','tabTrain'],['health','health','layout541-health','tabHealth'],['progress','progress54','layout541-progress54','tabProgress54']];
 const by=id=>document.getElementById(id);
@@ -17,6 +17,9 @@ const tasks=[
  ['day','Registrar comida','comer alimentos calorias proteínas desayuno almuerzo merienda cena dieta'],
  ['voiceMode891','Registrar comida por voz','dictar micrófono narrar transcribir almorcé describir alimentos'],
  ['mealComposer8810','Añadir alimentos','porciones plato morron pollo cantidad comida'],
+ ['compose92','Componer comida con alimentos disponibles','cantidades sugeridas porciones combinación macros'],
+ ['barcode92','Código de barras','ean upc gtin producto etiqueta favorito'],
+ ['recipeWeight92','Receta por peso cocido','rendimiento gramos cien gramos plato'],
  ['historyMeal903','Frecuentes y repetir comida','historial porción anterior copiar desayuno almuerzo merienda cena repetir'],
  ['memory55','Memoria del Coach y estrategias','recuerdos aprendizaje hipótesis decisiones seguimiento resultados'],
  ['voiceFast901','Describir comida con IA','texto descripción dictado ingredientes estimar macros'],

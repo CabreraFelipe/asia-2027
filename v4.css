@@ -517,3 +517,12 @@ body>nav button{min-height:48px;}
 #memory55 button{min-height:44px;white-space:normal;}
 
 #suggestions91 button{display:block;width:100%;margin:6px 0;text-align:left;overflow-wrap:anywhere;}
+
+/* V9.2 local food composition, barcode and cooked yield. */
+#compose92 .composeRow92{border:1px solid var(--line);border-radius:12px;padding:10px;margin:8px 0;overflow-wrap:anywhere;}
+#compose92 .composeRow92 small{display:block;margin:4px 0;}
+#compose92 .grid>*{min-width:0;}
+#compose92 input,#barcode92 input,#recipeWeight92 input{min-width:0;width:100%;}
+#compose92 button,#barcode92 button,#recipeWeight92 button{min-height:44px;white-space:normal;}
+#compose92 .mealFast901{grid-template-columns:repeat(auto-fit,minmax(110px,1fr));}
+#macro92-fiber{display:block;}
