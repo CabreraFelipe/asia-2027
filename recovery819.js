@@ -51,7 +51,7 @@ function activeRecovery872(){
  const groups=muscle.groups.filter(g=>g.planned);activeBody.append(make('p','Grupos principales de esta rutina · series válidas guardadas en los 7 días previos:','meta'));
  if(groups.length)for(const g of groups)activeBody.append(make('p',g.name+' · '+g.recent+' series · '+(g.daysSince===null?'sin estímulo registrado':g.daysSince===0?'último estímulo: fecha elegida':'último estímulo: hace '+g.daysSince+' d calendario'),'tiny'));
  else activeBody.append(make('p','Sin grupos principales identificados.','tiny'));
- activeBody.append(make('p',advice(muscle),'tiny'),make('p','Cobertura de Gym: '+muscle.coverage.recent+'/7 días con series válidas. Sin datos no equivale a reposo; no se suman sesiones del reloj ni se estima aptitud para entrenar. No cambia la rutina.','tiny'));
+ const report94=window.asiaRecoveryReport94?.(d,true);activeBody.append(make('p',report94?report94.label+' · '+report94.advice:advice(muscle),'tiny'),make('p','Cobertura de Gym: '+muscle.coverage.recent+'/7 días con series válidas. Sin datos no equivale a reposo; no se suman sesiones del reloj ni se estima aptitud para entrenar. No cambia la rutina.','tiny'));
 }
 activeContext.addEventListener('toggle',activeRecovery872);
 const priorHome872=window.asiaRenderHome42;window.asiaRenderHome42=()=>{priorHome872?.();activeRecovery872()};

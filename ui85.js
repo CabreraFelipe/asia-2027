@@ -1,4 +1,4 @@
-/* V9.3 — cross-app task navigation and presentation. Reuse original controls and preferences. */
+/* V9.4 — cross-app task navigation and presentation. Reuse original controls and preferences. */
 (()=>{'use strict';
 const specs=[['home','home42','layout51','tabHome'],['diet','diet','layout541-diet','tabDiet'],['training','training','layout541-training','tabTrain'],['health','health','layout541-health','tabHealth'],['progress','progress54','layout541-progress54','tabProgress54']];
 const by=id=>document.getElementById(id);

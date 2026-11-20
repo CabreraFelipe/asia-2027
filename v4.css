@@ -529,3 +529,6 @@ body>nav button{min-height:48px;}
 
 /* V9.3 performance charts */
 .gymChart93{display:grid;gap:8px;margin:10px 0}.gymChartRow93{display:grid;grid-template-columns:44px minmax(0,1fr) 72px;align-items:center;gap:8px}.gymChartBar93{height:10px;background:var(--line);border-radius:8px;overflow:hidden}.gymChartBar93 span{display:block;height:100%;background:var(--gold,#ffb23c);border-radius:8px}#gymPerformance93 .metric{min-width:0;overflow-wrap:anywhere}#barcodeResults92 select{margin:8px 0}#barcodeResults92 a{display:block;overflow-wrap:anywhere}
+
+/* V9.4 recovery: use existing palette, no fixed heights. */
+.recoveryState94{margin:10px 0;overflow-wrap:anywhere}.recoveryState94 h3{margin:0 0 6px}.recoveryState94[data-state="review"] h3{color:var(--accent)}#recoveryScore43{font-size:clamp(16px,4vw,23px);overflow-wrap:anywhere}

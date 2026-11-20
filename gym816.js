@@ -18,6 +18,7 @@ function records93(rows){let max=null,estimate=null,events=[];for(const r of row
 function fatigue93(rows){const r=rows.slice(-4);if(r.length<4||r.some(x=>x.estimate===null)||new Set(r.map(x=>x.key.slice(0,10))).size!==4)return null;const prior=(r[0].estimate+r[1].estimate)/2,recent=(r[2].estimate+r[3].estimate)/2;return {change:100*(recent/prior-1),review:recent<prior*.95&&r[2].estimate<prior&&r[3].estimate<prior};}
 function duration93(work,today,settings){if(!validDay(today))return [];return Object.entries(work||{}).filter(([k,w])=>(/^\d{4}-\d{2}-\d{2}_[0-3]$/.test(k)||!!globalThis.asiaGym826?.slotOK(k,settings))&&validDay(k.slice(0,10))&&k.slice(0,10)<today&&finite(w?.durationSec,1,86400)&&Object.values(w.ex||{}).some(a=>Array.isArray(a)&&a.some(validSet))).sort(([a],[b])=>b.localeCompare(a)).slice(0,12).map(([key,w])=>({key,minutes:w.durationSec/60}));}
 const api={strength93,performance93,records93,fatigue93,duration93,metrics,history,compare,plates,warmups,nextCopy852};if(typeof module!=='undefined'&&module.exports){module.exports=api;return;}
+window.asiaGymPerformance94=api;
 const el=id=>document.getElementById(id),list=el('exerciseList');if(!list)return;
 const make=(tag,text,cls)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;};const fmt=n=>n.toLocaleString('es-UY',{maximumFractionDigits:2});const signed=n=>(n>0?'+':'')+fmt(n);
 const barExercises=new Set(['Press banca con barra','Press inclinado con barra','Sentadilla con barra','Peso muerto rumano']);
