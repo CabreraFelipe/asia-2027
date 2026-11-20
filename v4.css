@@ -532,3 +532,6 @@ body>nav button{min-height:48px;}
 
 /* V9.4 recovery: use existing palette, no fixed heights. */
 .recoveryState94{margin:10px 0;overflow-wrap:anywhere}.recoveryState94 h3{margin:0 0 6px}.recoveryState94[data-state="review"] h3{color:var(--accent)}#recoveryScore43{font-size:clamp(16px,4vw,23px);overflow-wrap:anywhere}
+
+/* V9.5: separate local / push reminder channels. */
+.automationRow95{margin:8px 0;padding:10px;min-width:0}.automationRow95>.row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}.automationRow95>.row strong{flex:1;min-width:0;overflow-wrap:anywhere}.automationRow95 input[type=time]{min-width:0;width:125px;max-width:100%;min-height:44px}.automationChannels95{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:center;gap:6px}.automationChannels95 label{display:flex;align-items:center;gap:6px;min-height:44px;margin:0;overflow-wrap:anywhere}.automationChannels95 input{flex:none;width:auto}.automationChannels95>span{padding:6px}
