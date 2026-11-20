@@ -14,7 +14,7 @@ function group(name){if(!groups[name]){const d=document.createElement('details')
 // Exact prefixes of static guidance; preserve original paragraphs and links intact.
 // Short essential information remains beside the relevant action or metric.
 const rules=[
- ['Meta principal 72 kg','Inicio y objetivos','Meta: 72 kg · aspiracional: 70 kg.'],
+ ['Referencia original: 72 kg','Inicio y objetivos','Programa original: 72 kg · aspiracional: 70 kg.'],
  ['Tendencia lineal de hasta 42 días','Inicio y objetivos','Proyección orientativa, no garantía.'],
  ['Gasto = energía activa + en reposo','Inicio y objetivos','Gasto estimado; no suma entrenamientos dos veces.'],
  ['Se basan en registros desde el inicio','Inicio y objetivos',''],
