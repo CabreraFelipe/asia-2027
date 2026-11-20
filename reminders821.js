@@ -11,7 +11,7 @@ function clean(raw){return {enabled:Object.fromEntries(keys.map(k=>[k,cloudKeys.
 function plan(data,now,context={}){const {day,time}=localClock(now),p=clean(data?.settings?.reminders821),a=planner.agenda(data,day,day).days.find(x=>x.date===day),inPeriod=day>='2026-11-16'&&day<='2027-03-08',vac=a.phase==='vacation',generic=inPeriod&&(!vac||[1,4].includes(weekday(day))),items=[];
  const add=(id,registered,detail,optional=false)=>{if(!(context.cloud?p.cloudEnabled[id]:p.enabled[id]))return;items.push({id,label:names[id],time:p.times[id],status:registered?'registered':optional?'optional':time<p.times[id]?'scheduled':'pending',detail});};
  if(inPeriod&&(!vac||generic))add('weight',a.weight,a.weight?'Peso guardado en el diario.':'No consta un pesaje en el diario.',vac);
- if(a.phase==='active'){if(a.routine!==null)add('gym',a.matching,a.matching?'Al menos una serie de la rutina prevista está guardada; no confirma que se completó.':a.recorded?'Hay series de otra rutina, no de la prevista.':'No constan series guardadas de la rutina prevista.');add('diet',a.dietComplete,a.dietComplete?'Total de calorías y proteína marcado completo.':'Si querés, revisá o completá tu diario. No se puede inferir ingesta ni cumplimiento.');}
+ if(a.phase==='active'&&(!context.cloud||day<'2027-03-08')){if(a.routine!==null)add('gym',a.matching,a.matching?'Al menos una serie de la rutina prevista está guardada; no confirma que se completó.':a.recorded?'Hay series de otra rutina, no de la prevista.':'No constan series guardadas de la rutina prevista.');if(inPeriod&&day<'2027-03-08')add('diet',a.dietComplete,a.dietComplete?'Total de calorías y proteína marcado completo.':'Si querés, revisá o completá tu diario. No se puede inferir ingesta ni cumplimiento.');}
  if(inPeriod&&a.control)add('weekly',p.reviewed.includes(day),p.reviewed.includes(day)?'Marcaste el informe como revisado.':'La revisión requiere confirmación manual.',vac);
  if(!context.cloud){
  const c=data?.diet?.[day]?.checkin89,answered=['energy','hunger','rest','stress','soreness'].filter(k=>Number.isInteger(c?.[k])&&c[k]>=1&&c[k]<=5).length;
@@ -19,7 +19,7 @@ function plan(data,now,context={}){const {day,time}=localClock(now),p=clean(data
  if(Number.isSafeInteger(context.pendingStrategies)&&context.pendingStrategies>0)add('strategy',false,`${context.pendingStrategies} estrategias con revisión prevista o vencida. Revisalas cuando te resulte cómodo.`,vac);
  const t=context.trend;if(inPeriod&&!vac&&['likely','up'].includes(t?.status)&&t.weighinsRecent>=3&&t.weighinsPrevious>=3&&t.complete14>=8)add('trend',false,'Hay una tendencia que merece revisión. Es descriptiva, no indica que debas cambiar tus metas.');
  }
- return {day,time,phase:day<'2026-11-16'||day>'2027-03-08'?'outside':a.phase,items,routine:a.routine,generic,settings:p};}
+ return {day,time,phase:day<'2026-11-16'||(day>'2027-03-08'&&a.phase!=='active')?'outside':a.phase,items,routine:a.routine,generic,settings:p};}
 const api={plan,clean,localClock,timeOK,cloudKeys:Object.freeze(cloudKeys)};if(typeof module!=='undefined'&&module.exports){module.exports=api;return;}if(!planner)return;window.asiaReminders821=Object.freeze(api);
 const el=id=>document.getElementById(id),make=(tag,text,cls)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;};
 const home=el('homeDate42')?.closest('.card'),config=el('settingsV4'),agenda=el('planner820');if(!home||!config||!agenda)return;
