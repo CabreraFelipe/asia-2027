@@ -499,3 +499,11 @@ body>nav button{border-radius:14px}body>nav button.active{font-weight:750}
 .visualDetails905{margin:10px 0}.visualDetails905>summary{min-height:44px;line-height:1.3;white-space:normal}.healthCompare855:has(.visualPlot905){grid-column:1/-1}.healthCompare855 .visualPlot905 svg{max-height:150px}.visualSection905 .visualPlot905 svg{max-height:210px}
 
 .photoDates905{display:grid;gap:9px}.photoDateRow905{display:grid;grid-template-columns:52px minmax(0,1fr);align-items:center;gap:8px;padding:8px;border:1px solid var(--edge);border-radius:12px;background:var(--field)}.photoDateRow905 img{width:52px;height:68px;object-fit:contain;border-radius:7px}.photoDateText905{min-width:0;display:grid;gap:4px;overflow-wrap:anywhere}.photoDateRow905 button{grid-column:2;min-height:44px}.photoDateText905 small{font-size:12px}.featureEvent896{border-left:3px solid var(--accent)!important}
+
+/* V9.0.6 — transversal accessibility and interaction polish. Existing palette tokens. */
+html{scroll-padding-bottom:calc(82px + env(safe-area-inset-bottom));}
+:is(main,header,nav,dialog) :is(button,summary,input,select,textarea,a[href]):focus-visible{outline:2px solid var(--accent-text,var(--teal));outline-offset:2px;}
+:is(main,header,dialog) :is(button,summary){touch-action:manipulation;}
+body>nav button{min-height:48px;}
+.searchResults889 button:focus-visible{outline-offset:-2px;}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}}
