@@ -1,9 +1,10 @@
-/* V9.7 — cross-app task navigation and presentation. Reuse original controls and preferences. */
+/* V10.0 — cross-app task navigation and presentation. Reuse original controls and preferences. */
 (()=>{'use strict';
 const specs=[['home','home42','layout51','tabHome'],['diet','diet','layout541-diet','tabDiet'],['training','training','layout541-training','tabTrain'],['health','health','layout541-health','tabHealth'],['progress','progress54','layout541-progress54','tabProgress54']];
 const by=id=>document.getElementById(id);
 function button(label,action){const b=document.createElement('button');b.type='button';b.className='secondary';b.textContent=label;b.addEventListener('click',action);return b;}
 const tasks=[
+ ['profile100','Mi perfil y primera meta','nombre motivación motivos objetivos perfil preferencias contexto viaje asia'],
  ['calendar96','Calendario integral y diario personal','fecha mes diario nota acontecimientos actividad registros'],
  ['homeWater902','Agua registrada hoy','hidratación total vaso'],
  ['homeNext902','Próxima sesión prevista','entrenamiento plan calendario'],
