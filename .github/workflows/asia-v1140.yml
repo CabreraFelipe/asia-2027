@@ -1,0 +1,36 @@
+name: Asia 2027 - candidato unificado V11.40
+on:
+  push:
+    branches: ['development/multiuser']
+    paths: ['staging/source/V11.40-INTEGRACION/**','.github/workflows/asia-v1140.yml']
+permissions:
+  contents: read
+jobs:
+  integration:
+    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/development/multiuser'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22.16.0'
+      - run: node staging/source/V11.29-INTEGRACION/tests/build-candidate.mjs
+      - run: node staging/source/V11.39-INTEGRACION/tests/patch-candidate.mjs
+      - run: node staging/source/V11.40-INTEGRACION/tests/patch-candidate.mjs
+      - name: Chrome real shell integrado
+        env:
+          ASIA_BROWSER_PREFIX: /staging/source/V11.40-INTEGRACION/tests
+          ASIA_CANDIDATE: '1'
+        run: node staging/source/V11.26-INTEGRACION/tests/run-browser.mjs
+      - name: Regresión offline
+        env:
+          ASIA_BROWSER_PREFIX: /staging/source/V11.37-INTEGRACION/tests
+        run: node staging/source/V11.26-INTEGRACION/tests/run-browser.mjs
+      - name: Regresión sincronización amplia
+        env:
+          ASIA_BROWSER_PREFIX: /staging/source/V11.38-INTEGRACION/tests
+        run: node staging/source/V11.26-INTEGRACION/tests/run-browser.mjs
