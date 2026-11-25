@@ -22,9 +22,14 @@ for(const n of rootFiles.filter(n=>n.endsWith('.mjs')))cpSync(n,server+'/'+n);
 const official='staging/source/official/V11.24-STAGING/src';for(const n of readdirSync(official).filter(n=>n.endsWith('.mjs'))){const p=server+'/'+official+'/'+n;mkdirSync(dirname(p),{recursive:true});writeFileSync(p,patch(readFileSync(official+'/'+n,'utf8')))}
 const worker=sroot+'/V11.42-INTEGRACION/src/worker.mjs';mkdirSync(dirname(worker),{recursive:true});cpSync(base+'/src/worker.mjs',worker);
 function walk(dir){return readdirSync(dir).flatMap(n=>{const p=join(dir,n);return statSync(p).isDirectory()?walk(p):[p]})}
-// Remove server-only browser files; sync needs integral-v106 and large-sync for validation.
-for(const p of walk(web).filter(p=>/\/(?:authorized-worker|service-worker|worker|private-provider|service-gateway)\.mjs$/.test(p))){/* kept only as static code if explicitly imported; no credentials, no server env */}
 const paths=walk(web).map(p=>'/'+p.slice((out+'/assets/').length)).filter(p=>!p.endsWith('/diary/manifest.json'));
 writeFileSync(server+'/index.mjs',"import {createPwaWorker} from './staging/source/V11.42-INTEGRACION/src/worker.mjs';\nexport default createPwaWorker({assetPaths:new Set("+JSON.stringify(paths)+")});\n");
 cpSync(base+'/wrangler.template.toml',out+'/wrangler.template.toml');
+mkdirSync(out+'/migrations');
+for(const [dir,n] of [
+ ['staging/source/official/V11.9-LAB/migrations','0001_staging.sql'],
+ ['staging/source/official/V11.24-STAGING/migrations','0006_identity_oidc.sql'],
+ ['staging/source/official/V11.24-STAGING/migrations','0007_synthetic_journal_v115.sql'],
+ ['staging/source/V11.38-INTEGRACION/migrations','0009_large_sync.sql']
+])cpSync(dir+'/'+n,out+'/migrations/'+n);
 console.log('PWA isolated package:',paths.length,'exact assets, no original changes');
