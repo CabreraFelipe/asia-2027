@@ -23,4 +23,9 @@ jobs:
       - run: node staging/source/V11.40-INTEGRACION/tests/patch-candidate.mjs
       - run: node staging/source/V11.42-INTEGRACION/tests/build.mjs
       - run: node staging/source/V11.42-INTEGRACION/tests/package.test.mjs
-      - run: node staging/source/V11.43-INTEGRACION/tests/package-browser.mjs
+      - name: Chrome normal
+        run: node staging/source/V11.43-INTEGRACION/tests/package-browser.mjs
+      - name: Chrome recurso secundario lento
+        env:
+          ASIA_SLOW_DIARY: '1'
+        run: node staging/source/V11.43-INTEGRACION/tests/package-browser.mjs

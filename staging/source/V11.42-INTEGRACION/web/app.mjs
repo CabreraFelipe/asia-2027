@@ -21,7 +21,7 @@ export async function start(passphrase){
    while(Date.now()<deadline){
     const win=frame.contentWindow,doc=frame.contentDocument;
     if(doc&&win.location.origin===location.origin&&win.location.pathname==='/v11.42/diary/index.html'){
-     if(win.asiaGym84Ready===false)throw Error('El diario cargó, pero no pudo verificar el módulo Gym cifrado.');
+     if(win.asiaGym84Ready===false){const code=win.asiaPilotGymDiagnostic;throw Error('Gym cifrado no verificado ('+(['READ','REVISION','INITIAL','SCHEMA','LEASE','SESSION','ADAPTER','OTHER'].includes(code)?code:'UNKNOWN')+').');}
      if(doc.readyState!=='loading'&&win.asiaGym84Ready===true){frame.inert=false;return {remove,hide(){frame.inert=true;frame.hidden=true}}}
     }
     await new Promise(r=>setTimeout(r,100));
