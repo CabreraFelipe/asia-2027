@@ -1,0 +1,25 @@
+name: Asia 2027 - recuperación cifrada V11.31
+on:
+  push:
+    branches: ['development/multiuser']
+    paths: ['staging/source/V11.31-INTEGRACION/**','.github/workflows/asia-v1131.yml']
+permissions:
+  contents: read
+jobs:
+  recovery:
+    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/development/multiuser'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22.16.0'
+      - run: node staging/source/V11.29-INTEGRACION/tests/build-candidate.mjs
+      - name: Recuperación cifrada explícita en Chrome real
+        env:
+          ASIA_BROWSER_PREFIX: /staging/source/V11.31-INTEGRACION/tests
+        run: node staging/source/V11.26-INTEGRACION/tests/run-browser.mjs

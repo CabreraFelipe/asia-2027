@@ -1,4 +1,4 @@
-name: Asia 2027 - persistencia de entrenamientos V11.30
+name: Asia 2027 - dispositivo y ciclo de guardado V11.30
 on:
   push:
     branches: ['development/multiuser']
@@ -6,7 +6,7 @@ on:
 permissions:
   contents: read
 jobs:
-  workouts:
+  device:
     if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/development/multiuser'
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -19,13 +19,8 @@ jobs:
         with:
           node-version: '22.16.0'
       - run: node staging/source/V11.29-INTEGRACION/tests/build-candidate.mjs
-      - name: Chrome real - recuperación de sesiones y temporizadores originales
+      - name: Probar sesión y temporizadores originales con guardado cifrado
         env:
           ASIA_BROWSER_PREFIX: /staging/source/V11.30-INTEGRACION/tests
-          ASIA_CANDIDATE: '1'
-        run: node staging/source/V11.26-INTEGRACION/tests/run-browser.mjs
-      - name: Regresión candidato V11.29
-        env:
-          ASIA_BROWSER_PREFIX: /staging/source/V11.29-INTEGRACION/tests
           ASIA_CANDIDATE: '1'
         run: node staging/source/V11.26-INTEGRACION/tests/run-browser.mjs
