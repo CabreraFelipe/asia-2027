@@ -11,22 +11,24 @@ export async function start(passphrase){
  const repository=await openUnifiedRepository(),pending=await openOfflineRepository();let shell,panel;
  const mount=async fixture=>{
   if(globalThis.__asiaCandidateFixture)throw Error('Diario ya abierto');globalThis.__asiaCandidateFixture=fixture;
-  const frame=document.createElement('iframe');frame.title='Diario original Asia V10.6';frame.src='/v11.42/diary/index.html';const loaded=new Promise(r=>frame.addEventListener('load',r,{once:true}));
+  const frame=document.createElement('iframe');frame.title='Diario original Asia V10.6';frame.src='/v11.42/diary/index.html';frame.inert=true;
   const remove=()=>{frame.remove();delete globalThis.__asiaCandidateFixture};document.getElementById('diary').append(frame);
-  let timer;
+  // The original diary may have nonessential resources still loading after its
+  // essential modules are ready. The global load event is not a security gate.
+  // Require the exact same-origin document, DOM readiness and verified Gym adapter.
+  const deadline=Date.now()+60000;
   try{
-   // Real Cloudflare requests for the original 51 scripts can be slower than loopback CI.
-   // Still fail closed: never enable editing until the module adapter is verified.
-   await Promise.race([loaded,new Promise((_,rej)=>{timer=setTimeout(()=>rej(Error('El diario no terminó de cargar en 60 segundos. Revisá la conexión.')),60000)})]);
-   clearTimeout(timer);
-   for(let i=0;i<300;i++){
-    const win=frame.contentWindow;
-    if(win.asiaGym84Ready===true)return {remove,hide(){frame.hidden=true}};
-    if(win.asiaGym84Ready===false)throw Error('El diario cargó, pero no pudo verificar el módulo Gym cifrado.');
+   while(Date.now()<deadline){
+    const win=frame.contentWindow,doc=frame.contentDocument;
+    if(doc&&win.location.origin===location.origin&&win.location.pathname==='/v11.42/diary/index.html'){
+     if(win.asiaGym84Ready===false)throw Error('El diario cargó, pero no pudo verificar el módulo Gym cifrado.');
+     if(doc.readyState!=='loading'&&win.asiaGym84Ready===true){frame.inert=false;return {remove,hide(){frame.inert=true;frame.hidden=true}}}
+    }
     await new Promise(r=>setTimeout(r,100));
    }
-   throw Error('El diario cargó, pero sus módulos no terminaron de inicializarse.');
-  }catch(e){remove();throw e}finally{clearTimeout(timer)}
+   throw Error('El diario no verificó sus módulos esenciales en 60 segundos. Revisá la conexión.');
+  }catch(e){remove();throw e}
+
  };
  try{
   const readSession=sessionReader({origin:location.origin}),identity=await readSession(),policy=globalThis.asiaAccounts106;
