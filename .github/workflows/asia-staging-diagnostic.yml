@@ -1,0 +1,74 @@
+name: Asia 2027 - diagnóstico staging sin cambios
+on:
+  push:
+    branches: ['development/multiuser']
+    paths: ['.github/workflows/asia-staging-diagnostic.yml', 'staging/DIAGNOSTIC.md']
+permissions: {}
+jobs:
+  diagnose:
+    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/development/multiuser'
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    environment: asia-staging
+    steps:
+      - name: Consultar configuración y despliegues sin mostrar secretos
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import os,re,json,urllib.request,urllib.error
+          token=os.environ.get('CLOUDFLARE_API_TOKEN','')
+          account=os.environ.get('CLOUDFLARE_ACCOUNT_ID','')
+          assert token and re.fullmatch(r'[a-fA-F0-9]{32}',account)
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self,*a,**kw): return None
+          opener=urllib.request.build_opener(NoRedirect)
+          base=f'https://api.cloudflare.com/client/v4/accounts/{account}/workers/scripts/asia-v1111-identity-staging'
+          def api(path):
+              try:
+                  with opener.open(urllib.request.Request(base+path,headers={'Authorization':'Bearer '+token,'Accept':'application/json'},method='GET'),timeout=20) as r:
+                      j=json.load(r)
+                  print('API',path,'success:',j.get('success') is True)
+                  return j.get('result') if j.get('success') is True else None
+              except urllib.error.HTTPError as e:
+                  print('API',path,'HTTP',e.code)
+                  return None
+              except Exception:
+                  print('API',path,'error de conexión o respuesta')
+                  return None
+          s=api('/settings')
+          if isinstance(s,dict):
+              bindings=s.get('bindings') or []
+              expected=[b for b in bindings if isinstance(b,dict) and b.get('name')=='STAGING_DB']
+              print('Binding STAGING_DB D1 esperado:',len(expected)==1 and expected[0].get('type')=='d1' and expected[0].get('id',expected[0].get('database_id'))=='05420c2a-d083-48ee-bc4f-f644177875f9')
+              print('STAGING_MODE esperado:',any(b.get('name')=='STAGING_MODE' and b.get('text')=='asia-v1111-identity-private' for b in bindings if isinstance(b,dict)))
+              print('STAGING_ORIGIN esperado:',any(b.get('name')=='STAGING_ORIGIN' and b.get('text')=='https://asia-v1111-identity-staging.cabrerafelipe2003.workers.dev' for b in bindings if isinstance(b,dict)))
+          sub=api('/subdomain')
+          if isinstance(sub,dict): print('workers.dev habilitado:',sub.get('enabled') is True)
+          deps=api('/deployments')
+          if isinstance(deps,dict):
+              ds=deps.get('deployments') or []
+              print('Despliegues visibles:',len(ds))
+              if ds:
+                  versions=ds[0].get('versions') or []
+                  print('Versiones del último despliegue:',len(versions))
+                  print('Último despliegue con versión única al 100%:',len(versions)==1 and versions[0].get('percentage')==100)
+          print('Solo GET API; no D1 ni escrituras.')
+          PY
+      - name: Repetir comprobación de estado con cliente original Node
+        shell: bash
+        run: |
+          node --input-type=module <<'JS'
+          const base='https://asia-v1111-identity-staging.cabrerafelipe2003.workers.dev';
+          const r=await fetch(base+'/v11.11/status',{redirect:'manual',cache:'no-store',signal:AbortSignal.timeout(14000)});
+          console.log('HTTP status:',r.status);
+          console.log('Content type JSON:',(r.headers.get('content-type')||'').includes('application/json'));
+          console.log('Cloudflare challenge:',r.headers.get('cf-mitigated')==='challenge');
+          console.log('Cloudflare Access redirect:',(r.headers.get('location')||'').includes('cloudflareaccess.com'));
+          if(r.status!==200)throw Error('Estado no accesible desde runner; no se modificará seguridad.');
+          const j=await r.json();
+          if(j.version!=='11.24'||j.production!==false||j.health!==false||j.publicRegistration!==false||j.configured!==true||j.ok!==true)throw Error('Estado V11.24 seguro no confirmado.');
+          console.log('V11.24 configurada y modo seguro verificados.');
+          JS
