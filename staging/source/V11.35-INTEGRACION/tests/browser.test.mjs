@@ -21,7 +21,7 @@ export async function run(){
  const repository=await openUnifiedRepository(),sourcePhrase='frase sintética archivo completo',passphrase='frase sintética destino completo';
  const raw={body:{'2026-11-22':{weight:78.2}},diet:{'2026-11-22':{steps:7812,notes:'prueba ñ'}},work:{},photos:{},settings:{height:1.81}};
  const map=new Map([['asia2027-v1',JSON.stringify(raw)],['asia-theme-v4','dark:forest']]);
- let gym=seedGym();gym=applyGym(gym,{type:'start',id:'ci-full-gym',routineId:gym.routines[0].id,date:'2026-11-22'},1700000000000);gym=applyGym(gym,{type:'finish'},1700000001000);
+ let gym=seedGym();gym=applyGym(gym,{type:'start',id:'ci-full-gym',routineId:gym.routines[0].id,date:'2026-11-22'},1700000000000);gym=applyGym(gym,{type:'set',entryId:gym.active.entries[0].id,index:0,values:{kg:20,reps:10,rir:2,done:true}},1700000001000);gym=applyGym(gym,{type:'finish'},1700000002000);
  const records=Object.fromEntries(MODULES.map(name=>[name,{name,revision:1,payload:name==='preferences'?empty84():name==='gym'?gym:{fixture:name}}]));
  records.recovery={name:'recovery',revision:0,payload:{}};
  const store={read:async name=>structuredClone(records[name]),readPair:async()=>({preferences:structuredClone(records.preferences),gym:structuredClone(records.gym)})};
@@ -44,7 +44,7 @@ export async function run(){
   await until(()=>d.getElementById('gymMigrationStatus826').textContent.includes('1 sesiones revisadas'),'UI no recuperó módulo Gym unificado');
   await gate.close({logout:true,unmount(){frame.remove();frame=null;delete globalThis.__asiaCandidateFixture}});
   check(loggedOut&&!authorized,'Logout no confirmado');await rejects(()=>Promise.resolve(gate.storage.getItem('asia2027-v1')),/bloqueada/);
-  accountId=B;csrf='b';authorized=true;const b=await unlock();check(b.storage.getItem('asia2027-v1')===null,'B recibió datos de A');await b.close({unmount(){}});
+  accountId=B;csrf='b';authorized=true;const b=await unlock();check(b.storage.getItem('asia2027-v1')===null,'B recibió datos de A');authorized=false;await rejects(()=>b.readSession(),/Sesión no disponible/);await rejects(()=>Promise.resolve(b.storage.getItem('asia2027-v1')),/bloqueada/);authorized=true;
   check(map.get('asia2027-v1')===JSON.stringify(raw),'Fuente modificada');
   return {ok:true,checks:'12 módulos inventariados, 11 presentes y 1 ausente preservados, puerta HTTP sintética, rechazo anónimo, ambas bóvedas y controles originales, logout y aislamiento'};
  }finally{frame?.remove();delete globalThis.__asiaCandidateFixture;repository.close()}
