@@ -76,9 +76,20 @@ try{
   await navigator.serviceWorker.ready;await wait(()=>!!navigator.serviceWorker.controller,'SW sin control');
   const keys=await caches.keys();check(keys.length===1&&keys[0]==='asia-v1142-public-notice-v1','Caché inesperada');
   const entries=await (await caches.open(keys[0])).keys();check(entries.length===1&&new URL(entries[0].url).pathname==='/v11.42/offline.html','Caché privada');
-  el('logout1140').click();return true;
+  return true;
  }.toString()+')()',true);assert.equal(result,true);
- await ready("!!document.getElementById('openAccount')&&!document.getElementById('shell1140')");
+ await cmd('Page.navigate',{url:home});await ready("document.readyState==='complete'&&!!document.getElementById('openAccount')&&!document.getElementById('shell1140')");
+ const wrongPhrase=await evalJS('('+async function(){
+  const el=id=>document.getElementById(id),wait=async(f,m)=>{for(let i=0;i<200;i++){if(f())return;await new Promise(r=>setTimeout(r,100))}throw Error(m)};
+  el('phrase').value='frase sintética incorrecta';el('openAccount').click();await wait(()=>!el('openAccount').disabled,'Frase incorrecta no rechazó');if(el('shell1140'))throw Error('Frase incorrecta abrió la bóveda');
+  el('phrase').value='frase sintética paquete completo';el('openAccount').click();await wait(()=>!!el('open1140'),'Frase correcta no abrió');
+  el('open1140').click();await wait(()=>document.querySelector('iframe')?.contentWindow?.asiaGym84Ready===true&&!el('close1140').disabled,'No reabrió diario');
+  if(document.querySelector('iframe').contentDocument.getElementById('height').value!=='1.86')throw Error('Registro perdido tras reinicio');
+  el('close1140').click();await wait(()=>!document.querySelector('iframe')&&!el('reconcile1140').disabled,'No cerró');
+  el('reconcile1140').click();await wait(()=>!el('logout1140').disabled,'Conciliación no terminó');
+  el('logout1140').click();return true;
+ }.toString()+')()',true);assert.equal(wrongPhrase,true);
+ await ready("document.readyState==='complete'&&!!document.getElementById('openAccount')&&!document.getElementById('shell1140')");
  assert.equal(db.prepare('SELECT COUNT(*) AS n FROM sync_v1138_objects WHERE account_id=?').get(A).n,1);
  const isolation=await evalJS('('+async function(){
   const el=id=>document.getElementById(id),wait=async(f,m)=>{for(let i=0;i<200;i++){if(f())return;await new Promise(r=>setTimeout(r,100))}throw Error(m)};

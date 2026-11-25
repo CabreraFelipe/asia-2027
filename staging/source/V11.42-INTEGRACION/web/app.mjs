@@ -21,7 +21,7 @@ export async function start(passphrase){
   const snapshot=await repository.readSync(identity.accountId),branch=await pending.inspect(identity.accountId);
   for(const row of [snapshot,...(branch?[branch.working]:[])]){
    const local=await openSessionVault({readSession:verify,repository:{read:async()=>row.local},passphrase,policy:devicePolicy(policy)});local.close();
-   const modules=await openEncryptedModuleStore({readSession:verify,repository:{read:async()=>row.modules},passphrase});modules.close();
+   const modules=await openEncryptedModuleStore({readSession:verify,repository:{read:async()=>row.modules,compareAndSwap(){throw Error('Solo lectura')}},passphrase});modules.close();
   }
   await verify();
   const c=await createController({origin:location.origin,repository,pending,policy:globalThis.asiaAccounts106,passphrase,mount,onState:s=>{shell?.render();panel?.render();if(s==='closed'){repository.close();pending.close();location.replace('/v11.42/index.html')}}});
