@@ -57,7 +57,12 @@ const fingerprint=createHash('sha256');
 for(const p of walk(web).sort()){
  const bytes=readFileSync(p);fingerprint.update(JSON.stringify([relative(web,p),bytes.length])+String.fromCharCode(10));fingerprint.update(bytes);
 }
-const entryFile=web+'/entry.js',lf=String.fromCharCode(10);writeFileSync(entryFile,readFileSync(entryFile,'utf8')+lf+'// asia-pilot-assets-sha256: '+fingerprint.digest('hex')+lf);
+// Also bind the public fingerprint to the server source; a CSP-only change
+// must not pass the smoke check using an older Worker with identical assets.
+for(const p of walk(server).sort()){
+ const bytes=readFileSync(p);fingerprint.update(JSON.stringify(['server',relative(server,p),bytes.length])+String.fromCharCode(10));fingerprint.update(bytes);
+}
+const entryFile=web+'/entry.js',lf=String.fromCharCode(10);writeFileSync(entryFile,readFileSync(entryFile,'utf8')+lf+'// asia-pilot-package-sha256: '+fingerprint.digest('hex')+lf);
 execFileSync(process.execPath,['--check',entryFile],{stdio:'inherit'});
 const paths=walk(web).map(p=>'/'+p.slice((out+'/assets/').length)).filter(p=>!p.endsWith('/diary/manifest.json'));
 writeFileSync(server+'/index.mjs',"import {createPwaWorker} from './staging/source/V11.42-INTEGRACION/src/worker.mjs';\nexport default createPwaWorker({assetPaths:new Set("+JSON.stringify(paths)+")});\n");
