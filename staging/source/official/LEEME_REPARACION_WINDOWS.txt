@@ -1,0 +1,32 @@
+ASIA 2027 V11.18 - REPARACION DE INSTALADOR WINDOWS
+
+CAUSA CONFIRMADA DEL FALLO PREVIO
+Una instruccion echo dentro de un bloque IF incluia parentesis no escapados:
+  echo ERROR: Falta Node.js (22 o superior) en PATH.
+El interprete CMD cerraba el bloque antes de llegar a "en PATH" y lanzaba
+"No se esperaba en en este momento." aun con Node.js instalado.
+
+CORRECCION
+INSTALAR_V11_18.cmd ahora tiene solo lineas simples, sin IF ni bloques de parentesis.
+La validacion, respaldo, consentimiento, despliegue y smoke estan en
+INSTALADOR_SEGURO_V11_18.mjs. El .cmd siempre muestra PAUSE al finalizar.
+Todos los archivos de V11.18-STAGING y versiones anteriores estan intactos.
+
+INSTALACION
+1) Extraer el ZIP COMPLETO en una carpeta NUEVA, nunca ejecutar dentro del ZIP.
+2) Ejecutar INSTALAR_V11_18.cmd con doble clic (no usar CMD viejo).
+3) El preflight local puede tardar. Despues, el precheck valida V11.17 en staging.
+4) Solo si todas las pruebas pasan, escribir S para autorizar el respaldo D1
+   seguido del despliegue en staging.
+5) Si hay error, no repetir el instalador; compartir el texto del error
+   sin codigos, tokens ni datos sensibles.
+
+DIAGNOSTICO SEGURO SIN DESPLIEGUE
+Abrir CMD en la carpeta y ejecutar:
+  node INSTALADOR_SEGURO_V11_18.mjs --diagnostico
+Para preflight offline completo:
+  node INSTALADOR_SEGURO_V11_18.mjs --solo-preflight
+
+No se ha hecho un despliegue desde este paquete. La V10.6 personal no se modifica.
+ATENCION: Sin una maquina Windows real no podemos certificar el doble clic del
+archivo CMD; su sintaxis se simplifico para eliminar la causa identificada.

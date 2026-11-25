@@ -1,0 +1,73 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {DatabaseSync} from 'node:sqlite';
+import {createWorker1111} from '../src/worker1112.mjs';
+import {validEnvelope,accountId,digest} from '../src/security1111.mjs';
+import {newRecoveryCode,keyFromRecoveryCode,encryptDemo,decryptDemo,blankPayload,nextSyntheticEntry} from '../web1112/crypto.js';
+import {decrypt84} from '../../V11.9-LAB/legacy_v106/model84.mjs';
+let contracts=0,http=0,cryptoTests=0;
+const ok=(condition,message)=>{assert.ok(condition,message);contracts++;};
+const eq=(a,b,message)=>{assert.deepEqual(a,b,message);contracts++;};
+const expect=(r,status,message)=>{assert.equal(r.status,status,message);http++;return r;};
+const origin='https://asia-v1111-identity-staging.cabrerafelipe2003.workers.dev';
+const workerSource=readFileSync(new URL('../src/worker1112.mjs',import.meta.url),'utf8');
+ok(workerSource.includes("Location:'/v11.12/'"),'Google callback returns to integrated demo');
+const db=new DatabaseSync(':memory:');db.exec('PRAGMA foreign_keys=ON');
+db.exec(readFileSync(new URL('../../V11.9-LAB/migrations/0001_staging.sql',import.meta.url),'utf8'));
+db.exec(readFileSync(new URL('../migrations/0006_identity_oidc.sql',import.meta.url),'utf8'));
+const D1={prepare(query){return {bind(...args){return {first:async()=>db.prepare(query).get(...args)||null,all:async()=>({results:db.prepare(query).all(...args)}),run:async()=>db.prepare(query).run(...args)};}}}};
+const env={STAGING_MODE:'asia-v1111-identity-private',STAGING_ORIGIN:origin,STAGING_DB:D1,STAGING_GOOGLE_CLIENT_ID:'staging-demo.apps.googleusercontent.com',STAGING_GOOGLE_CLIENT_SECRET:'dummy-synthetic-secret',STAGING_ALLOWED_EMAILS:'a@example.test,b@example.test',STAGING_ALLOW_SYNTHETIC_SNAPSHOTS:'true'};
+const app=createWorker1111({fetchImpl:async()=>{throw Error('NO_EXTERNAL_NETWORK_ALLOWED');}});
+const request=(path,options={},e=env)=>app.fetch(new Request(origin+path,options),e);
+for(const [file,mime] of [['/v11.12/','text/html'],['/v11.12/app.js','text/javascript'],['/v11.12/crypto.js','text/javascript'],['/v11.12/styles.css','text/css']]){
+ const r=expect(await request(file),200,'Static UI');ok(r.headers.get('content-type').includes(mime),'Exact MIME: '+file);ok(r.headers.get('content-security-policy').includes("script-src 'self'"),'No inline script');ok(r.headers.get('cache-control')==='no-store','No caching');const body=await r.text();ok(body.length>100,'Nonempty asset');if(file.endsWith('/')){ok(body.includes('v11.12'),'Visible version');ok(!body.includes('autocomplete="new-password"'),'No password required');ok(body.includes('SOLO PRUEBAS'),'No real data warning');}else if(file.endsWith('/app.js')){ok(body.includes('Iniciar sesión con Google'),'Real provider login link');ok(body.includes('CLAVE_O_COPIA_INVALIDA')===false,'UI does not embed a decryption key');ok(!body.includes('innerHTML'),'No unsanitized HTML injection');}else if(file.endsWith('styles.css')){eq(body,readFileSync(new URL('../../V11.9-LAB/v119/styles.css',import.meta.url),'utf8'),'V11.9 CSS identical');}
+}
+for(const path of ['/v11.12/nope','/v11.12/crypto.js?x=1'])expect(await request(path),404,'No unexpected routes');
+expect(await request('/v11.12/',{}, {...env,STAGING_MODE:'not-staging'}),503,'Staging marker required');
+expect(await request('/v11.12/',{}, {...env,STAGING_DB:{prepare:()=>({bind:()=>({first:async()=>({marker:'wrong'})})})}}),503,'D1 marker required');
+expect(await request('/v11.12/',{}, {...env,DB:{}}),503,'Prod binding rejected');
+const status=await(await request('/v11.11/status')).json();eq(status.version,'11.12','Visible worker version');
+const unauth=await request('/v11.11/data/snapshots');expect(unauth,401,'No unauthenticated access');
+const users=[];
+for(const [sub,email] of [['user-a','a@example.test'],['user-b','b@example.test']]){
+ const id=await accountId('https://accounts.google.com',sub),token=newRecoveryCode(),csrf=newRecoveryCode();
+ db.prepare('INSERT INTO accounts_v11(account_id,issuer,subject,created_at) VALUES(?,?,?,?)').run(id,'https://accounts.google.com',sub,new Date().toISOString());
+ db.prepare('INSERT INTO auth_oidc_sessions_v1111(token_digest,account_id,csrf,email_digest,created_at,expires_at) VALUES(?,?,?,?,?,?)').run(await digest(token),id,csrf,await digest(email),Date.now(),Date.now()+3600000);
+ users.push({id,token,csrf,cookie:'__Host-asia1111_session='+token});
+}
+const [A,B]=users;
+const reqUser=(path,user,opts={})=>request(path,{...opts,headers:{Cookie:user.cookie,...opts.headers}});
+const save=(user,expectedRevision,envelope,override={})=>reqUser('/v11.11/data/snapshots',user,{method:'POST',headers:{Origin:origin,'X-Asia-CSRF':user.csrf,'Content-Type':'application/json',...override},body:JSON.stringify({expectedRevision,envelope})});
+let recovery=newRecoveryCode(),key=await keyFromRecoveryCode(recovery);
+let state=blankPayload(A.id);state=nextSyntheticEntry(state,'meal');const e1=await encryptDemo(state,key,A.id);cryptoTests++;ok(validEnvelope(e1),'D1-valid encryption envelope');
+eq(await decryptDemo(e1,key,A.id),state,'Recovery with same key');cryptoTests++;
+// Confirm cryptographic compatibility with existing V10.6 AES-GCM/PBKDF2 envelope.
+eq(await decrypt84(e1,recovery),state,'V10.6-compatible decryption');cryptoTests++;
+const wrongKey=await keyFromRecoveryCode(newRecoveryCode());await assert.rejects(()=>decryptDemo(e1,wrongKey,A.id),/CLAVE_O_COPIA_INVALIDA/);cryptoTests++;
+await assert.rejects(()=>decryptDemo(e1,key,B.id),/CLAVE_O_COPIA_INVALIDA/);cryptoTests++;
+await assert.rejects(()=>keyFromRecoveryCode('q'.repeat(16)),/CODIGO_INVALIDO/);cryptoTests++;
+expect(await save(A,0,e1),201,'A creates revision 1');
+const v1=expect(await reqUser('/v11.11/data/snapshots/1',A),200,'A reads own revision');
+eq((await v1.json()).envelope,e1,'Ciphertext unchanged after D1');
+const bNoData=expect(await reqUser('/v11.11/data/snapshots/1',B),404,'B cannot read A revision');
+const listB=await(await reqUser('/v11.11/data/snapshots',B)).json();eq(listB.head,0,'B has no versions');
+let recoveryB=newRecoveryCode(),keyB=await keyFromRecoveryCode(recoveryB);const bPayload=nextSyntheticEntry(blankPayload(B.id),'rest'),bEnvelope=await encryptDemo(bPayload,keyB,B.id);
+expect(await save(B,0,bEnvelope),201,'B writes own encrypted snapshot');
+expect(await save(A,0,e1),409,'Stale write conflict');
+let second=nextSyntheticEntry(state,'walk'),e2=await encryptDemo(second,key,A.id);
+expect(await save(A,1,e2),201,'A creates revision 2');
+const listA=await(await reqUser('/v11.11/data/snapshots',A)).json();eq(listA.head,2,'Two revisions available');
+const received=await(await reqUser('/v11.11/data/snapshots/2',A)).json();
+eq(await decryptDemo(received.envelope,await keyFromRecoveryCode(recovery),A.id),second,'Second browser recovery');cryptoTests++;
+expect(await save(B,1,bEnvelope,{Origin:'https://attacker.invalid'}),403,'CSRF origin check');
+expect(await save(B,1,bEnvelope,{'X-Asia-CSRF':'bad'}),403,'CSRF token check');
+expect(await reqUser('/v11.11/data/snapshots?accountId='+A.id,B),400,'Query ID spoofing blocked');
+expect(await reqUser('/v11.11/data/snapshots/1',B,{headers:{'X-Asia-Account':A.id}}),403,'Header ID spoofing blocked');
+expect(await request('/v11.12/',{}, {...env,STAGING_ALLOW_SYNTHETIC_SNAPSHOTS:'false'}),200,'UI available even when data disabled');
+expect(await request('/v11.11/data/snapshots',{}, {...env,STAGING_ALLOW_SYNTHETIC_SNAPSHOTS:'false'}),403,'Data requires explicit flag');
+const logout=expect(await reqUser('/v11.11/auth/logout',A,{method:'POST',headers:{Origin:origin,'X-Asia-CSRF':A.csrf}}),200,'Logout');
+expect(await reqUser('/v11.11/data/snapshots',A),401,'Revocation');
+expect(await reqUser('/v11.11/data/snapshots',B),200,'Other account survives logout');
+for(const kind of ['meal','walk','rest','training'])ok(nextSyntheticEntry(blankPayload(A.id),kind).entries[0].kind===kind,'Synthetic enum '+kind);
+console.log(`V11.12: ${contracts} contratos + ${http} verificaciones HTTP/D1 + ${cryptoTests} verificaciones criptográficas offline.`);
+console.log('Datos exclusivamente ficticios. Sin acceso a Google real ni Cloudflare.');

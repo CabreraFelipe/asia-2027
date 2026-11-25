@@ -1,0 +1,14 @@
+ASIA 2027 V11.21 - CORRECCION RUTA_INEXISTENTE
+
+VERIFICADO EN CLOUD: El Worker de staging estaba en V11.17; /v11.18/ y /v11.21/ no existian.
+La V11.21 acumulativa incorpora todo el codigo de V11.18. NO es necesario instalar V11.18 primero.
+
+1) EXTRAER este ZIP completo en carpeta NUEVA (no mezclar con versiones anteriores).
+2) Ejecutar INSTALAR_V11_21.cmd desde la raiz.
+3) PRECHECK permite V11.17 o V11.18; si alguna otra version aparece, se detiene SIN deploy.
+4) Luego de pruebas, escribir S para confirmar copia de seguridad D1 y despliegue SOLO staging.
+5) Aguardar a que el instalador muestre V11.21 INSTALADA EN STAGING.
+6) ReciEn entonces abrir https://asia-v1111-identity-staging.cabrerafelipe2003.workers.dev/v11.21/
+
+Si falla, NO repetir a ciegas. Copiar ultimas lineas de la consola sin secretos.
+Produccion V10.6 intacta. SOLO DATOS FICTICIOS.

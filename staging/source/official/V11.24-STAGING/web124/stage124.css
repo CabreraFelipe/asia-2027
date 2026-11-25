@@ -1,0 +1,23 @@
+/* V11.22-11.24: progressive presentation only. Inherits V11.21 and never imports remote CSS. */
+:root{--surface124:#14283e;--focus124:#e7b45e}
+html[data-density124="compacto"] main .card{padding:12px 14px;margin:8px 0;border-radius:13px}
+html[data-density124="compacto"] .shortcut121{min-height:49px;padding:9px}
+html[data-density124="compacto"] .workspace-intro121{margin-bottom:10px}
+html[data-palette124="oceano"]{--gold:#77cde9;--focus124:#77cde9}
+html[data-palette124="grafito"]{--gold:#c5b1f7;--focus124:#c5b1f7}
+html[data-palette124="oceano"] .version121,html[data-palette124="oceano"] .eyebrow121,html[data-palette124="oceano"] .eyebrow-head121,html[data-palette124="oceano"] .bottom-nav121 button.active{color:#9de2ff}
+html[data-palette124="grafito"] .version121,html[data-palette124="grafito"] .eyebrow121,html[data-palette124="grafito"] .eyebrow-head121,html[data-palette124="grafito"] .bottom-nav121 button.active{color:#d8c6ff}
+.weeks124{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:12px 0}
+.week124{background:linear-gradient(145deg,#11263d,#16253b);border:1px solid #344b69;padding:12px;border-radius:13px;min-width:0}
+.week-label124{display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:10px;color:#d5e2f2;font-size:12px}
+.week-label124 strong{font-size:11px;color:#f3cf8c;white-space:nowrap}
+.week-rail124{background:#0b1c30;border:1px solid #354862;height:11px;border-radius:999px;overflow:hidden}
+.week-fill124{display:block;background:linear-gradient(90deg,#628cf1,#dfb05d);height:100%;border-radius:999px;min-width:0}
+.week124 small{display:block;font-size:10px;margin-top:7px;color:#aebfda}
+.recent124{display:grid;gap:8px}.recent-item124{display:flex;gap:12px;align-items:center;background:#102039;border:1px solid #2f4867;border-radius:11px;padding:11px 13px;font-size:12px;color:#d1e0f5}
+.recent-date124{font-weight:750;color:#ebc68c;letter-spacing:.06em;flex:none}
+.prefs124{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.prefs124 .field115{margin:0}
+.bottom-nav121 button[aria-current="page"]{outline-offset:-3px}
+@media(max-width:520px){.weeks124{grid-template-columns:1fr 1fr}.prefs124{grid-template-columns:1fr}.recent-item124{align-items:flex-start}}
+@media(max-width:360px){.weeks124{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.week-fill124{transition:none}}

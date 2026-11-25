@@ -1,0 +1,16 @@
+# Standalone NEW Worker. No production names or bindings. Never use this config on prod.
+name = "asia-v1111-identity-staging"
+main = "src/worker1111.mjs"
+compatibility_date = "2026-11-20"
+workers_dev = true
+
+[vars]
+STAGING_MODE = "asia-v1111-identity-private"
+STAGING_ORIGIN = "https://asia-v1111-identity-staging.cabrerafelipe2003.workers.dev"
+STAGING_ALLOW_SYNTHETIC_SNAPSHOTS = "false"
+
+[[d1_databases]]
+binding = "STAGING_DB"
+database_name = "asia-v11-db-staging"
+database_id = "05420c2a-d083-48ee-bc4f-f644177875f9"
+migrations_dir = "migrations"

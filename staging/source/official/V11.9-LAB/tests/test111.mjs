@@ -1,0 +1,90 @@
+import assert from 'node:assert/strict';
+import {DatabaseSync} from 'node:sqlite';
+import {readFileSync} from 'node:fs';
+import {randomBytes} from 'node:crypto';
+import api from '../api-staging.mjs';
+import {b64u111,un64u111,validTestKey111,freshTestKey111,testKeyDigest111,validPepper111} from '../auth111-crypto.mjs';
+let n=0;
+const eq=(a,b,m)=>{assert.deepEqual(a,b,m);n++};
+const ok=(a,m)=>{assert.ok(a,m);n++};
+const sql=new DatabaseSync(':memory:');sql.exec('PRAGMA foreign_keys=ON;');
+for(const m of ['0001_staging.sql','0002_auth_staging.sql','0003_auth_test_keys.sql'])sql.exec(readFileSync(new URL('../migrations/'+m,import.meta.url),'utf8'));
+const wrap=db=>({
+ prepare(q){let args=[];return {q,args,bind(...values){args=values;this.args=args;return this;},async all(){return {results:db.prepare(q).all(...args)}},async first(){return db.prepare(q).get(...args)||null},async run(){return {meta:{changes:Number(db.prepare(q).run(...args).changes)}}}}},
+ async batch(stmts){db.exec('BEGIN IMMEDIATE');try{const res=stmts.map(x=>db.prepare(x.q).run(...x.args));db.exec('COMMIT');return res.map(x=>({meta:{changes:Number(x.changes)}}));}catch(e){db.exec('ROLLBACK');throw e;}}
+});
+const admin='a'.repeat(43),pepper=b64u111(new Uint8Array(32).fill(19)),DB=wrap(sql);
+const env={STAGING_MODE:'asia-v11-staging-110',STAGING_API_TOKEN:admin,STAGING_DB:DB,AUTH_PEPPER_V111:pepper};
+const root='https://staging.invalid';
+const req=(path,method='GET',h={},body)=>new Request(root+path,{method,headers:{Authorization:'Bearer '+admin,...h},...(body===undefined?{}:{body})});
+const post=(path,body,h={})=>req(path,'POST',{'Content-Type':'application/json',...h},JSON.stringify(body));
+const register=(u='test_amber')=>post('/v11/auth/register',{username:u});
+const login=(u,key)=>post('/v11/auth/login',{username:u,test_key:key});
+const session=(key,path='/v11/auth/session',method='GET')=>req(path,method,{'X-Asia-Session':key});
+async function response(r,e=env,code=200){const res=await api.fetch(r,e);eq(res.status,code);eq(res.headers.get('Cache-Control'),'no-store');eq(res.headers.get('Access-Control-Allow-Origin'),null);eq(res.headers.get('Set-Cookie'),null);return res.json();}
+// Runtime crypto assertions: never invoke unsupported PBKDF2.
+for(let i=0;i<10;i++){const key=freshTestKey111();ok(validTestKey111(key));eq(un64u111(key.slice(6)).length,32);}
+for(const s of ['aslab_invalid','',null,'aslab_'+'a'.repeat(40),'a'.repeat(43),'aslab_'+randomBytes(31).toString('base64url')])eq(validTestKey111(s),false);
+ok(validPepper111(pepper));
+const secret=freshTestKey111(),salt=b64u111(new Uint8Array(16).fill(7));
+const d1=await testKeyDigest111(pepper,salt,secret);eq(d1.length,64);eq(d1,await testKeyDigest111(pepper,salt,secret));
+ok(d1!==await testKeyDigest111(pepper,b64u111(new Uint8Array(16).fill(8)),secret));
+ok(d1!==await testKeyDigest111(pepper,salt,freshTestKey111()));
+const status=await response(req('/v11/status'));eq(status.version,'11.2');
+await response(register(),{...env,AUTH_PEPPER_V111:'invalid'},503);
+await response(register(),{...env,STAGING_DB:null},503);
+await response(register(),{...env,DB},503);
+await response(register('test_wrong'),{...env,STAGING_API_TOKEN:'a'.repeat(42)},503);
+await response(post('/v11/auth/register',{username:'test_amber'},{Authorization:'Bearer wrong'}),env,401);
+await response(post('/v11/auth/register',{username:'test_amber'},{Origin:'https://example.com'}),env,403);
+for(const u of ['amber','Test_amber','test_a','test_áaaa',"test_foo' OR 1=1--"]){await response(register(u),env,400);}
+await response(post('/v11/auth/register',{username:'test_amber',password:'Weak!123456'}),env,400);
+await response(req('/v11/auth/register','POST',{'Content-Type':'text/plain'},'{}'),env,400);
+await response(req('/v11/auth/register','POST',{'Content-Type':'application/json'},'{'),env,400);
+await response(post('/v11/auth/register',{username:'test_amber',test_key:freshTestKey111()}),env,400);
+await response(req('/v11/auth/register?key=x','POST',{'Content-Type':'application/json'},'{}'),env,400);
+await response(req('/v11/auth/register','GET'),env,405);
+const a=await response(register(),env,201);
+eq(a.username,'test_amber');eq(a.registered,true);ok(validTestKey111(a.test_key));eq(a.humanPasswords,false);
+const acct=sql.prepare('SELECT * FROM accounts_v11 WHERE subject=?').get('test_amber');ok(acct.account_id.startsWith('acct_'));
+const cred=sql.prepare('SELECT * FROM auth_test_keys_v111b WHERE account_id=?').get(acct.account_id);
+ok(cred.key_digest.length===64);eq(cred.salt.length,22);eq(cred.method,'hmac-sha256-synthetic-v1');
+ok(!JSON.stringify(cred).includes(a.test_key));eq(cred.key_digest,await testKeyDigest111(pepper,cred.salt,a.test_key));
+eq(sql.prepare('SELECT COUNT(*) AS n FROM auth_credentials_v111').get().n,0);
+await response(register(),env,409);
+const b=await response(register('test_bravo'),env,201);ok(a.test_key!==b.test_key);
+await response(post('/v11/auth/login',{username:'test_amber',password:'HumanPassword!123'}),env,400);
+await response(post('/v11/auth/login',{username:'test_amber',test_key:'1234'}),env,400);
+await response(login('test_amber',b.test_key),env,401);
+await response(login('test_missing',a.test_key),env,401);
+const logA=await response(login('test_amber',a.test_key),env,200);
+ok(/^asstg_[A-Za-z0-9_-]{43}$/.test(logA.session));eq(logA.username,'test_amber');
+ok(!JSON.stringify(logA).includes(a.test_key));
+const logB=await response(login('test_bravo',b.test_key),env,200);ok(logA.session!==logB.session);
+const inDB=sql.prepare('SELECT * FROM auth_sessions_v111 WHERE account_id=?').all(acct.account_id);eq(inDB.length,1);eq(inDB[0].token_digest.length,64);ok(!JSON.stringify(inDB).includes(logA.session));
+const infoA=await response(session(logA.session));eq(infoA.username,'test_amber');eq(infoA.humanPasswords,false);
+const infoB=await response(session(logB.session));eq(infoB.username,'test_bravo');
+await response(req('/v11/auth/session'),env,401);
+await response(session(logA.session.slice(0,-1)+'x'),env,401);
+await response(session(logA.session,'/v11/auth/logout','GET'),env,405);
+await response(req('/v11/auth/logout','POST',{'X-Asia-Session':logA.session},'{}'),env,400);
+eq((await response(session(logA.session,'/v11/auth/logout','POST'))).logged_out,true);
+await response(session(logA.session),env,401);
+eq((await response(session(logB.session))).username,'test_bravo');
+const a2=(await response(login('test_amber',a.test_key))).session;
+const a3=(await response(login('test_amber',a.test_key))).session;
+await response(session(a2,'/v11/auth/logout-all','POST'));
+await response(session(a2),env,401);
+await response(session(a3),env,401);
+eq((await response(session(logB.session))).username,'test_bravo');
+sql.prepare('UPDATE auth_sessions_v111 SET created_at=?,expires_at=? WHERE account_id=(SELECT account_id FROM accounts_v11 WHERE subject=?)').run(Date.now()-10800000,Date.now()-3600000,'test_bravo');
+await response(session(logB.session),env,401);
+for(let i=0;i<8;i++)await response(login('test_bravo',a.test_key),env,401);
+await response(login('test_bravo',b.test_key),env,429);
+eq(sql.prepare('PRAGMA integrity_check').get().integrity_check,'ok');eq(sql.prepare('PRAGMA foreign_key_check').all().length,0);
+sql.exec('CREATE TABLE ai_usage (dummy TEXT)');await response(register('test_oops'),env,503);sql.exec('DROP TABLE ai_usage');
+await response(req('/v11/auth/other','POST'),env,404);
+await response(req('/coach'),env,404);
+// Fail-closed with a malformed marker.
+sql.exec('DELETE FROM staging_identity_v110');await response(register('test_oops'),env,503);
+console.log(`V11.1b: ${n} verified assertions (SQLite and WebCrypto real, D1 adapter simulated; synthetic keys only).`);

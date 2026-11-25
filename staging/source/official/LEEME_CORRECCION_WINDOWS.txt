@@ -1,0 +1,33 @@
+Asia 2027 V11.18 - CORRECCION DEL INSTALADOR WINDOWS
+======================================================
+
+Esta edicion conserva los archivos de V11.18-STAGING sin cambios de codigo.
+Se corrigio el formato de lineas del .cmd de LF (Unix) a CRLF (Windows)
+y se agrego un lanzador que siempre espera una tecla.
+
+PASOS
+1. No ejecutes el .cmd dentro de la vista previa del ZIP.
+2. Clic derecho en el ZIP > Extraer todo...
+3. Entra a la carpeta extraida.
+4. Haz doble clic en ABRIR_INSTALADOR_V11_18.cmd.
+5. Lee el resultado y confirma con S solo si es el staging correcto.
+
+Si vuelve a cerrarse:
+- Pulsa Win + R, escribe cmd y presiona Enter.
+- En el Explorador, arrastra ABRIR_INSTALADOR_V11_18.cmd sobre esa ventana y presiona Enter.
+- La ventana de CMD ya abierta permanecera visible al terminar.
+- Manda una captura del primer error. NO compartas tokens, passwords ni codigos de rescate.
+
+PRERREQUISITOS
+- Node.js >= 22 accesible desde CMD (node --version)
+- Conexion a Internet y autenticacion Wrangler para el deploy
+- Version V11.17 real en el Worker STAGING
+
+SEGURIDAD
+- El preflight inicial es OFFLINE y no modifica Cloudflare.
+- La instalacion remota solicita S para continuar.
+- Si se autoriza, primero respalda D1 STAGING y despues despliega solo ese Worker.
+- NO usar datos reales. NO afecta la app V10.6 personal.
+- Si llega a la fase de deploy y falla, NO volver a ejecutar a ciegas.
+
+Esta correccion no es V11.19 ni cambia el comportamiento de V11.18.

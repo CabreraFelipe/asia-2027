@@ -1,0 +1,1 @@
+Asia 2027 V11.21 (hotfix ruta). Extrae TODO el ZIP en carpeta NUEVA. Ejecuta INSTALAR_V11_21.cmd. Acepta origen remoto V11.17 o V11.18. Requiere preflight, confirmacion S, respaldo D1 y smoke. El enlace V11.21 funciona SOLO despues de un despliegue exitoso. Usa SOLO datos ficticios.

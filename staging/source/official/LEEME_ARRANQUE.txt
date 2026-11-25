@@ -1,0 +1,13 @@
+Asia 2027 V11.18 - instalador reparado. Leer LEEME_REPARACION_WINDOWS.txt.
+
+ASIA 2027 V11.18 - KIT DE RESCATE CIFRADO - STAGING
+
+1. Descomprimir TODO este ZIP en una carpeta nueva de Windows.
+2. Doble clic en INSTALAR_V11_18.cmd desde esta misma carpeta.
+3. Si el preflight y el precheck de V11.17 pasan, confirmar S para respaldar D1 STAGING y actualizar SOLO el Worker de pruebas.
+4. Abrir https://asia-v1111-identity-staging.cabrerafelipe2003.workers.dev/v11.18/
+
+SOLO DATOS FICTICIOS. Produccion V10.6 sin cambios.
+El kit V11.18 NO rota la clave original. Guardar su archivo cifrado y codigo de rescate POR SEPARADO.
+NO compartir secretos ni capturas que incluyan codigos. Si falla, no repetir CMD a ciegas.
+Mas informacion: V11.18-STAGING/LEEME_V11.18.md

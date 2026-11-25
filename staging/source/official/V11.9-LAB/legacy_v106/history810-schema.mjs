@@ -1,0 +1,8 @@
+// Verified V6.0.1 field definitions. Units are never inferred from magnitude.
+export const bodyFields810=Object.freeze({weight:['Peso','kg',20,300],fat:['Grasa corporal','%',0,70],fatMass:['Masa grasa','kg',0,200],muscle:['Masa muscular','kg',0,200],skeletal:['Músculo esquelético','kg',0,150],visceral:['Grasa visceral','nivel',0,99],water:['Agua corporal','%',0,100],protein:['Proteína corporal','%',0,100],bmr:['Metabolismo basal','kcal',0,5000],waist:['Cintura','cm',30,250],bmi:['IMC','kg/m²',10,100],bone:['Masa ósea','kg',0,30],bodyAge:['Edad corporal','años',0,150],bodyScore:['Puntuación corporal','puntos',0,100]});
+export const wellbeingFields810=Object.freeze({sleep:['Sueño','h',0,24],recovery:['Recuperación','/5',1,5],fatigue43:['Fatiga','/5',1,5]});
+export const memoryCategories810=['Preferencia','Objetivo','Decisión','Contexto','Otro'];
+export const memoryKey810=e=>JSON.stringify([e.day,e.category,e.text]);
+export const historyKey810=e=>`${e.day}/${e.source}/${e.metric}`;
+export function historyRecordOK810(e,dayOK){const fields=e?.source==='body'?bodyFields810:e?.source==='diet'?wellbeingFields810:null;const def=fields&&Object.hasOwn(fields,e.metric)?fields[e.metric]:null;return !!(e&&def&&Object.keys(e).length===4&&dayOK(e.day)&&typeof e.value==='number'&&Number.isFinite(e.value)&&e.value>=def[2]&&e.value<=def[3]&&(!['recovery','fatigue43'].includes(e.metric)||Number.isInteger(e.value)))}
+export const memoryRecordOK810=(e,dayOK)=>!!(e&&Object.keys(e).length===6&&typeof e.id==='string'&&/^v6mem-[a-f0-9]{64}$/.test(e.id)&&dayOK(e.day)&&memoryCategories810.includes(e.category)&&typeof e.text==='string'&&e.text.trim()&&e.text.length<=240&&typeof e.health==='boolean'&&['pending','approved','excluded'].includes(e.status));

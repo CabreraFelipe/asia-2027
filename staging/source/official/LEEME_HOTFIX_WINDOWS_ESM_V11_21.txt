@@ -1,0 +1,17 @@
+ASIA 2027 V11.21 - HOTFIX ESM WINDOWS
+
+ERROR REPRODUCIDO: ERR_UNSUPPORTED_ESM_URL_SCHEME, Received protocol c:
+CAUSA: test_upgrade1121.mjs hacia import(C:\...), que falla en Windows.
+CAMBIO: usa pathToFileURL() de Node para import(file:///C:/...).
+NO SE OMITIERON LAS PRUEBAS; sigue igual el preflight de 626+ checks.
+
+PASOS:
+1. Extrae TODO este ZIP en carpeta nueva, no combines versiones.
+2. Abre CMD en la carpeta y ejecuta: node INSTALADOR_SEGURO_V11_21.mjs --solo-preflight
+   (sin conexiones externas, sin instalaciones)
+3. Si aparece PREFLIGHT LOCAL OK, ejecuta INSTALAR_V11_21.cmd.
+4. Precheck remoto solo V11.17/V11.18; despues exige S, respaldo D1 staging y smoke.
+5. No abrir la URL V11.21 hasta que muestre V11.21 INSTALADA EN STAGING.
+
+Si la consola indica que el despliegue ya se inicio, NO reintentar ciegamente.
+La aplicacion personal V10.6 no se modifica. SOLO datos ficticios.

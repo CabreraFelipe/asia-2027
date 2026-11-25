@@ -1,0 +1,15 @@
+ASIA 2027 V11.21 - PREFLIGHT AISLADO PARA WINDOWS Y ONEDRIVE
+
+Problema anterior: el preflight estricto rechazaba archivos adicionales del entorno aunque todos los hashes oficiales coincidieran ("Unexpected or missing file").
+
+Solucion: primero se comprueban todos los hashes del paquete y se crea una copia temporal que contiene SOLAMENTE los archivos listados en el inventario oficial; luego se ejecutan todas las pruebas originales sin omitirlas ni modificarlas. La carpeta original permanece intacta.
+
+MODO SEGURO (sin conexion ni despliegue):
+node INSTALADOR_SEGURO_V11_21.mjs --solo-preflight
+
+INSTALACION (SOLO cuando aparezca PREFLIGHT LOCAL OK):
+INSTALAR_V11_21.cmd
+
+El instalador necesita obtener V11.17 o V11.18 de Cloudflare staging, pedir S, respaldar D1 staging, verificar integridad otra vez y recien entonces desplegar. Si aparece un error, no reintentes sin revisar el mensaje. No tocar datos reales de V10.6.
+
+LIMITACION: no fue ejecutado en Windows real; las pruebas se realizaron con Node en Linux simulando archivos extra, rutas complejas y extracciones ZIP frescas. No podemos garantizar que nunca falle, pero ahora el control indica el nombre del archivo ante una alteracion y no considera los auxiliares como parte del codigo oficial.
