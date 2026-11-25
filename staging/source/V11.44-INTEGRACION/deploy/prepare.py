@@ -7,8 +7,16 @@ client=os.environ.get('STAGING_GOOGLE_CLIENT_ID','')
 secret=os.environ.get('STAGING_GOOGLE_CLIENT_SECRET','')
 emails=os.environ.get('STAGING_ALLOWED_EMAILS','')
 allowed=[x.strip().lower() for x in emails.split(',')]
-if not re.fullmatch(r'[A-Za-z0-9_.-]+\.apps\.googleusercontent\.com',client) or not 8<=len(secret)<=512 or not 1<=len(allowed)<=5 or len(set(allowed))!=len(allowed) or not all(re.fullmatch(r'[^\s@,]+@[^\s@,]+\.[^\s@,]+',x) for x in allowed):
-    sys.exit('Faltan los tres secretos OAuth de prueba o su formato no es válido')
+problems=[]
+if not client:problems.append('STAGING_GOOGLE_CLIENT_ID: ausente')
+elif not re.fullmatch(r'[A-Za-z0-9_.-]+\.apps\.googleusercontent\.com',client):problems.append('STAGING_GOOGLE_CLIENT_ID: formato inválido; debe terminar en .apps.googleusercontent.com')
+if not secret:problems.append('STAGING_GOOGLE_CLIENT_SECRET: ausente')
+elif not 8<=len(secret)<=512 or secret!=secret.strip() or any(x.isspace() for x in secret):problems.append('STAGING_GOOGLE_CLIENT_SECRET: formato inválido; copiar solo valor del secreto')
+if not emails:problems.append('STAGING_ALLOWED_EMAILS: ausente')
+elif not 1<=len(allowed)<=5 or len(set(allowed))!=len(allowed) or not all(re.fullmatch(r'[^\s@,]+@[^\s@,]+\.[^\s@,]+',x) for x in allowed):problems.append('STAGING_ALLOWED_EMAILS: formato inválido; 1 a 5 correos distintos separados por comas')
+if problems:
+    for problem in problems:print(problem)
+    sys.exit('Validación OAuth fallida; sin escrituras en Cloudflare')
 base='https://api.cloudflare.com/client/v4/accounts/'+account
 class NoRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self,*args,**kwargs): return None

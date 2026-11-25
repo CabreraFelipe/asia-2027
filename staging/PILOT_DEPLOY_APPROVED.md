@@ -1,3 +1,5 @@
 # Solicitud de publicación del piloto V11.44
 
 El propietario pidió continuar después de configurar el entorno asia-v12-pilot y recibir instrucciones para los secretos Google OAuth. Esta solicitud activa la workflow de publicación exclusivamente del candidato nuevo `asia-v1142-candidate-staging` en el entorno protegido `asia-v12-pilot`. La publicación exige aprobación manual del propietario y validación de los secretos, CI del paquete, D1 vacía y R2 de piloto. No autoriza modificar otros Workers, bases o buckets ni migrar datos personales. Si falla la publicación o el smoke, detener e inspeccionar antes de reintentar.
+
+Segundo intento solicitado tras fallo de formato OAuth en 45552206418. El preflight reporta exclusivamente nombres de secretos y tipo de fallo; ningún valor. Mantener aprobación manual y no sobrescribir destinos existentes.
