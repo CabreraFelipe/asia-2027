@@ -1,0 +1,30 @@
+name: Asia 2027 - almacenamiento amplio y servicios V11.38
+on:
+  push:
+    branches: ['development/multiuser']
+    paths: ['staging/source/V11.38-INTEGRACION/**','.github/workflows/asia-v1138.yml']
+permissions:
+  contents: read
+jobs:
+  integration:
+    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/development/multiuser'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22.16.0'
+      - run: node staging/source/V11.38-INTEGRACION/tests/worker.test.mjs
+      - run: node staging/source/V11.29-INTEGRACION/tests/build-candidate.mjs
+      - name: Regresión sincronización V11.36
+        env:
+          ASIA_BROWSER_PREFIX: /staging/source/V11.36-INTEGRACION/tests
+        run: node staging/source/V11.26-INTEGRACION/tests/run-browser.mjs
+      - name: Regresión offline V11.37
+        env:
+          ASIA_BROWSER_PREFIX: /staging/source/V11.37-INTEGRACION/tests
+        run: node staging/source/V11.26-INTEGRACION/tests/run-browser.mjs
