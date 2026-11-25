@@ -1,0 +1,104 @@
+name: Asia 2027 - crear recursos nuevos del piloto (aprobación manual)
+on:
+  push:
+    branches: ['development/multiuser']
+    paths: ['.github/workflows/asia-v12-pilot-provision.yml']
+permissions: {}
+concurrency:
+  group: asia-v12-pilot-provision
+  cancel-in-progress: false
+jobs:
+  provision:
+    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/development/multiuser'
+    environment: asia-v12-pilot
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Crear D1 y R2 exclusivos e inicializar esquema nuevo
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import os, re, json, sqlite3, sys, urllib.request, urllib.error
+          account=os.environ.get('CLOUDFLARE_ACCOUNT_ID','')
+          token=os.environ.get('CLOUDFLARE_API_TOKEN','')
+          if not token or not re.fullmatch(r'[a-fA-F0-9]{32}',account):
+              sys.exit('Secretos del piloto ausentes o Account ID inválido.')
+          base='https://api.cloudflare.com/client/v4/accounts/'+account
+          WORKER='asia-v1142-candidate-staging'
+          DB='asia-v1142-new-synthetic-db'
+          BUCKET='asia-v1142-new-synthetic-objects'
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self,*args,**kwargs): return None
+          opener=urllib.request.build_opener(NoRedirect)
+          def api(method,path,body=None,missing=False):
+              # Do not log account identifiers, token, response bodies or SQL results.
+              request=urllib.request.Request(base+path,data=None if body is None else json.dumps(body).encode(),headers={'Authorization':'Bearer '+token,'Accept':'application/json','Content-Type':'application/json'},method=method)
+              try:
+                  with opener.open(request,timeout=30) as res: obj=json.load(res)
+              except urllib.error.HTTPError as e:
+                  if missing and e.code==404: return None
+                  sys.exit('Cloudflare rechazó '+method+' '+path.split('?')[0].replace(DB,'D1-piloto').replace(BUCKET,'R2-piloto')+' (HTTP '+str(e.code)+'). Detener, inspeccionar y no repetir escrituras a ciegas.')
+              except Exception:
+                  sys.exit('Respuesta no confirmada. Detener e inspeccionar los recursos; no repetir escrituras a ciegas.')
+              if not isinstance(obj,dict) or obj.get('success') is not True:
+                  sys.exit('Cloudflare no confirmó la operación. No continuar.')
+              return obj
+          def result(method,path,body=None,missing=False):
+              r=api(method,path,body,missing)
+              return None if r is None else r.get('result')
+          sub=result('GET','/workers/subdomain')
+          if not isinstance(sub,dict) or not re.fullmatch(r'[a-z0-9-]{1,63}',sub.get('subdomain','')):
+              sys.exit('No se confirmó el subdominio workers.dev.')
+          if api('GET','/workers/scripts/'+WORKER+'/settings',missing=True) is not None:
+              sys.exit('El Worker candidato ya existe: detener sin sobrescribir.')
+          listing=api('GET','/d1/database?name='+DB+'&per_page=100&page=1')
+          rows=listing.get('result')
+          if not isinstance(rows,list) or len(rows)>=100 or any(not isinstance(x,dict) or x.get('name')==DB for x in rows):
+              sys.exit('D1 candidato existente o listado ambiguo: no reutilizar.')
+          if api('GET','/r2/buckets/'+BUCKET,missing=True) is not None:
+              sys.exit('R2 candidato existente: no reutilizar.')
+          print('Destinos exactos comprobados. No se modificaron recursos anteriores.')
+          created=result('POST','/d1/database',{'name':DB})
+          if not isinstance(created,dict) or created.get('name')!=DB or not re.fullmatch(r'[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}',created.get('uuid','')):
+              sys.exit('Creación D1 no confirmada. No continuar.')
+          uid=created['uuid']
+          print('D1 nueva creada.')
+          created_bucket=result('POST','/r2/buckets',{'name':BUCKET})
+          if not isinstance(created_bucket,dict) or created_bucket.get('name')!=BUCKET:
+              sys.exit('Creación R2 no confirmada. Inspeccionar antes de reintentar.')
+          print('R2 nuevo creado.')
+          assert result('GET','/d1/database/'+uid).get('name')==DB
+          assert result('GET','/r2/buckets/'+BUCKET).get('name')==BUCKET
+          def query(sql):
+              # Only UUID obtained from THIS successful creation, never from existing resource.
+              r=result('POST','/d1/database/'+uid+'/query',{'sql':sql})
+              if not isinstance(r,list) or not r or any(not isinstance(x,dict) or x.get('success') is not True for x in r):
+                  sys.exit('Consulta D1 no confirmada; no aplicar más migraciones.')
+              return r
+          tables=query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '_cf_%'")[0].get('results')
+          if tables!=[]: sys.exit('La D1 recién creada no está vacía: detener.')
+          migrations=["-- STAGING ONLY. New empty D1 database. Never run against current personal database.\n-- D1 enables foreign keys. No production tables are referenced.\nCREATE TABLE staging_identity_v110 (\n id INTEGER PRIMARY KEY CHECK(id=1),\n marker TEXT NOT NULL CHECK(marker='asia-v11-staging-110')\n);\nINSERT INTO staging_identity_v110(id,marker) VALUES(1,'asia-v11-staging-110');\nCREATE TABLE accounts_v11 (\n account_id TEXT PRIMARY KEY CHECK(length(account_id)=37 AND substr(account_id,1,5)='acct_' AND substr(account_id,6) NOT GLOB '*[^0-9a-f]*'),\n issuer TEXT NOT NULL CHECK(length(issuer) BETWEEN 1 AND 500),\n subject TEXT NOT NULL CHECK(length(subject) BETWEEN 1 AND 500),\n created_at TEXT NOT NULL,\n UNIQUE(issuer,subject)\n);\nCREATE TABLE encrypted_snapshots_v11 (\n account_id TEXT NOT NULL REFERENCES accounts_v11(account_id),\n revision INTEGER NOT NULL CHECK(revision>=1),\n envelope TEXT NOT NULL CHECK(length(envelope) BETWEEN 1 AND 1400000),\n created_at TEXT NOT NULL,\n PRIMARY KEY(account_id,revision)\n);\nCREATE TABLE push_devices_v11 (\n account_id TEXT NOT NULL REFERENCES accounts_v11(account_id),\n device_id TEXT NOT NULL CHECK(length(device_id) BETWEEN 1 AND 128),\n endpoint TEXT NOT NULL UNIQUE,\n subscription_json TEXT NOT NULL CHECK(length(subscription_json) BETWEEN 1 AND 16384),\n created_at TEXT NOT NULL,\n PRIMARY KEY(account_id,device_id)\n);\nCREATE TABLE reminder_queue_v11 (\n account_id TEXT NOT NULL,\n device_id TEXT NOT NULL,\n reminder_id TEXT NOT NULL,\n kind TEXT NOT NULL CHECK(kind IN ('weight','gym','diet','weekly','checkin','strategy')),\n due_at INTEGER NOT NULL CHECK(due_at>0),\n PRIMARY KEY(account_id,device_id,reminder_id),\n FOREIGN KEY(account_id,device_id) REFERENCES push_devices_v11(account_id,device_id) ON DELETE CASCADE\n);\nCREATE INDEX reminders_due_v11 ON reminder_queue_v11(due_at);\n","-- Asia V11.11 ONLY staging database asia-v11-db-staging.\n-- DO NOT apply to asia2027db or any production database.\nCREATE TABLE IF NOT EXISTS auth_oidc_flows_v1111 (\n state_digest TEXT PRIMARY KEY CHECK(length(state_digest)=64),\n nonce TEXT NOT NULL CHECK(length(nonce)=43),\n verifier TEXT NOT NULL CHECK(length(verifier)=43),\n expires_at INTEGER NOT NULL CHECK(expires_at>0)\n);\nCREATE INDEX IF NOT EXISTS auth_oidc_flows_expiry_v1111 ON auth_oidc_flows_v1111(expires_at);\nCREATE TABLE IF NOT EXISTS auth_oidc_sessions_v1111 (\n token_digest TEXT PRIMARY KEY CHECK(length(token_digest)=64),\n account_id TEXT NOT NULL REFERENCES accounts_v11(account_id) ON DELETE CASCADE,\n csrf TEXT NOT NULL CHECK(length(csrf)=43),\n email_digest TEXT NOT NULL CHECK(length(email_digest)=64),\n created_at INTEGER NOT NULL CHECK(created_at>0),\n expires_at INTEGER NOT NULL CHECK(expires_at>created_at)\n);\nCREATE INDEX IF NOT EXISTS auth_oidc_sessions_account_v1111 ON auth_oidc_sessions_v1111(account_id,expires_at);\n","-- ASIA V11.15 ONLY. Run only against asia-v11-db-staging.\n-- Separate append-only synthetic domain journal; never changes V11.14 encrypted snapshots.\nCREATE TABLE IF NOT EXISTS synthetic_journal_v115 (\n  account_id TEXT NOT NULL REFERENCES accounts_v11(account_id) ON DELETE CASCADE,\n  revision INTEGER NOT NULL CHECK(revision BETWEEN 1 AND 30),\n  envelope TEXT NOT NULL CHECK(length(envelope) BETWEEN 24 AND 120000),\n  created_at TEXT NOT NULL,\n  PRIMARY KEY(account_id,revision)\n);\nCREATE INDEX IF NOT EXISTS synthetic_journal_recent_v115 ON synthetic_journal_v115(account_id, revision DESC);\n","-- New synthetic table only; no existing table changed. Not applied by CI.\nCREATE TABLE IF NOT EXISTS sync_v1138_objects (\n account_id TEXT NOT NULL,\n revision INTEGER NOT NULL CHECK(revision BETWEEN 1 AND 200),\n object_key TEXT NOT NULL UNIQUE,\n bytes INTEGER NOT NULL CHECK(bytes BETWEEN 1 AND 41000000),\n sha256 TEXT NOT NULL,\n created_at TEXT NOT NULL,\n PRIMARY KEY(account_id,revision)\n);\n"]
+          # Verify exactly the already-tested schema locally before remote execution.
+          local=sqlite3.connect(':memory:')
+          for m in migrations: local.executescript(m)
+          expected=sorted(r[0] for r in local.execute("SELECT name FROM sqlite_master WHERE type='table'"))
+          for i,m in enumerate(migrations,1):
+              statement=''
+              for line in m.splitlines(keepends=True):
+                  statement+=line
+                  if sqlite3.complete_statement(statement):
+                      query(statement);statement=''
+              if statement.strip(): sys.exit('Migración incompleta; detener.')
+              print('Migración '+str(i)+' aplicada en D1 nueva.')
+          actual=query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '_cf_%'")[0].get('results')
+          if sorted(r['name'] for r in actual)!=expected: sys.exit('Esquema remoto no coincide.')
+          for table in ['accounts_v11','auth_oidc_sessions_v1111','sync_v1138_objects']:
+              if query('SELECT COUNT(*) AS n FROM '+table)[0]['results']!=[{'n':0}]: sys.exit('La base no es sintética vacía.')
+          print('Esquema verificado; cuentas, sesiones y copias: cero.')
+          print('Origen reservado: https://'+WORKER+'.'+sub['subdomain']+'.workers.dev')
+          print('Callback OAuth: https://'+WORKER+'.'+sub['subdomain']+'.workers.dev/v11.11/auth/callback')
+          print('Sin deploy de Worker, sin cambios a producción, sin datos reales.')
+          PY
