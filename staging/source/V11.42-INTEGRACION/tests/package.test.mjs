@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import {readFileSync,existsSync} from 'node:fs';
+import {DatabaseSync} from 'node:sqlite';
+import worker from '../dist/server/index.mjs';
+import {digest} from '../dist/server/staging/source/official/V11.24-STAGING/src/security1111.mjs';
+const root=new URL('../dist/assets',import.meta.url).pathname,origin='https://asia-v1142-candidate-staging.example.workers.dev',A='acct_'+'a'.repeat(32),token='A'.repeat(43);
+const db=new DatabaseSync(':memory:');db.exec("CREATE TABLE staging_identity_v110(id INTEGER PRIMARY KEY,marker TEXT);INSERT INTO staging_identity_v110 VALUES(1,'asia-v11-staging-110');CREATE TABLE auth_oidc_sessions_v1111(token_digest TEXT PRIMARY KEY,account_id TEXT,csrf TEXT,expires_at INTEGER,email_digest TEXT);");db.prepare('INSERT INTO auth_oidc_sessions_v1111 VALUES(?,?,?,?,?)').run(await digest(token),A,'a',Date.now()+60000,await digest('a@example.invalid'));
+const env={STAGING_MODE:'asia-v1111-identity-private',STAGING_ORIGIN:origin,STAGING_ALLOW_V1142_TESTS:'true',STAGING_GOOGLE_CLIENT_ID:'test.apps.googleusercontent.com',STAGING_GOOGLE_CLIENT_SECRET:'synthetic-only',STAGING_ALLOWED_EMAILS:'a@example.invalid',STAGING_DB:{prepare(sql){let a=[];return {bind(...args){a=args;return this},async first(){return db.prepare(sql).get(...a)||null}}}},STAGING_PWA_ASSETS:{async fetch(r){const p=root+new URL(r.url).pathname;return existsSync(p)?new Response(readFileSync(p)):new Response(null,{status:404})}}};
+const req=(p,auth=false,e=env)=>worker.fetch(new Request(origin+p,{headers:auth?{Cookie:'__Host-asia1111_session='+token}:{}}),e);
+const prefix='/v11.42/';
+assert.equal((await req(prefix+'index.html')).status,200);const m=await (await req(prefix+'manifest.json')).json();assert.equal(m.scope,prefix);assert.equal(m.start_url,prefix+'index.html');assert.equal(m.display,'standalone');assert.equal(m.icons.length,2);
+assert.equal((await req(prefix+'app.mjs')).status,401);assert.equal((await req(prefix+'diary/index.html')).status,401);assert.equal((await req(prefix+'diary/index.html',true)).headers.get('cache-control'),'no-store');assert.match((await req(prefix+'diary/index.html',true)).headers.get('content-security-policy'),/connect-src 'none'/);
+assert.equal((await req(prefix+'sw.js')).headers.get('service-worker-allowed'),prefix);assert.equal((await req(prefix+'diary/sw.js',true)).status,404);assert.equal((await req('/v11.24/',true)).status,404);assert.equal((await req(prefix+'app.mjs',true,{...env,STAGING_ALLOW_V1142_TESTS:'false'})).status,403);
+assert.equal((await req('/v11.11/auth/me',true)).status,200);db.prepare('DELETE FROM auth_oidc_sessions_v1111').run();assert.equal((await req(prefix+'diary/index.html',true)).status,401);
+db.close();console.log('Package, manifest, isolated origin, Worker auth, no-store, CSP, revoked access and route allowlist verified.');
