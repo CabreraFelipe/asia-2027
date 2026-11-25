@@ -1,0 +1,57 @@
+name: Asia 2027 - regresión V11.24 y V11.25
+on:
+  push:
+    branches: ['development/multiuser']
+    paths: ['staging/import/asia-ci-base.zip']
+permissions:
+  contents: read
+jobs:
+  regression:
+    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/development/multiuser'
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22.16.0'
+      - name: Validar y extraer exclusivamente paquete aprobado
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo '6749b8a70ea2f9bd87b87467df74a38eebf0c17b524d19cf8dccd5e8caa56ba6  staging/import/asia-ci-base.zip' | sha256sum -c -
+          python3 - <<'PY'
+          import os, zipfile, pathlib, stat, shutil
+          base=pathlib.Path(os.environ['RUNNER_TEMP'])/'asia-ci'
+          base.mkdir()
+          def unpack(src,dst,expected):
+              with zipfile.ZipFile(src) as z:
+                  infos=z.infolist()
+                  assert len(infos)==expected and sum(i.file_size for i in infos)<20_000_000
+                  assert z.testzip() is None
+                  seen=set()
+                  for i in infos:
+                      p=pathlib.PurePosixPath(i.filename)
+                      assert not p.is_absolute() and '\\' not in i.filename and ':' not in i.filename and '..' not in p.parts and i.filename not in seen
+                      assert not stat.S_ISLNK(i.external_attr>>16)
+                      seen.add(i.filename)
+                  z.extractall(dst)
+          unpack('staging/import/asia-ci-base.zip',base,35)
+          unpack(base/'Asia_2027_V11.24_UX_ACUMULATIVA_STAGING.zip',base/'official',726)
+          shutil.copytree(base/'official/V11.24-STAGING',base/'BASE_V11.24',dirs_exist_ok=True)
+          PY
+      - name: Verificar 110 archivos originales frente al manifiesto histórico
+        shell: bash
+        run: |
+          cd "$RUNNER_TEMP/asia-ci"
+          node recuperar-v106.mjs "$GITHUB_WORKSPACE"
+      - name: Regresiones acumuladas V11.24 y candidato V11.25
+        shell: bash
+        run: |
+          cd "$RUNNER_TEMP/asia-ci"
+          node official/PREFLIGHT_PORTABLE_V11_24.mjs
+          node VERIFICAR_V11_25.mjs
+          echo 'No se ejecutaron instaladores, despliegues ni migraciones remotas.'
