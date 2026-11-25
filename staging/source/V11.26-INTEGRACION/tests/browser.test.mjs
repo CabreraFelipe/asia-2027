@@ -1,0 +1,37 @@
+import {openVaultRepository,openSessionVault} from '../src/session-vault.mjs';
+const check=(x,m)=>{if(!x)throw Error(m)};
+const rejects=async(p,pattern)=>{try{await p}catch(e){check(pattern.test(e.message),e.message);return}throw Error('Se esperaba rechazo')};
+export async function run(){
+ const policy=globalThis.asiaAccounts106;
+ const A='acct_'+'a'.repeat(32),B='acct_'+'b'.repeat(32);
+ let accountId=A,csrf='a-session';
+ const readSession=async()=>({accountId,csrf});
+ let repo=await openVaultRepository();
+ const open=(passphrase='clave sintética de cuenta A')=>openSessionVault({repository:repo,policy,passphrase,readSession});
+ const k=policy.portable[0];
+ const a=await open(),other=await open();
+ a.storage.setItem(k,'valor sintético de cuenta A');
+ other.storage.setItem(k,'escritura concurrente');
+ const outcomes=await Promise.allSettled([a.flush(),other.flush()]);
+ check(outcomes.filter(x=>x.status==='fulfilled').length===1,'CAS no atómico');
+ check(outcomes.filter(x=>x.status==='rejected').length===1,'Conflicto no detectado');
+ const winner=outcomes[0].status==='fulfilled'?a:other,loser=winner===a?other:a;
+ const expected=winner.storage.getItem(k);
+ check(loser.dirty,'Se perdió indicador pendiente');
+ winner.close();loser.invalidate();
+ const stored=await repo.read(A);
+ check(stored.revision===1&&stored.envelope.format==='asia84-encrypted-v1','Registro incorrecto');
+ check(!JSON.stringify(stored).includes(expected)&&!JSON.stringify(stored).includes(k),'Dato en claro');
+ repo.close();repo=await openVaultRepository();
+ const restored=await open();
+ check(restored.storage.getItem(k)===expected,'Restauración persistente incorrecta');
+ await rejects(open('otra frase sintética incorrecta'),/./);
+ accountId=B;csrf='b-session';
+ await rejects(restored.revalidate(),/cambió/);
+ const b=await open('clave sintética de cuenta B');
+ check(b.storage.length===0,'Mezcla de cuentas');
+ b.storage.setItem(k,'valor sintético B');await b.flush();b.close();
+ accountId=A;csrf='a-session-new';
+ const back=await open();check(back.storage.getItem(k)===expected,'A fue sobrescrita por B');back.close();repo.close();
+ return {ok:true,checks:'IndexedDB real, CAS simultáneo, AES-GCM, persistencia al reabrir, frase errónea, cambio de cuenta y aislamiento'};
+}

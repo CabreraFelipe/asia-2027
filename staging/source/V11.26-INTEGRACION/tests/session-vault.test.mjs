@@ -43,3 +43,11 @@ assert.equal((await transport()).accountId,A);
 await assert.rejects(sessionReader({origin:'https://staging.example',fetcher:async()=>({ok:false})})());
 console.log('V11.26: claves portables originales, cifrado, restauración, conflicto, cambio de sesión, dos cuentas y transporte aprobados.');
 console.log('CAS probado con repositorio en memoria; IndexedDB físico y DOM original pendientes.');
+
+const revoked=await openSessionVault({repository,policy,passphrase:'frase sintética de prueba A',readSession:async()=>({accountId:A,csrf:'revoke-test'})});revoked.close();
+let unauthorized=false;
+const revocable=await openSessionVault({repository,policy,passphrase:'frase sintética de prueba A',readSession:async()=>{if(unauthorized){const e=Error('401');e.revoked=true;throw e}return {accountId:A,csrf:'revoke-test'}}});
+unauthorized=true;
+await assert.rejects(revocable.revalidate(),/verificar/);
+assert.throws(()=>revocable.storage.getItem(keys[0]),/cerrada/);
+console.log('Revocación explícita bloquea acceso a memoria.');

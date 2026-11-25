@@ -8,7 +8,7 @@ export function sessionReader({origin,fetcher=fetch}){
  assert(typeof origin==='string'&&origin.startsWith('https://')&&new URL(origin).origin===origin,'Origen inválido');
  return async()=>{
   const r=await fetcher(origin+'/v11.11/auth/me',{credentials:'same-origin',cache:'no-store',redirect:'error'});
-  if(!r.ok)throw Error('Sesión no disponible');
+  if(!r.ok){const e=Error('Sesión no disponible');e.revoked=r.status===401||r.status===403;throw e}
   const s=await r.json();
   assert(s.ok===true&&validId(s.accountId)&&typeof s.csrf==='string'&&s.csrf.length>0&&s.syntheticOnly===true,'Sesión staging inválida');
   return {accountId:s.accountId,csrf:s.csrf};
@@ -55,7 +55,7 @@ export async function openSessionVault({readSession,repository,passphrase,policy
  async function revalidate(){
   guard();
   let s;
-  try{s=await readSession()}catch(e){throw Error('No se pudo verificar la sesión; no se guardó nada')}
+  try{s=await readSession()}catch(e){if(e?.revoked===true)invalidate();throw Error('No se pudo verificar la sesión; no se guardó nada')}
   guard();
   if(s?.accountId!==id||s?.csrf!==csrf){invalidate();throw Error('La sesión cambió; almacenamiento bloqueado')}
  }

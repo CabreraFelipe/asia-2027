@@ -18,3 +18,6 @@ jobs:
         with:
           node-version: '22.16.0'
       - run: node staging/source/V11.26-INTEGRACION/tests/session-vault.test.mjs
+
+      - name: Probar IndexedDB y WebCrypto en Chrome real
+        run: node staging/source/V11.26-INTEGRACION/tests/run-browser.mjs
