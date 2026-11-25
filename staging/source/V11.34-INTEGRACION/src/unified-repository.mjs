@@ -28,6 +28,19 @@ export async function openUnifiedRepository(factory=globalThis.indexedDB){
  })}
  return Object.freeze({local:adapter('local'),modules:adapter('modules'),
   empty:id=>tx(id,false,row=>row===null),
+  // Snapshot both branches and sync marker in one transaction. No plaintext stored.
+  readSync:id=>tx(id,false,row=>({local:row?.local??null,modules:row?.modules??null,baseline:row?.baseline??null})),
+  commitSync(id,expected,{local=null,modules=null,baseline}){
+   const rev=r=>r?.revision??0;
+   check(baseline&&Number.isSafeInteger(baseline.remote)&&baseline.remote>0&&Number.isSafeInteger(baseline.local)&&baseline.local>=0&&Number.isSafeInteger(baseline.modules)&&baseline.modules>=0,'Marcador inválido');
+   check((local===null&&modules===null)||(validRecord(local)&&validRecord(modules)&&local.revision===rev(expected.local)+1&&modules.revision===rev(expected.modules)+1),'Revisión de sincronización inválida');
+   check(baseline.local===(local?.revision??rev(expected.local))&&baseline.modules===(modules?.revision??rev(expected.modules)),'Marcador inconsistente');
+   return tx(id,true,(row,s)=>{
+    const current={local:row?.local??null,modules:row?.modules??null,baseline:row?.baseline??null};
+    check(JSON.stringify(current)===JSON.stringify(expected),'Conflicto de revisión local');
+    s.put({...row,...(local?{local,modules}:{}),baseline},id);return true;
+   });
+  },
   initialize(id,local,modules){
    check(validRecord(local)&&validRecord(modules)&&local.revision===1&&modules.revision===1,'Importación inválida');
    return tx(id,true,(row,s)=>{check(row===null,'La cuenta ya contiene datos');s.add({local,modules},id);return true});
