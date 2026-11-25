@@ -6,14 +6,22 @@ import {tmpdir} from 'node:os';
 import {resolve,join,extname} from 'node:path';
 import {once} from 'node:events';
 const dir=await mkdtemp(join(tmpdir(),'asia-chrome-'));
-const root=process.cwd(),prefix='/staging/source/V11.26-INTEGRACION/tests';
-const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8'};
+const root=process.cwd(),prefix=process.env.ASIA_BROWSER_PREFIX||'/staging/source/V11.26-INTEGRACION/tests';
+const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.png':'image/png','.json':'application/json'};
 const server=createServer(async(req,res)=>{
  try{
   const path=new URL(req.url,'http://localhost').pathname;
   const file=resolve(root,'.'+path);
   if(!file.startsWith(root+'/')||!mime[extname(file)])throw Error('path');
-  const data=await readFile(file);res.writeHead(200,{'Content-Type':mime[extname(file)],'Cache-Control':'no-store'});res.end(data);
+  let data=await readFile(file);
+  if(process.env.ASIA_ORIGINAL==='1'&&path==='/index.html'){
+   const original=data.toString('utf8');
+   if(!original.startsWith('<!doctype html><html lang="es"><head>'))throw Error('HTML inesperado');
+   data=original.replace('<head>','<head><script src="/staging/source/V11.27-INTEGRACION/tests/original-preload.js"></script>');
+   res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'none'; worker-src 'none'; object-src 'none'; frame-src 'none'; form-action 'none'; base-uri 'none'; frame-ancestors 'self'");
+  }
+  if(path==='/sw.js'||path.endsWith('/sw.js'))throw Error('SW deshabilitado en pruebas');
+  res.writeHead(200,{'Content-Type':mime[extname(file)],'Cache-Control':'no-store'});res.end(data);
  }catch{res.writeHead(404);res.end()}
 });
 server.listen(0,'127.0.0.1');await once(server,'listening');
@@ -34,7 +42,7 @@ try{
  const result=await new Promise((ok,fail)=>{
   const timeout=setTimeout(()=>fail(Error('Timeout prueba navegador')),90000);
   ws.addEventListener('message',event=>{const m=JSON.parse(event.data);if(m.id!==1)return;clearTimeout(timeout);if(m.error||m.result?.exceptionDetails)fail(Error(JSON.stringify(m.error||m.result.exceptionDetails)));else ok(m.result.result.value)});
-  ws.send(JSON.stringify({id:1,method:'Runtime.evaluate',params:{expression:"(async()=>{if(document.readyState!=='complete')await new Promise(r=>addEventListener('load',r,{once:true}));return (await import('"+prefix+"/browser.test.mjs')).run()})()",awaitPromise:true,returnByValue:true}}));
+  ws.send(JSON.stringify({id:1,method:'Runtime.evaluate',params:{expression:"(async()=>{if(document.readyState!=='complete')await new Promise(r=>addEventListener('load',r,{once:true}));if(!globalThis.__asiaTestPromise)throw Error('Harness no inicializado');return await globalThis.__asiaTestPromise})()",awaitPromise:true,returnByValue:true}}));
  });
  if(!result?.ok)throw Error('Resultado inválido');
  console.log('Chrome real OK:',result.checks);

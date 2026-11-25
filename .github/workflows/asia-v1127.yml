@@ -1,0 +1,45 @@
+name: Asia 2027 - integración original V11.27
+on:
+  push:
+    branches: ['development/multiuser']
+    paths: ['staging/source/V11.27-INTEGRACION/**','staging/source/V11.26-INTEGRACION/tests/run-browser.mjs','.github/workflows/asia-v1127.yml']
+permissions:
+  contents: read
+jobs:
+  original:
+    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/development/multiuser'
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22.16.0'
+      - name: Comprobar snapshot raíz exacto y contar referencias de almacenamiento
+        run: |
+          python3 - <<'PY'
+          import subprocess,pathlib,hashlib,re
+          commit='061bb34dc3735d38dfd14eeb77f1054f34b63578'
+          rows=subprocess.check_output(['git','ls-tree','-rz',commit]).split(b'\0')
+          files=0
+          counts={k:0 for k in ['localStorage','sessionStorage','indexedDB','serviceWorker']}
+          for row in filter(None,rows):
+              meta,p=row.split(b'\t',1);sha=meta.decode().split()[2];p=p.decode()
+              raw=pathlib.Path(p).read_bytes()
+              assert hashlib.sha1(('blob '+str(len(raw))+'\0').encode()+raw).hexdigest()==sha,p
+              files+=1
+              if p.endswith(('.js','.mjs','.html','.cjs')):
+                  for k in counts:
+                      if re.search(rb'\b'+k.encode()+rb'\b',raw):counts[k]+=1
+          assert files==110
+          print('110/110 archivos originales sin cambios:',counts)
+          PY
+      - run: node staging/source/V11.27-INTEGRACION/tests/bridge.test.mjs
+      - name: Abrir HTML V10.6 y probar controles originales con datos sintéticos
+        env:
+          ASIA_BROWSER_PREFIX: /staging/source/V11.27-INTEGRACION/tests
+          ASIA_ORIGINAL: '1'
+        run: node staging/source/V11.26-INTEGRACION/tests/run-browser.mjs

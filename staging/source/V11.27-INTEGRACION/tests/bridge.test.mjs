@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {createRequire} from 'node:module';
+import {createLegacyBridge,createSaveCoordinator} from '../src/legacy-bridge.mjs';
+const policy=createRequire(import.meta.url)('../../../../accounts106.js');
+const m=new Map();let dirty=false,revision=0,closed=false,changeDuringSave=true;
+const vault={storage:{getItem:k=>m.get(k)??null,setItem(k,v){m.set(k,v);dirty=true},removeItem(k){m.delete(k);dirty=true},key:i=>[...m.keys()][i],get length(){return m.size}},get dirty(){return dirty},get revision(){return revision},async revalidate(){},async flush(){revision++;dirty=false;if(changeDuringSave){changeDuringSave=false;dirty=true}return revision},close(){assert(!dirty);closed=true}};
+let notifications=0;const bridge=createLegacyBridge({vault,policy,onDirty:()=>notifications++});
+bridge.storage.setItem('asia2027-v1','record');bridge.storage.setItem('asia-timers-v4','device');
+assert.equal(notifications,1);assert.equal(m.size,1);assert.equal(bridge.storage.getItem('asia-timers-v4'),'device');assert.equal(bridge.storage.getItem('asia-ai-access-v1'),null);
+assert.throws(()=>bridge.storage.setItem('asia-ai-access-v1','secret'));assert.throws(()=>bridge.storage.setItem('unknown','x'));assert.equal(bridge.unknownCount(),1);
+const c=createSaveCoordinator(vault);const p=c.flush();assert.equal(p,c.flush());assert.equal(await p,2);await c.close();assert(closed);
+bridge.close();assert.throws(()=>bridge.storage.getItem('asia2027-v1'));
+console.log('V11.27 bridge: claves portables, dispositivo temporal, rechazo credenciales/desconocidas, flush serializado y cierre aprobados.');
