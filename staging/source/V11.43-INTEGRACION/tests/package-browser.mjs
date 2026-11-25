@@ -70,6 +70,8 @@ try{
   await fetch('/__ci/a');check((await fetch('/v11.11/auth/me')).ok,'Cookie sintética no disponible');
   el('phrase').value=phrase;el('openAccount').click();await wait(()=>!!el('open1140'),'Shell no inicializado: '+el('entryStatus').textContent);
   el('open1140').click();await wait(()=>{if(el('message1140').textContent.startsWith('No se completó:'))throw Error(el('message1140').textContent);return document.querySelector('iframe')?.contentWindow?.asiaGym84Ready===true&&!el('close1140').disabled},'Diario empaquetado no inició');
+  check(!document.querySelector('iframe').inert,'Interacción no habilitada tras verificar Gym');
+  if(document.querySelector('iframe').contentDocument.querySelector('img[src*="12345678"]'))check(document.querySelector('iframe').contentDocument.readyState!=='complete','La prueba no ejercitó apertura con carga secundaria pendiente');
   const d=document.querySelector('iframe').contentDocument;d.getElementById('height').value='1.86';d.getElementById('saveHeight').click();
   await wait(()=>el('status1140').textContent.includes('saved'),'No guardó');
   check(localStorage.getItem('asia2027-v1')===null,'Diario en almacenamiento nativo');
