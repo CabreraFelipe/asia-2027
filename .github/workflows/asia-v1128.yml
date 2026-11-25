@@ -1,0 +1,45 @@
+name: Asia 2027 - módulos cifrados V11.28
+on:
+  push:
+    branches: ['development/multiuser']
+    paths: ['staging/source/V11.28-INTEGRACION/**','.github/workflows/asia-v1128.yml']
+permissions:
+  contents: read
+jobs:
+  modules:
+    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/development/multiuser'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22.16.0'
+      - name: Verificar preservación de los 110 archivos originales
+        run: |
+          python3 - <<'PY'
+          import subprocess,pathlib,hashlib
+          rows=subprocess.check_output(['git','ls-tree','-rz','061bb34dc3735d38dfd14eeb77f1054f34b63578']).split(b'\0')
+          files=0
+          for row in filter(None,rows):
+              meta,p=row.split(b'\t',1);sha=meta.decode().split()[2];p=p.decode()
+              raw=pathlib.Path(p).read_bytes()
+              assert hashlib.sha1(('blob '+str(len(raw))+'\0').encode()+raw).hexdigest()==sha,p
+              files+=1
+          assert files==110
+          print('110/110 archivos originales intactos')
+          PY
+      - run: node staging/source/V11.26-INTEGRACION/tests/session-vault.test.mjs
+      - run: node staging/source/V11.27-INTEGRACION/tests/bridge.test.mjs
+      - name: Probar módulos cifrados en Chrome real
+        env:
+          ASIA_BROWSER_PREFIX: /staging/source/V11.28-INTEGRACION/tests
+        run: node staging/source/V11.26-INTEGRACION/tests/run-browser.mjs
+      - name: Regresión de interfaz original con fixture V11.27
+        env:
+          ASIA_BROWSER_PREFIX: /staging/source/V11.27-INTEGRACION/tests
+          ASIA_ORIGINAL: '1'
+        run: node staging/source/V11.26-INTEGRACION/tests/run-browser.mjs

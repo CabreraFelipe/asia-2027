@@ -1,0 +1,12 @@
+# Continuidad V11.28 — 25/11/2026
+
+## Estado y alcance
+V11.24 continúa como versión instalada según V11.27; no se realizó ninguna escritura Cloudflare, migración ni acceso a registros personales. main de referencia: 061bb34dc3735d38dfd14eeb77f1054f34b63578. Base de trabajo: f3a05431929cad94f5e078345ff7f7bafafee1c4. Se verificó que la corrida previa 45539901743 terminó con smoke y regression SUCCESS.
+
+Primer bloque V11.28: adaptador explícito para los 12 módulos de store84.mjs, con lectura/escritura y readPair/replacePair compatibles, copia de payload validada mediante clonePayload, cifrado AES-GCM original encrypt84/decrypt84, verificación de identidad/CSRF, CAS por cuenta y restauración atómica del par. Base IndexedDB nueva y aislada de la personal y de la V11.26; no se sobreescribe el fixture anterior. Solo ciphertext y metadatos de cuenta/revisión persistidos. Un conflicto de cualquier módulo simultáneo puede obligar a releer; no se reintenta ni fusiona silenciosamente. La frase queda en memoria mientras está abierto. No se afirma cancelación de una transacción ya iniciada tras revocación ni protección contra scripts same-origin.
+
+## Validación
+Se incorpora CI de solo lectura, sin secretos/despliegues, con verificación byte a byte de los 110 archivos originales, regresiones Node V11.26/V11.27 y Chrome real para IndexedDB, par atómico, concurrencia, aislamiento, reapertura, frase errónea, cambio de cuenta y revocación. También vuelve a ejecutar el fixture original V11.27. Resultados pendientes hasta consultar Actions; no declarar aprobación antes de obtener evidencia.
+
+## Siguiente bloque
+Este adaptador todavía no está conectado a las pantallas originales: sustituir las llamadas a openStore mediante inyección explícita en copia candidata auditada, sin monkey patch de producción; verificar consumidores y restricciones de origen de los 51 scripts. Diseñar persistencia cifrada de claves de dispositivo (sesión activa y temporizadores incluidos) y guardado/recuperación sin pérdida ante conflicto, revocación o suspensión móvil. Integrar puerta OIDC real antes de montar UI; no activar rutas de usuario, servicios personales, importación real ni PWA hasta superar contrato. Mantener V10.6 original intacta y preservar sus datos. Continuar pruebas funcionales Dieta/Gym/Coach/Salud/Progreso, sincronización, fotos, respaldo integral y dispositivos iPhone/Android físicos. No considerar este bloque versión instalable ni paridad completa.
