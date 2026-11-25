@@ -112,6 +112,35 @@ try{
   name.value='Usuario A';name.dispatchEvent(new Event('input',{bubbles:true}));form.requestSubmit();
   await wait(()=>heading.textContent==='Usuario A'&&el('status1140').textContent.includes('saved'),'No actualizó nombre');
 
+  // Exercise real classic and Gym PRO timers in the actual candidate DOM.
+  // Fake only time and the remote scheduling callback: no historic push service.
+  const w=d.defaultView,realNow=w.Date.now,realHook=w.asiaRestWatch533,realConfirm=w.confirm;
+  let offset=0;const restCalls=[];
+  const click=id=>d.getElementById(id).click(),clock=id=>d.getElementById(id).textContent;
+  const advance=ms=>{offset+=ms;d.dispatchEvent(new Event('visibilitychange'))};
+  try{
+   w.Date.now=()=>realNow()+offset;w.confirm=()=>true;w.asiaRestWatch533=due=>restCalls.push(due);
+   d.querySelector('#timerBlock button[data-rest="60"]').click();
+   check(restCalls.at(-1)>w.Date.now()&&clock('restClock')!=='00:00','Descanso clásico no programó');
+   advance(61000);
+   check(clock('restClock')==='00:00'&&d.getElementById('toast').textContent==='Descanso terminado','No avisó fin de descanso clásico');
+   d.querySelector('#timerBlock button[data-rest="60"]').click();click('stopRest');
+   check(restCalls.at(-1)===0&&clock('restClock')==='00:00','Cancelación clásica no propagada');
+   click('gymStart53');click('gymBegin53');
+   check(w.asiaGymHasSession532(),'Gym PRO no inició');
+   check(w.asiaGymRest532(30)&&restCalls.at(-1)>w.Date.now(),'Gym PRO no programó descanso');
+   click('gymPause53');check(restCalls.at(-1)===0&&clock('gymPause53')==='Reanudar','Pausa PRO no canceló aviso');
+   advance(35000);check(clock('gymRestClock53')!=='00:00','Descanso pausado venció');
+   click('gymPause53');const resumed=restCalls.at(-1);check(resumed>w.Date.now(),'Reanudación no reprogramó aviso');
+   click('gymAdd53');check(restCalls.at(-1)===resumed+30000,'Ampliación no reprogramó aviso');
+   click('gymSkip53');check(restCalls.at(-1)===0&&clock('gymRestClock53')==='00:00','Omitir no canceló aviso');
+   w.asiaGymRest532(30);advance(31000);
+   check(clock('gymRestClock53')==='00:00'&&d.getElementById('toast').textContent==='Descanso terminado','No avisó fin de descanso PRO');
+   click('gymDiscard53');check(!w.asiaGymHasSession532()&&restCalls.at(-1)===0,'Sesión descartada conserva aviso');
+   if(!d.getElementById('gymExit53').hidden)click('gymExit53');
+  }finally{w.Date.now=realNow;w.confirm=realConfirm;w.asiaRestWatch533=realHook}
+  await wait(()=>el('status1140').textContent.includes('saved'),'Temporizadores no se guardaron');
+  check(d.getElementById('reminders821')&&d.getElementById('reminderConfig821')&&d.getElementById('pushReminders845'),'Paneles originales de recordatorios ausentes');
   check(localStorage.getItem('asia2027-v1')===null,'Diario en almacenamiento nativo');
   el('close1140').click();await wait(()=>!document.querySelector('iframe')&&!el('reconcile1140').disabled,'No cerró');
   el('reconcile1140').click();await wait(()=>!el('reconcile1140').disabled,'No concilió');
