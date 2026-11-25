@@ -19,6 +19,15 @@ const releaseFile=web+'/diary/release831.mjs';
 const releaseText=readFileSync(releaseFile,'utf8'),catchMarker="catch{window.asiaGym84Ready=false;";
 if(releaseText.split(catchMarker).length!==2)throw Error('Marcador de diagnóstico Gym no único');
 writeFileSync(releaseFile,releaseText.replace(catchMarker,`catch(e){const m=String(e?.message||'');window.asiaPilotGymDiagnostic=/Rama bloqueada|Permiso local vencido/.test(m)?'LEASE':/Sesión|sesión|Diario bloqueado/.test(m)?'SESSION':/Revisión Gym/.test(m)?'REVISION':/Registro inicial/.test(m)?'INITIAL':/Esquema|Límite de registros|ID duplicado/.test(m)?'SCHEMA':/Candidato CI|Contexto incompleto|openStore|store\.read|store\.close/.test(m)?'ADAPTER':/read|lectura|Transacción/.test(m)?'READ':'OTHER';window.asiaGym84Ready=false;`));
+// Candidate-only header personalization uses the existing encrypted diary profile.
+// Never derive a display name from email or expose Google profile claims.
+const profileFile=web+'/diary/profile100.js';
+let profileText=readFileSync(profileFile,'utf8');
+const replaceProfile=(from,to)=>{if(profileText.split(from).length!==2)throw Error('Marcador de perfil no único');profileText=profileText.replace(from,to)};
+replaceProfile("function render(){if(!panel.open)return;", "function renderHeaderName(){const h=document.querySelector('header .brand h1');if(h){h.textContent=window.asiaExtras830.profile100(data.settings?.profile100).displayName.trim()||'Mi progreso';h.style.overflowWrap='anywhere';}}function render(){renderHeaderName();if(!panel.open)return;");
+replaceProfile("load();panel.addEventListener('toggle',render);","load();renderHeaderName();panel.addEventListener('toggle',render);");
+writeFileSync(profileFile,profileText);
+execFileSync(process.execPath,['--check',profileFile],{stdio:'inherit'});
 const diary=web+'/diary/index.html';writeFileSync(diary,readFileSync(diary,'utf8').replace(/<link rel="manifest" href="manifest.json">/,''));
 const patch=s=>s.replaceAll('asia-v1111-identity-staging',origin);
 const dirs=readdirSync('staging/source').filter(n=>/^V11\.(?:2[5-9]|3[0-9]|4[01])-INTEGRACION$/.test(n));

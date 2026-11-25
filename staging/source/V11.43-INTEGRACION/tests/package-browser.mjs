@@ -103,6 +103,15 @@ try{
   check(await Promise.race([violation,new Promise(r=>setTimeout(()=>r(false),3000))]),'No se bloqueó ruta externa ajena a fotos');forbidden.remove();
   d.getElementById('height').value='1.86';d.getElementById('saveHeight').click();
   await wait(()=>el('status1140').textContent.includes('saved'),'No guardó');
+  const heading=d.querySelector('header .brand h1');check(heading.textContent==='Mi progreso','Cuenta sin nombre no conserva título');
+  const profile=d.getElementById('profile100');profile.open=true;
+  const name=d.getElementById('profile100-displayName'),form=d.getElementById('profileForm100');
+  name.value='Usuario A <b>prueba</b>';name.dispatchEvent(new Event('input',{bubbles:true}));form.requestSubmit();
+  await wait(()=>heading.textContent==='Usuario A <b>prueba</b>'&&el('status1140').textContent.includes('saved'),'No guardó nombre de perfil');
+  check(heading.children.length===0,'Nombre interpretado como HTML');
+  name.value='Usuario A';name.dispatchEvent(new Event('input',{bubbles:true}));form.requestSubmit();
+  await wait(()=>heading.textContent==='Usuario A'&&el('status1140').textContent.includes('saved'),'No actualizó nombre');
+
   check(localStorage.getItem('asia2027-v1')===null,'Diario en almacenamiento nativo');
   el('close1140').click();await wait(()=>!document.querySelector('iframe')&&!el('reconcile1140').disabled,'No cerró');
   el('reconcile1140').click();await wait(()=>!el('reconcile1140').disabled,'No concilió');
@@ -119,6 +128,7 @@ try{
   el('phrase').value='frase sintética paquete completo';el('openAccount').click();await wait(()=>!!el('open1140'),'Frase correcta no abrió');
   el('open1140').click();await wait(()=>document.querySelector('iframe')?.contentWindow?.asiaGym84Ready===true&&!el('close1140').disabled,'No reabrió diario');
   if(document.querySelector('iframe').contentDocument.getElementById('height').value!=='1.86')throw Error('Registro perdido tras reinicio');
+  if(document.querySelector('iframe').contentDocument.querySelector('header .brand h1').textContent!=='Usuario A')throw Error('Nombre perdido al reabrir');
   el('close1140').click();await wait(()=>!document.querySelector('iframe')&&!el('reconcile1140').disabled,'No cerró');
   el('reconcile1140').click();await wait(()=>!el('logout1140').disabled,'Conciliación no terminó');
   el('logout1140').click();return true;
@@ -131,6 +141,7 @@ try{
   await fetch('/__ci/b');el('phrase').value='frase sintética paquete completo';el('openAccount').click();await wait(()=>!!el('open1140'),'B no abrió shell');
   el('open1140').click();await wait(()=>document.querySelector('iframe')?.contentWindow?.asiaGym84Ready===true&&!el('close1140').disabled,'B no abrió diario');
   if(document.querySelector('iframe').contentDocument.getElementById('height').value==='1.86')throw Error('Datos cruzados');
+  if(document.querySelector('iframe').contentDocument.querySelector('header .brand h1').textContent!=='Mi progreso')throw Error('Nombre cruzado entre cuentas');
   if((await (await fetch('/v11.38/sync')).json()).head!==0)throw Error('Nube cruzada');
   return true;
  }.toString()+')()',true);assert.equal(isolation,true);

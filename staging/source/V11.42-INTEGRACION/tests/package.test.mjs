@@ -22,6 +22,8 @@ assert.equal(directive(shellCsp,'img-src'),"img-src 'self' data: blob:");
 assert.equal(directive(diaryCsp,'connect-src'),"connect-src 'none'");
 assert.equal(directive(diaryCsp,'worker-src'),"worker-src 'none'");
 assert.equal(readFileSync(root+prefix+'diary/gym571.js','utf8'),readFileSync('gym571.js','utf8'),'Gym original no debe modificarse');
+assert.match(readFileSync(root+prefix+'diary/profile100.js','utf8'),/h\.textContent=window\.asiaExtras830\.profile100/);
+assert.equal((await req(prefix+'diary/profile100.js')).status,401);
 assert.equal((await req(prefix+'sw.js')).headers.get('service-worker-allowed'),prefix);assert.equal((await req(prefix+'diary/sw.js',true)).status,404);assert.equal((await req('/v11.24/',true)).status,404);assert.equal((await req(prefix+'app.mjs',true,{...env,STAGING_ALLOW_V1142_TESTS:'false'})).status,403);
 assert.equal((await req('/v11.11/auth/me',true)).status,200);db.prepare('DELETE FROM auth_oidc_sessions_v1111').run();assert.equal((await req(prefix+'diary/index.html',true)).status,401);
 db.close();console.log('Package, manifest, isolated origin, Worker auth, no-store, CSP, revoked access and route allowlist verified.');
