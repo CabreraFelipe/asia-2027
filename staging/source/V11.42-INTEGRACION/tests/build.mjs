@@ -1,6 +1,7 @@
 // Produces a disposable deploy directory; never writes root/original files.
 import {cpSync,mkdirSync,readFileSync,writeFileSync,readdirSync,existsSync,statSync} from 'node:fs';
 import {join,dirname,resolve,relative} from 'node:path';
+import {createHash} from 'node:crypto';
 const base='staging/source/V11.42-INTEGRACION',out=base+'/dist',web=out+'/assets/v11.42',candidate='staging/source/V11.29-INTEGRACION/tests/candidate';
 if(existsSync(out))throw Error('Build debe ser nuevo');
 mkdirSync(web,{recursive:true});cpSync(base+'/web',web,{recursive:true});
@@ -49,6 +50,13 @@ for(const n of rootFiles.filter(n=>n.endsWith('.mjs')))cpSync(n,server+'/'+n);
 const official='staging/source/official/V11.24-STAGING/src';for(const n of readdirSync(official).filter(n=>n.endsWith('.mjs'))){const p=server+'/'+official+'/'+n;mkdirSync(dirname(p),{recursive:true});writeFileSync(p,patch(readFileSync(official+'/'+n,'utf8')))}
 const worker=sroot+'/V11.42-INTEGRACION/src/worker.mjs';mkdirSync(dirname(worker),{recursive:true});cpSync(base+'/src/worker.mjs',worker);
 function walk(dir){return readdirSync(dir).flatMap(n=>{const p=join(dir,n);return statSync(p).isDirectory()?walk(p):[p]})}
+// Public entry carries a fingerprint of the complete private and public asset set.
+// Compute before adding the comment, so the build is reproducible and noncircular.
+const fingerprint=createHash('sha256');
+for(const p of walk(web).sort()){
+ const bytes=readFileSync(p);fingerprint.update(JSON.stringify([relative(web,p),bytes.length])+'\\n');fingerprint.update(bytes);
+}
+const entryFile=web+'/entry.js';writeFileSync(entryFile,readFileSync(entryFile,'utf8')+'\\n// asia-pilot-assets-sha256: '+fingerprint.digest('hex')+'\\n');
 const paths=walk(web).map(p=>'/'+p.slice((out+'/assets/').length)).filter(p=>!p.endsWith('/diary/manifest.json'));
 writeFileSync(server+'/index.mjs',"import {createPwaWorker} from './staging/source/V11.42-INTEGRACION/src/worker.mjs';\nexport default createPwaWorker({assetPaths:new Set("+JSON.stringify(paths)+")});\n");
 cpSync(base+'/wrangler.template.toml',out+'/wrangler.template.toml');
