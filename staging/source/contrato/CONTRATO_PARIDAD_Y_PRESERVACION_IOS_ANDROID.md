@@ -134,3 +134,6 @@ Un cambio de URL, dominio, `scope` o `id` puede crear otra instalación con otro
 - El almacenamiento local de WebKit depende del contexto y de políticas de cuota; no es un respaldo duradero: https://webkit.org/blog/14403/updates-to-storage-policy/
 
 **Estado del contrato:** requisitos actualizados; no constituye implementación móvil probada, migración de datos ni una versión para instalar. Ningún dato personal fue leído o modificado al prepararlo.
+
+### 8.6 Salud y wearables realmente multiusuario
+Vinculación independiente por cuenta y dispositivo, Apple Salud/Health Connect mediante integración compatible y conectores de fabricante autorizados. Cada cuenta empieza desconectada; origen visible, selección de fuentes sin duplicados, permisos y revocación por tipo de dato. La compatibilidad no se presume por marca. Criterios detallados en CONTRATO_SALUD_WEARABLES_V12.md. No admitir registros reales hasta validar los adaptadores correspondientes.
