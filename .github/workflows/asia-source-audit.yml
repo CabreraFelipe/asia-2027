@@ -1,0 +1,81 @@
+name: Asia 2027 - auditoría V10.6 y staging
+on:
+  push:
+    branches: ['development/multiuser']
+    paths: ['.github/workflows/asia-source-audit.yml', 'staging/AUDIT.md']
+permissions:
+  contents: read
+jobs:
+  source:
+    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/development/multiuser'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Recuperar y verificar snapshot original sin ejecutar código
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir="$(mktemp -d)"
+          trap 'rm -rf "$dir"' EXIT
+          git init --bare "$dir/repo"
+          git -C "$dir/repo" fetch --no-tags --depth=1 https://github.com/CabreraFelipe/asia-2027.git 061bb34dc3735d38dfd14eeb77f1054f34b63578
+          cd "$dir/repo"
+          python3 - <<'PY'
+          import subprocess, hashlib, re
+          commit = '061bb34dc3735d38dfd14eeb77f1054f34b63578'
+          def git(*a): return subprocess.check_output(['git', *a])
+          assert git('rev-parse', 'FETCH_HEAD').decode().strip() == commit
+          raw = git('cat-file', 'commit', commit)
+          def oid(kind, raw): return hashlib.sha1((kind+' '+str(len(raw))+'\0').encode()+raw).hexdigest()
+          assert oid('commit',raw)==commit
+          rows=git('ls-tree','-rz',commit).split(b'\0')
+          sources={}
+          for row in filter(None,rows):
+              meta,path=row.split(b'\t',1)
+              mode,kind,sha=meta.decode().split()
+              path=path.decode()
+              assert mode in ('100644','100755') and kind=='blob'
+              assert path not in sources and not any(p in ('','.','..') for p in path.split('/'))
+              data=git('cat-file','blob',sha)
+              assert oid('blob',data)==sha
+              sources[path]=data
+          assert len(sources)==110
+          assert {'index.html','v4.css','ultimate84.css','accounts106.js','backup844.mjs','sw.js','manifest.json'} <= sources.keys()
+          print('110/110 blobs originales recuperados y verificados contra el commit fijo.')
+          print('Bytes:',sum(map(len,sources.values())))
+          for token in ('localStorage','sessionStorage','indexedDB','serviceWorker','fetch(','Notification','PushManager'):
+              n=sum(token.encode() in data for p,data in sources.items() if p.endswith(('.js','.mjs','.html','.cjs')))
+              print(token,':',n,'archivos con referencias estáticas')
+          print('Auditoría estática: no certifica paridad, aislamiento ni comportamiento móvil.')
+          PY
+  staging:
+    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/development/multiuser'
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Smoke V11.24 real (GET sin sesión)
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import urllib.request, urllib.error, json
+          base='https://asia-v1111-identity-staging.cabrerafelipe2003.workers.dev'
+          paths=[('/v11.11/status',200),('/v11.24/',200),('/v11.24/app.js',200),('/v11.24/stage124.css',200),('/v11.24/stage121.css',200),('/v11.24/kit118.js',200),('/v11.21/',200),('/v11.18/',200),('/v11.17/',200),('/v11.16/',200),('/v11.15/',200),('/v11.14/',200),('/v11.13/',200),('/v11.15/data/journal',401),('/v11.11/data/snapshots',401),('/v11.11/auth/me',401)]
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self,*args,**kwargs): return None
+          opener=urllib.request.build_opener(NoRedirect)
+          for path,expected in paths:
+              req=urllib.request.Request(base+path,method='GET',headers={'Cache-Control':'no-cache'})
+              try:
+                  with opener.open(req,timeout=14) as res:
+                      status=res.status
+                      body=res.read(2000000) if path in ('/v11.11/status','/v11.24/') else b''
+              except urllib.error.HTTPError as e:
+                  status=e.code
+                  body=b''
+              assert status==expected,(path,status,expected)
+              if path=='/v11.11/status':
+                  j=json.loads(body)
+                  assert j.get('version')=='11.24' and j.get('production') is False and j.get('health') is False and j.get('publicRegistration') is False and j.get('configured') is True
+              if path=='/v11.24/': assert 'V11.24 · STAGING' in body.decode()
+          print('SMOKE V11.24: 16 rutas verificadas, solo GET sin credenciales.')
+          PY
