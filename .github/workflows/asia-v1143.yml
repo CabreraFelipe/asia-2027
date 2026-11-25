@@ -1,0 +1,26 @@
+name: Asia 2027 - paquete completo Chrome V11.43
+on:
+  push:
+    branches: ['development/multiuser']
+    paths: ['staging/source/V11.43-INTEGRACION/**','staging/source/V11.42-INTEGRACION/web/**','.github/workflows/asia-v1143.yml']
+permissions:
+  contents: read
+jobs:
+  pilot:
+    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/development/multiuser'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22.16.0'
+      - run: node staging/source/V11.29-INTEGRACION/tests/build-candidate.mjs
+      - run: node staging/source/V11.39-INTEGRACION/tests/patch-candidate.mjs
+      - run: node staging/source/V11.40-INTEGRACION/tests/patch-candidate.mjs
+      - run: node staging/source/V11.42-INTEGRACION/tests/build.mjs
+      - run: node staging/source/V11.42-INTEGRACION/tests/package.test.mjs
+      - run: node staging/source/V11.43-INTEGRACION/tests/package-browser.mjs

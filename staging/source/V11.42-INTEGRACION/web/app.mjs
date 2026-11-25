@@ -4,6 +4,9 @@ import {mountShell} from './staging/source/V11.40-INTEGRACION/src/shell.mjs';
 import {mountMaintenance} from './staging/source/V11.41-INTEGRACION/src/maintenance.mjs';
 import {openUnifiedRepository} from './staging/source/V11.34-INTEGRACION/src/unified-repository.mjs';
 import {openOfflineRepository} from './staging/source/V11.37-INTEGRACION/src/offline-repository.mjs';
+import {sessionReader,openSessionVault} from './staging/source/V11.26-INTEGRACION/src/session-vault.mjs';
+import {devicePolicy} from './staging/source/V11.30-INTEGRACION/src/device-session.mjs';
+import {openEncryptedModuleStore} from './staging/source/V11.28-INTEGRACION/src/encrypted-module-store.mjs';
 export async function start(passphrase){
  const repository=await openUnifiedRepository(),pending=await openOfflineRepository();let shell,panel;
  const mount=async fixture=>{
@@ -13,6 +16,14 @@ export async function start(passphrase){
   try{await Promise.race([loaded,new Promise((_,rej)=>setTimeout(()=>rej(Error('Montaje agotado')),15000))]);for(let i=0;i<150;i++){if(frame.contentWindow.asiaGym84Ready===true)return {remove,hide(){frame.hidden=true}};await new Promise(r=>setTimeout(r,100))}throw Error('Diario no inicializado')}catch(e){remove();throw e}
  };
  try{
+  const readSession=sessionReader({origin:location.origin}),identity=await readSession(),policy=globalThis.asiaAccounts106;
+  const verify=async()=>{const t=await readSession();if(t.accountId!==identity.accountId||t.csrf!==identity.csrf)throw Error('Sesión cambió');return t};
+  const snapshot=await repository.readSync(identity.accountId),branch=await pending.inspect(identity.accountId);
+  for(const row of [snapshot,...(branch?[branch.working]:[])]){
+   const local=await openSessionVault({readSession:verify,repository:{read:async()=>row.local},passphrase,policy:devicePolicy(policy)});local.close();
+   const modules=await openEncryptedModuleStore({readSession:verify,repository:{read:async()=>row.modules},passphrase});modules.close();
+  }
+  await verify();
   const c=await createController({origin:location.origin,repository,pending,policy:globalThis.asiaAccounts106,passphrase,mount,onState:s=>{shell?.render();panel?.render();if(s==='closed'){repository.close();pending.close();location.replace('/v11.42/index.html')}}});
   shell=mountShell({doc:document,anchor:document.getElementById('shell'),controller:c,onRender:()=>panel?.render()});
   panel=mountMaintenance({doc:document,anchor:document.getElementById('shell'),controller:c,onChange:()=>shell.render()});
