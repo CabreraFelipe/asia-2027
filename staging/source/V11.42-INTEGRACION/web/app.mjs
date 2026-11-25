@@ -13,7 +13,20 @@ export async function start(passphrase){
   if(globalThis.__asiaCandidateFixture)throw Error('Diario ya abierto');globalThis.__asiaCandidateFixture=fixture;
   const frame=document.createElement('iframe');frame.title='Diario original Asia V10.6';frame.src='/v11.42/diary/index.html';const loaded=new Promise(r=>frame.addEventListener('load',r,{once:true}));
   const remove=()=>{frame.remove();delete globalThis.__asiaCandidateFixture};document.getElementById('diary').append(frame);
-  try{await Promise.race([loaded,new Promise((_,rej)=>setTimeout(()=>rej(Error('Montaje agotado')),15000))]);for(let i=0;i<150;i++){if(frame.contentWindow.asiaGym84Ready===true)return {remove,hide(){frame.hidden=true}};await new Promise(r=>setTimeout(r,100))}throw Error('Diario no inicializado')}catch(e){remove();throw e}
+  let timer;
+  try{
+   // Real Cloudflare requests for the original 51 scripts can be slower than loopback CI.
+   // Still fail closed: never enable editing until the module adapter is verified.
+   await Promise.race([loaded,new Promise((_,rej)=>{timer=setTimeout(()=>rej(Error('El diario no terminó de cargar en 60 segundos. Revisá la conexión.')),60000)})]);
+   clearTimeout(timer);
+   for(let i=0;i<300;i++){
+    const win=frame.contentWindow;
+    if(win.asiaGym84Ready===true)return {remove,hide(){frame.hidden=true}};
+    if(win.asiaGym84Ready===false)throw Error('El diario cargó, pero no pudo verificar el módulo Gym cifrado.');
+    await new Promise(r=>setTimeout(r,100));
+   }
+   throw Error('El diario cargó, pero sus módulos no terminaron de inicializarse.');
+  }catch(e){remove();throw e}finally{clearTimeout(timer)}
  };
  try{
   const readSession=sessionReader({origin:location.origin}),identity=await readSession(),policy=globalThis.asiaAccounts106;

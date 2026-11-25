@@ -24,7 +24,7 @@ const env={STAGING_MODE:'asia-v1111-identity-private',STAGING_ORIGIN:origin,STAG
  STAGING_SYNC_OBJECTS:{async put(k,v){objects.set(k,new Uint8Array(v))},async get(k){const v=objects.get(k);return v?{size:v.length,arrayBuffer:async()=>v.buffer.slice(0)}:null},async delete(k){objects.delete(k)}},
  STAGING_PWA_ASSETS:{async fetch(r){const p=new URL(r.url).pathname;try{return new Response(await readFile(root+'assets'+p),{headers:{'Content-Type':mime[extname(p)]||'application/octet-stream'}})}catch{return new Response(null,{status:404})}}}
 };
-const dir=await mkdtemp(join(tmpdir(),'asia-pwa-ci-'));let chrome,ws,server,offline=false;
+const dir=await mkdtemp(join(tmpdir(),'asia-pwa-ci-'));let chrome,ws,server,offline=false,delayDiary=true;
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 try{
  execFileSync('openssl',['req','-x509','-newkey','rsa:2048','-nodes','-keyout',join(dir,'key.pem'),'-out',join(dir,'cert.pem'),'-days','1','-subj','/CN='+host,'-addext','subjectAltName=DNS:'+host],{stdio:'ignore'});
@@ -34,6 +34,7 @@ try{
    const u=new URL(req.url,origin);
    if(['/__ci/a','/__ci/b'].includes(u.pathname)){res.writeHead(200,{'Set-Cookie':'__Host-asia1111_session='+(u.pathname.endsWith('/a')?ta:tb)+'; Path=/; Secure; HttpOnly; SameSite=Lax','Cache-Control':'no-store'});res.end('fixture');return}
    if(u.pathname==='/__ci/offline'){res.end('offline');offline=true;return}
+   if(delayDiary&&u.pathname==='/v11.42/diary/release831.mjs'){delayDiary=false;await sleep(17000)}
    const chunks=[];for await(const x of req)chunks.push(x);
    const r=await worker.fetch(new Request(u,{method:req.method,headers:req.headers,...(['GET','HEAD'].includes(req.method)?{}:chunks.length?{body:Buffer.concat(chunks)}:{})}),env);
    const h=Object.fromEntries(r.headers);if(r.headers.getSetCookie().length)h['set-cookie']=r.headers.getSetCookie();
@@ -60,7 +61,7 @@ try{
  async function ready(expr){for(let i=0;i<200;i++){try{if(await evalJS(expr))return}catch{}await sleep(100)}throw Error('Página no disponible: '+expr)}
  await ready("location.href==="+JSON.stringify(home)+"&&document.readyState==='complete'&&!!document.getElementById('openAccount')");
  const result=await evalJS('('+async function(){
-  const check=(x,m)=>{if(!x)throw Error(m)},el=id=>document.getElementById(id),wait=async(f,m)=>{for(let i=0;i<200;i++){if(f())return;await new Promise(r=>setTimeout(r,100))}throw Error(m)};
+  const check=(x,m)=>{if(!x)throw Error(m)},el=id=>document.getElementById(id),wait=async(f,m)=>{for(let i=0;i<1000;i++){if(f())return;await new Promise(r=>setTimeout(r,100))}throw Error(m)};
   const phrase='frase sintética paquete completo';
   check((await fetch('/v11.42/app.mjs')).status===401,'Asset anónimo');
   el('phrase').value=phrase;el('openAccount').click();await wait(()=>!el('openAccount').disabled,'Acceso anónimo no terminó');check(!el('shell1140'),'Shell anónimo');
@@ -70,6 +71,7 @@ try{
   const d=document.querySelector('iframe').contentDocument;d.getElementById('height').value='1.86';d.getElementById('saveHeight').click();
   await wait(()=>el('status1140').textContent.includes('saved'),'No guardó');
   check(localStorage.getItem('asia2027-v1')===null,'Diario en almacenamiento nativo');
+  check(document.querySelector('iframe')?.contentWindow?.asiaGym84Ready===true,'Diario no permaneció abierto tras carga lenta');
   el('close1140').click();await wait(()=>!document.querySelector('iframe')&&!el('reconcile1140').disabled,'No cerró');
   el('reconcile1140').click();await wait(()=>!el('reconcile1140').disabled,'No concilió');
   el('sync1140').click();await wait(()=>!el('apply1140').disabled,'Sync no preparado');el('apply1140').click();await wait(()=>el('message1140').textContent.includes('confirmada'),'Sync no completó');
@@ -80,7 +82,7 @@ try{
  }.toString()+')()',true);assert.equal(result,true);
  await cmd('Page.navigate',{url:home});await ready("document.readyState==='complete'&&!!document.getElementById('openAccount')&&!document.getElementById('shell1140')");
  const wrongPhrase=await evalJS('('+async function(){
-  const el=id=>document.getElementById(id),wait=async(f,m)=>{for(let i=0;i<200;i++){if(f())return;await new Promise(r=>setTimeout(r,100))}throw Error(m)};
+  const el=id=>document.getElementById(id),wait=async(f,m)=>{for(let i=0;i<1000;i++){if(f())return;await new Promise(r=>setTimeout(r,100))}throw Error(m)};
   el('phrase').value='frase sintética incorrecta';el('openAccount').click();await wait(()=>!el('openAccount').disabled,'Frase incorrecta no rechazó');if(el('shell1140'))throw Error('Frase incorrecta abrió la bóveda');
   el('phrase').value='frase sintética paquete completo';el('openAccount').click();await wait(()=>!!el('open1140'),'Frase correcta no abrió');
   el('open1140').click();await wait(()=>document.querySelector('iframe')?.contentWindow?.asiaGym84Ready===true&&!el('close1140').disabled,'No reabrió diario');
@@ -92,7 +94,7 @@ try{
  await ready("document.readyState==='complete'&&!!document.getElementById('openAccount')&&!document.getElementById('shell1140')");
  assert.equal(db.prepare('SELECT COUNT(*) AS n FROM sync_v1138_objects WHERE account_id=?').get(A).n,1);
  const isolation=await evalJS('('+async function(){
-  const el=id=>document.getElementById(id),wait=async(f,m)=>{for(let i=0;i<200;i++){if(f())return;await new Promise(r=>setTimeout(r,100))}throw Error(m)};
+  const el=id=>document.getElementById(id),wait=async(f,m)=>{for(let i=0;i<1000;i++){if(f())return;await new Promise(r=>setTimeout(r,100))}throw Error(m)};
   if((await fetch('/v11.42/diary/index.html')).status!==401)throw Error('Logout no revocó acceso');
   await fetch('/__ci/b');el('phrase').value='frase sintética paquete completo';el('openAccount').click();await wait(()=>!!el('open1140'),'B no abrió shell');
   el('open1140').click();await wait(()=>document.querySelector('iframe')?.contentWindow?.asiaGym84Ready===true&&!el('close1140').disabled,'B no abrió diario');
