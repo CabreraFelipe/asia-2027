@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import {DatabaseSync} from 'node:sqlite';
+import {createWorker1111} from '../../official/V11.24-STAGING/src/worker1124.mjs';
+import {digest} from '../../official/V11.24-STAGING/src/security1111.mjs';
+import {sessionReader} from '../../V11.26-INTEGRACION/src/session-vault.mjs';
+const db=new DatabaseSync(':memory:');
+db.exec("CREATE TABLE staging_identity_v110(id INTEGER PRIMARY KEY,marker TEXT);INSERT INTO staging_identity_v110 VALUES(1,'asia-v11-staging-110');CREATE TABLE auth_oidc_sessions_v1111(token_digest TEXT PRIMARY KEY,account_id TEXT,csrf TEXT,expires_at INTEGER,email_digest TEXT);");
+const origin='https://asia-v1111-identity-staging.example.workers.dev',accountId='acct_'+'a'.repeat(32),csrf='synthetic-csrf',token='A'.repeat(43);
+db.prepare('INSERT INTO auth_oidc_sessions_v1111 VALUES(?,?,?,?,?)').run(await digest(token),accountId,csrf,Date.now()+60000,await digest('a@example.invalid'));
+const env={STAGING_MODE:'asia-v1111-identity-private',STAGING_ORIGIN:origin,STAGING_DB:{prepare(sql){let a=[];return {bind(...args){a=args;return this},async first(){return db.prepare(sql).get(...a)||null},async run(){return db.prepare(sql).run(...a)}}}},STAGING_GOOGLE_CLIENT_ID:'example.apps.googleusercontent.com',STAGING_GOOGLE_CLIENT_SECRET:'synthetic-only',STAGING_ALLOWED_EMAILS:'a@example.invalid'};
+const worker=createWorker1111({fetchImpl:()=>{throw Error('Red prohibida')}});
+const fetcher=async(url,opt={})=>{const headers=new Headers(opt.headers);headers.set('Cookie','__Host-asia1111_session='+token);if(opt.method==='POST')headers.set('Origin',origin);return worker.fetch(new Request(url,{...opt,headers}),env)};
+const read=sessionReader({origin,fetcher});assert.deepEqual(await read(),{accountId,csrf});
+assert.equal((await fetcher(origin+'/v11.11/auth/logout',{method:'POST',headers:{'X-Asia-CSRF':'wrong'}})).status,403);
+assert.deepEqual(await read(),{accountId,csrf});
+assert.equal((await fetcher(origin+'/v11.11/auth/logout',{method:'POST',headers:{'X-Asia-CSRF':csrf}})).status,200);
+await assert.rejects(read,e=>e.revoked===true);db.close();console.log('Worker V11.24 real + SQLite: sesión, CSRF y revocación logout aprobados; sin contacto con Google.');
