@@ -22,8 +22,11 @@ assert.equal(directive(shellCsp,'img-src'),"img-src 'self' data: blob:");
 assert.equal(directive(diaryCsp,'connect-src'),"connect-src 'none'");
 assert.equal(directive(diaryCsp,'worker-src'),"worker-src 'none'");
 assert.equal(readFileSync(root+prefix+'diary/gym571.js','utf8'),readFileSync('gym571.js','utf8'),'Gym original no debe modificarse');
-for(const n of ['push.js','rest533.js','reminders821.js','reminders845.js','gym53.js','v4.js'])assert.equal(readFileSync(root+prefix+'diary/'+n,'utf8'),readFileSync(n,'utf8'),'Regresión de notificaciones: '+n);
+for(const n of ['push.js','rest533.js','reminders845.js','gym53.js','v4.js'])assert.equal(readFileSync(root+prefix+'diary/'+n,'utf8'),readFileSync(n,'utf8'),'Regresión de notificaciones: '+n);
 
+const originalReminders=readFileSync('reminders821.js','utf8');
+const expectedReminders=originalReminders.replace("cloudKeys.includes(k)?raw?.enabled?.[k]!==false:raw?.enabled?.[k]===true","raw?.enabled?.[k]===true").replace("typeof raw?.cloudEnabled?.[k]==='boolean'?raw.cloudEnabled[k]:raw?.enabled?.[k]!==false","typeof raw?.cloudEnabled?.[k]==='boolean'?raw.cloudEnabled[k]:raw?.enabled?.[k]===true").replace("Horarios en Uruguay. Elegí qué mostrar al abrir la app y qué programar en la nube.","Horarios en Uruguay. Cada cuenta elige sus propios avisos; los horarios sugeridos no activan notificaciones. Elegí qué mostrar al abrir la app y qué programar en la nube.");
+assert.equal(readFileSync(root+prefix+'diary/reminders821.js','utf8'),expectedReminders,'Solo se permite adaptar consentimiento inicial y explicación');
 assert.match(readFileSync(root+prefix+'diary/profile100.js','utf8'),/h\.textContent=window\.asiaExtras830\.profile100/);
 assert.equal((await req(prefix+'diary/profile100.js')).status,401);
 assert.equal((await req(prefix+'sw.js')).headers.get('service-worker-allowed'),prefix);assert.equal((await req(prefix+'diary/sw.js',true)).status,404);assert.equal((await req('/v11.24/',true)).status,404);assert.equal((await req(prefix+'app.mjs',true,{...env,STAGING_ALLOW_V1142_TESTS:'false'})).status,403);

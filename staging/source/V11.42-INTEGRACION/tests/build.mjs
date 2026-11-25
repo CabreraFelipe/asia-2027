@@ -28,6 +28,16 @@ replaceProfile("function render(){if(!panel.open)return;", "function renderHeade
 replaceProfile("load();panel.addEventListener('toggle',render);","load();renderHeaderName();panel.addEventListener('toggle',render);");
 writeFileSync(profileFile,profileText);
 execFileSync(process.execPath,['--check',profileFile],{stdio:'inherit'});
+// Candidate only: new accounts opt in to reminders. Explicit imported
+// preferences remain authoritative; default times are suggestions, not schedules.
+const remindersFile=web+'/diary/reminders821.js';
+let remindersText=readFileSync(remindersFile,'utf8');
+const replaceReminder=(from,to)=>{if(remindersText.split(from).length!==2)throw Error('Marcador de recordatorios no único');remindersText=remindersText.replace(from,to)};
+replaceReminder("cloudKeys.includes(k)?raw?.enabled?.[k]!==false:raw?.enabled?.[k]===true","raw?.enabled?.[k]===true");
+replaceReminder("typeof raw?.cloudEnabled?.[k]==='boolean'?raw.cloudEnabled[k]:raw?.enabled?.[k]!==false","typeof raw?.cloudEnabled?.[k]==='boolean'?raw.cloudEnabled[k]:raw?.enabled?.[k]===true");
+replaceReminder("Horarios en Uruguay. Elegí qué mostrar al abrir la app y qué programar en la nube.","Horarios en Uruguay. Cada cuenta elige sus propios avisos; los horarios sugeridos no activan notificaciones. Elegí qué mostrar al abrir la app y qué programar en la nube.");
+writeFileSync(remindersFile,remindersText);
+execFileSync(process.execPath,['--check',remindersFile],{stdio:'inherit'});
 const diary=web+'/diary/index.html';writeFileSync(diary,readFileSync(diary,'utf8').replace(/<link rel="manifest" href="manifest.json">/,''));
 const patch=s=>s.replaceAll('asia-v1111-identity-staging',origin);
 const dirs=readdirSync('staging/source').filter(n=>/^V11\.(?:2[5-9]|3[0-9]|4[01])-INTEGRACION$/.test(n));

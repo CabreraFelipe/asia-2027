@@ -20,3 +20,9 @@ Servicio nuevo aislado por cuenta y dispositivo; suscripción propia y revocaci�
 - La migración y el reemplazo de V10.6 están prohibidos hasta que todos estos requisitos estén verificados y el usuario apruebe una transición explícita sin duplicados. Mantener V10.6 activa hasta entonces.
 ## Situación actual
 El SW piloto solo cachea el aviso offline; no tiene handler push. CSP del diario bloquea transporte histórico. Los controles originales se conservan pero entrega remota no habilitada. Ninguna afirmación de paridad de push real está justificada todavía.
+
+## Personalización e independencia obligatorias
+- Cuenta nueva: avisos contextuales y push desactivados hasta elección explícita; horas sugeridas visibles no constituyen agenda activa. Temporizadores de entrenamiento locales siguen funcionando al iniciarlos. Sin agenda personal del propietario, ni suscripción, tokens, historial de entrega o consentimiento heredado de otra cuenta.
+- Cada cuenta elige tipo, hora, canal, activación y desactivación, con persistencia cifrada y sincronización de preferencias propias. La zona horaria debe ser configurable por cuenta antes de producción (el piloto conserva Uruguay). No confundir preferencias con permiso real del dispositivo o programación confirmada.
+- Importación explícita: conservar preferencias explícitas de la cuenta origen, nunca convertir defaults ausentes en consentimiento push. Renovación o reactivación requiere permiso y nueva suscripción vinculada a la cuenta actual. La configuración original y sus entregas quedan intactas hasta transición explícita.
+- Dispositivo compartido: al cambiar de cuenta no reutilizar destinatario sin revocar la vinculación previa; no enviar recordatorios de A a B. Validar cambios de horario de A, reapertura, sincronización y nueva cuenta B sin herencia, además de cancelaciones y aislamiento del backend.

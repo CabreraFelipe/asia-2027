@@ -141,6 +141,19 @@ try{
   }finally{w.Date.now=realNow;w.confirm=realConfirm;w.asiaRestWatch533=realHook}
   await wait(()=>el('status1140').textContent.includes('saved'),'Temporizadores no se guardaron');
   check(d.getElementById('reminders821')&&d.getElementById('reminderConfig821')&&d.getElementById('pushReminders845'),'Paneles originales de recordatorios ausentes');
+  const reminder=w.asiaReminders821,initial=reminder.clean();
+  check(Object.values(initial.enabled).every(x=>x===false)&&Object.values(initial.cloudEnabled).every(x=>x===false),'Cuenta nueva hereda avisos activos');
+  check(reminder.clean({enabled:{weight:true},cloudEnabled:{weight:false},times:{weight:'06:35'}}).enabled.weight===true&&!reminder.clean({enabled:{weight:true},cloudEnabled:{weight:false}}).cloudEnabled.weight,'Preferencia explícita no preservada');
+  const cfg=d.getElementById('reminderConfig821');cfg.open=true;
+  await new Promise(r=>setTimeout(r,100));
+  for(const c of cfg.querySelectorAll('input[id^="reminderEnabled821_"],input[id^="reminderCloud95_"]'))check(!c.checked,'Aviso preactivado en la interfaz');
+  d.getElementById('reminderEnabled821_weight').checked=true;
+  d.getElementById('reminderCloud95_weight').checked=true;
+  d.getElementById('reminderTime821_weight').value='06:35';
+  d.getElementById('reminderSave821').click();
+  await wait(()=>el('status1140').textContent.includes('saved'),'Preferencias de avisos no guardadas');
+  check(d.getElementById('reminderTime821_weight').value==='06:35','Horario personalizado perdido');
+
   check(localStorage.getItem('asia2027-v1')===null,'Diario en almacenamiento nativo');
   el('close1140').click();await wait(()=>!document.querySelector('iframe')&&!el('reconcile1140').disabled,'No cerró');
   el('reconcile1140').click();await wait(()=>!el('reconcile1140').disabled,'No concilió');
@@ -158,6 +171,9 @@ try{
   el('open1140').click();await wait(()=>document.querySelector('iframe')?.contentWindow?.asiaGym84Ready===true&&!el('close1140').disabled,'No reabrió diario');
   if(document.querySelector('iframe').contentDocument.getElementById('height').value!=='1.86')throw Error('Registro perdido tras reinicio');
   if(document.querySelector('iframe').contentDocument.querySelector('header .brand h1').textContent!=='Usuario A')throw Error('Nombre perdido al reabrir');
+  const diaryA=document.querySelector('iframe').contentDocument;
+  if(diaryA.getElementById('reminderTime821_weight').value!=='06:35'||!diaryA.getElementById('reminderEnabled821_weight').checked||!diaryA.getElementById('reminderCloud95_weight').checked)throw Error('Preferencias de avisos perdidas al reabrir');
+
   el('close1140').click();await wait(()=>!document.querySelector('iframe')&&!el('reconcile1140').disabled,'No cerró');
   el('reconcile1140').click();await wait(()=>!el('logout1140').disabled,'Conciliación no terminó');
   el('logout1140').click();return true;
@@ -171,6 +187,9 @@ try{
   el('open1140').click();await wait(()=>document.querySelector('iframe')?.contentWindow?.asiaGym84Ready===true&&!el('close1140').disabled,'B no abrió diario');
   if(document.querySelector('iframe').contentDocument.getElementById('height').value==='1.86')throw Error('Datos cruzados');
   if(document.querySelector('iframe').contentDocument.querySelector('header .brand h1').textContent!=='Mi progreso')throw Error('Nombre cruzado entre cuentas');
+  const diaryB=document.querySelector('iframe').contentDocument;
+  if(diaryB.getElementById('reminderTime821_weight').value==='06:35'||[...diaryB.querySelectorAll('input[id^="reminderEnabled821_"],input[id^="reminderCloud95_"]')].some(x=>x.checked))throw Error('Horario o preferencias cruzadas entre cuentas');
+
   if((await (await fetch('/v11.38/sync')).json()).head!==0)throw Error('Nube cruzada');
   return true;
  }.toString()+')()',true);assert.equal(isolation,true);
