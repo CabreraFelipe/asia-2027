@@ -27,7 +27,7 @@ export async function createController({origin,fetcher=fetch,repository,pending,
  })}
  publish('maintenance');
  return Object.freeze({
-  get state(){return state},get busy(){return busy},get status(){return editing?.status??null},
+  get state(){return state},get hasPlan(){return plan!==null},get busy(){return busy},get status(){return editing?.status??null},
   async openDiary(){maintenance();return operation(async()=>{
    await verify();editing=await openOfflineEditing({...options,onStatus:()=>{try{onState(state)}catch{}}});
    try{

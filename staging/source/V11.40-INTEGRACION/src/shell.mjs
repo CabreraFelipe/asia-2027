@@ -1,6 +1,6 @@
 // Small maintenance shell for synthetic candidate. No automatic sync/import or deletion.
 import {downloadEncryptedCopy} from '../../V11.32-INTEGRACION/src/download.mjs';
-export function mountShell({doc,anchor,controller,download=downloadEncryptedCopy}){
+export function mountShell({doc,anchor,controller,download=downloadEncryptedCopy,onRender=()=>{}}){
  const el=(tag,text,id)=>{const n=doc.createElement(tag);if(text)n.textContent=text;if(id)n.id=id;return n};
  const root=el('section',null,'shell1140'),status=el('p',null,'status1140');status.setAttribute('role','status');
  const message=el('p',null,'message1140'),actions=el('div'),preview=el('div');let plan=null,busy=false,requested=false;
@@ -13,7 +13,7 @@ export function mountShell({doc,anchor,controller,download=downloadEncryptedCopy
  const cancel=btn('cancel1140','Cancelar comparación',()=>{plan.cancel();plan=null;preview.textContent='';requested=false});
  const logout=btn('logout1140','Cerrar sesión',()=>controller.logout());
  function render(){const state=controller.state;status.textContent=state==='editing'?'Diario abierto · '+(controller.status?.phase??''):state==='maintenance'?'Modo mantenimiento':state==='locked'?'Sesión bloqueada':'Sesión cerrada';
-  const ready=!busy&&state==='maintenance'&&!plan;open.disabled=reconcile.disabled=sync.disabled=logout.disabled=!ready;close.disabled=busy||state!=='editing';downloadButton.disabled=busy||!plan?.backup;apply.disabled=busy||!plan||!['equal','push','pull'].includes(plan.kind)||!!plan.backup&&!requested;cancel.disabled=busy||!plan;
+  const ready=!busy&&state==='maintenance'&&!plan&&!controller.hasPlan&&!controller.busy;open.disabled=reconcile.disabled=sync.disabled=logout.disabled=!ready;close.disabled=busy||state!=='editing';downloadButton.disabled=busy||!plan?.backup;apply.disabled=busy||!plan||!['equal','push','pull'].includes(plan.kind)||!!plan.backup&&!requested;cancel.disabled=busy||!plan;onRender();
  }
  async function run(fn){if(busy)return;busy=true;message.textContent='';render();try{await fn()}catch(e){message.textContent='No se completó: '+e.message}finally{busy=false;render()}}
  root.append(el('h1','Asia 2027 · candidato sintético'),el('p','Solo pruebas. No ingreses registros personales.'),status,actions,preview,message);anchor.append(root);render();return {render,remove(){if(plan)plan.cancel();root.remove()}};

@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import {createPrivateProvider,validateProviderInput} from '../src/private-provider.mjs';
+const A='acct_'+'a'.repeat(32),B='acct_'+'b'.repeat(32),calls=[];
+let active=true,revoke=false;
+const binding={async fetch(r){const x=await r.json(),kind=new URL(r.url).pathname.split('/').pop();calls.push({kind,...x});if(revoke)active=false;const base={ok:true,syntheticOnly:true,model:'fixture',remaining:0};
+return new Response(JSON.stringify({...base,...kind==='health'?{records:[{fixture:x.accountId}]}:kind==='vision'?{answer:'SIMULACIÓN; sin análisis real'}:kind==='scan'?{result:{notes:'Sin mediciones extraídas'}}:kind==='nutrition52'?{result:{name:'',basis:''}}:{result:{answer:'SIMULACIÓN',proposal:null}}}));}};
+assert.throws(()=>createPrivateProvider({binding}),/configurado/);
+const p=createPrivateProvider({binding,enabled:true}),req=(kind,payload,accountId=A)=>p.request({kind,payload,accountId,verify:async()=>active});
+assert.deepEqual((await req('health',null)).records,[{fixture:A}]);assert.deepEqual((await req('health',null,B)).records,[{fixture:B}]);
+const img='data:image/jpeg;base64,AAAA';
+assert.match((await req('vision',{mode:'meal',question:'fixture',images:[img]})).answer,/SIMULACIÓN/);
+assert.deepEqual((await req('scan',{image:img,data:{report:'fixture'}})).result,{notes:'Sin mediciones extraídas'});
+assert.deepEqual((await req('nutrition52',{mode:'meal',image:img})).result,{name:'',basis:''});
+assert.throws(()=>validateProviderInput('vision',{mode:'meal',question:'x',images:Array(5).fill(img)}),/inválidas/);
+assert.throws(()=>validateProviderInput('coach',{context:{accountId:B}}),/prohibido/);
+assert.throws(()=>validateProviderInput('scan',{image:'https://example.invalid',data:{}}),/inválida/);
+revoke=true;await assert.rejects(()=>req('health',null),/revocada/);const n=calls.length;await assert.rejects(()=>req('health',null),/revocada/);assert.equal(calls.length,n);
+assert.equal(calls.every(x=>x.syntheticOnly===true),true);console.log('Private provider contract: isolated binding, account scope, image limits, no real upstream, revocation.');

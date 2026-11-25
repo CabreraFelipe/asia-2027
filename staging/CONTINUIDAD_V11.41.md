@@ -1,0 +1,8 @@
+# Continuidad V11.41 — mantenimiento integrado y contrato de proveedor privado
+Base 0c05ff493bbcc9e302888714070a4f4dfb645c20, V11.40 CI SUCCESS. main 061bb34dc3735d38dfd14eeb77f1054f34b63578. V11.24 instalada. No deploy ni datos reales.
+
+Panel de mantenimiento del candidato conectado al controlador V11.40: importación integral a cuenta vacía con inventario, confirmación y respaldo original retenido; recuperación selectiva de apariencia con vista previa, respaldo cifrado anterior y confirmación; preparación/descarga explícita de conflicto offline sin borrar rama. Bloquea abrir diario y otras operaciones mientras existe plan. Descarga de prueba stub, no verifica disco. No restaura diario/Coach mediante selección ni resuelve conflicto offline. No se modifica interfaz original, el panel vive fuera del diario.
+
+Contrato privado de proveedor mediante binding inyectado, deshabilitado por defecto y acepta exclusivamente respuestas syntheticOnly. Rutas lógicas de salud, workouts, coach, chat, diet, weekly, training, OCR, nutrición e imágenes visuales, validación acotada, identidad verificada antes y después. Prueba fake binding, no upstream real, no envío de imágenes reales. No está conectado a Worker ni a UI de imágenes; no es proveedor real, no simular valores médicos/nutricionales. Requiere binding aislado, configuración y credenciales de un proyecto nuevo, consentimiento y cuotas antes de habilitar datos reales. Notificaciones/REST/push y Health Auto Export ingestión pendientes. No acceder a servicios personales antiguos.
+
+CI pendiente. Próximo: empaquetado PWA autenticado y operación aislada; proveedor real y servicios restantes continúan bloqueantes de paridad. Pruebas físicas y migración real pendientes; no prometer V12.0 por numeración.
