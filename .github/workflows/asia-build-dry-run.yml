@@ -1,0 +1,43 @@
+name: Asia 2027 - compilación de despliegue sin publicar
+on:
+  push:
+    branches: ['development/multiuser']
+    paths: ['.github/workflows/asia-build-dry-run.yml']
+permissions:
+  contents: read
+jobs:
+  build:
+    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/development/multiuser'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22.16.0'
+      - name: Verificar destino e integridad de la versión actualmente instalada
+        run: |
+          node staging/source/official/PREFLIGHT_PORTABLE_V11_24.mjs --solo-integridad
+          python3 - <<'PY'
+          import pathlib,tomllib
+          p=pathlib.Path('staging/source/official/V11.24-STAGING/wrangler.preview.toml')
+          c=tomllib.loads(p.read_text())
+          assert c['name']=='asia-v1111-identity-staging'
+          assert c['main']=='src/worker1124.mjs'
+          assert len(c['d1_databases'])==1
+          b=c['d1_databases'][0]
+          assert b['binding']=='STAGING_DB' and b['database_name']=='asia-v11-db-staging' and b['database_id']=='05420c2a-d083-48ee-bc4f-f644177875f9'
+          assert not c.get('routes') and not c.get('env')
+          print('Configuración V11.24 exacta, destino exclusivo staging.')
+          PY
+      - name: Compilar con Wrangler oficial en modo dry-run, sin credenciales
+        working-directory: staging/source/official/V11.24-STAGING
+        env:
+          WRANGLER_SEND_METRICS: 'false'
+        run: |
+          set -euo pipefail
+          npx --yes wrangler@4.165.0 deploy --dry-run --config wrangler.preview.toml --outdir "$RUNNER_TEMP/asia-build"
+          test -s "$RUNNER_TEMP/asia-build/worker1124.js"
+          echo 'Bundle generado. No se ha publicado ni modificado ningún Worker.'
