@@ -1,6 +1,6 @@
 // Produces a disposable deploy directory; never writes root/original files.
 import {cpSync,mkdirSync,readFileSync,writeFileSync,readdirSync,existsSync,statSync} from 'node:fs';
-import {join,dirname} from 'node:path';
+import {join,dirname,resolve,relative} from 'node:path';
 const base='staging/source/V11.42-INTEGRACION',out=base+'/dist',web=out+'/assets/v11.42',candidate='staging/source/V11.29-INTEGRACION/tests/candidate';
 if(existsSync(out))throw Error('Build debe ser nuevo');
 mkdirSync(web,{recursive:true});cpSync(base+'/web',web,{recursive:true});
@@ -15,6 +15,27 @@ const diary=web+'/diary/index.html';writeFileSync(diary,readFileSync(diary,'utf8
 const patch=s=>s.replaceAll('asia-v1111-identity-staging',origin);
 const dirs=readdirSync('staging/source').filter(n=>/^V11\.(?:2[5-9]|3[0-9]|4[01])-INTEGRACION$/.test(n));
 for(const d of dirs){const src='staging/source/'+d+'/src';if(!existsSync(src))continue;for(const n of readdirSync(src).filter(n=>n.endsWith('.mjs'))){const p=web+'/'+src+'/'+n;mkdirSync(dirname(p),{recursive:true});writeFileSync(p,patch(readFileSync(src+'/'+n,'utf8')))}}
+// Verify the actual browser dependency graph, including original pure classic scripts
+// imported for their side effects by migration88. Do not copy arbitrary missing files.
+const visited=new Set(),assetRoot=resolve(web);
+function dependencies(file){
+ const abs=resolve(file);if(visited.has(abs))return;visited.add(abs);
+ checkPath(abs);const source=readFileSync(abs,'utf8');
+ const imports=[...source.matchAll(/^\s*(?:import\s+(?:[^'";\n]*?\s+from\s+)?|export\s+[^'";\n]*?\s+from\s+)['"]([^'"]+)['"]/gm)].map(m=>m[1]);
+ for(const spec of imports){
+  if(!spec.startsWith('.'))throw Error('Import no local: '+spec);
+  const target=resolve(dirname(abs),spec);checkPath(target);
+  if(!existsSync(target)){
+   const rel=relative(assetRoot,target);
+   if(!rel.includes('/')&&['core105.js','extras830.js','gym826.js','schedule829.js'].includes(rel)&&rootFiles.includes(rel))cpSync(rel,target);
+   else throw Error('Dependencia de shell ausente: '+rel);
+  }
+  dependencies(target);
+ }
+}
+function checkPath(p){if(!p.startsWith(assetRoot+'/'))throw Error('Dependencia fuera del paquete');}
+dependencies(web+'/app.mjs');
+console.log('Shell static dependency graph:',visited.size,'modules; original pure JS dependencies included');
 // Server modules isolated from static asset binding. Preserve relative paths for imports.
 const server=out+'/server',sroot=server+'/staging/source';
 for(const d of dirs){const src='staging/source/'+d+'/src';if(!existsSync(src))continue;for(const n of readdirSync(src).filter(n=>n.endsWith('.mjs'))){const p=server+'/'+src+'/'+n;mkdirSync(dirname(p),{recursive:true});writeFileSync(p,patch(readFileSync(src+'/'+n,'utf8')))}}

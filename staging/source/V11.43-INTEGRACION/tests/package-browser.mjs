@@ -37,7 +37,7 @@ try{
    const chunks=[];for await(const x of req)chunks.push(x);
    const r=await worker.fetch(new Request(u,{method:req.method,headers:req.headers,...(['GET','HEAD'].includes(req.method)?{}:chunks.length?{body:Buffer.concat(chunks)}:{})}),env);
    const h=Object.fromEntries(r.headers);if(r.headers.getSetCookie().length)h['set-cookie']=r.headers.getSetCookie();
-   res.writeHead(r.status,h);res.end(Buffer.from(await r.arrayBuffer()));
+   if(r.status>=400&&r.status!==401)console.log('CI HTTP',r.status,u.pathname);res.writeHead(r.status,h);res.end(Buffer.from(await r.arrayBuffer()));
   }catch(e){console.error('CI server',e.message);res.writeHead(500);res.end()}
  });
  server.listen(0,'127.0.0.1');await once(server,'listening');
@@ -53,6 +53,9 @@ try{
  const page=await (await fetch('http://127.0.0.1:'+port+'/json/new?'+encodeURIComponent(home),{method:'PUT'})).json();
  ws=new WebSocket(page.webSocketDebuggerUrl);await new Promise((ok,fail)=>{ws.addEventListener('open',ok,{once:true});ws.addEventListener('error',fail,{once:true})});
  let seq=0;function cmd(method,params={}){return new Promise((ok,fail)=>{const id=++seq,t=setTimeout(()=>{ws.removeEventListener('message',listen);fail(Error('CDP timeout '+method))},120000);function listen(e){const m=JSON.parse(e.data);if(m.id!==id)return;clearTimeout(t);ws.removeEventListener('message',listen);if(m.error||m.result?.exceptionDetails)fail(Error(JSON.stringify(m.error||m.result.exceptionDetails)));else ok(m.result)}ws.addEventListener('message',listen);ws.send(JSON.stringify({id,method,params}))})}
+ // Only log failed network paths and browser diagnostic errors from this synthetic fixture.
+ ws.addEventListener('message',e=>{const m=JSON.parse(e.data);if(m.method==='Network.responseReceived'&&m.params.response.status>=400){const u=new URL(m.params.response.url);console.log('Browser HTTP',m.params.response.status,u.pathname)}if(m.method==='Runtime.exceptionThrown')console.log('Browser exception',m.params.exceptionDetails.text);if(m.method==='Log.entryAdded'&&m.params.entry.level==='error')console.log('Browser error',m.params.entry.text.slice(0,500))});
+ await cmd('Network.enable');await cmd('Runtime.enable');await cmd('Log.enable');
  const evalJS=async(expression,awaitPromise=false)=>(await cmd('Runtime.evaluate',{expression,awaitPromise,returnByValue:true})).result.value;
  async function ready(expr){for(let i=0;i<200;i++){try{if(await evalJS(expr))return}catch{}await sleep(100)}throw Error('Página no disponible: '+expr)}
  await ready("location.href==="+JSON.stringify(home)+"&&document.readyState==='complete'&&!!document.getElementById('openAccount')");
@@ -61,7 +64,7 @@ try{
   const phrase='frase sintética paquete completo';
   check((await fetch('/v11.42/app.mjs')).status===401,'Asset anónimo');
   el('phrase').value=phrase;el('openAccount').click();await wait(()=>!el('openAccount').disabled,'Acceso anónimo no terminó');check(!el('shell1140'),'Shell anónimo');
-  await fetch('/__ci/a');
+  await fetch('/__ci/a');check((await fetch('/v11.11/auth/me')).ok,'Cookie sintética no disponible');
   el('phrase').value=phrase;el('openAccount').click();await wait(()=>!!el('open1140'),'Shell no inicializado: '+el('entryStatus').textContent);
   el('open1140').click();await wait(()=>document.querySelector('iframe')?.contentWindow?.asiaGym84Ready===true&&!el('close1140').disabled,'Diario empaquetado no inició');
   const d=document.querySelector('iframe').contentDocument;d.getElementById('height').value='1.86';d.getElementById('saveHeight').click();
