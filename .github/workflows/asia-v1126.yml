@@ -1,0 +1,20 @@
+name: Asia 2027 - integración V11.26
+on:
+  push:
+    branches: ['development/multiuser']
+    paths: ['staging/source/V11.26-INTEGRACION/**', '.github/workflows/asia-v1126.yml']
+permissions:
+  contents: read
+jobs:
+  vault:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/development/multiuser'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22.16.0'
+      - run: node staging/source/V11.26-INTEGRACION/tests/session-vault.test.mjs
