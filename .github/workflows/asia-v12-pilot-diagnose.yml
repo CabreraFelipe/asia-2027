@@ -1,0 +1,22 @@
+name: Asia 2027 - diagnóstico piloto publicado (solo lectura)
+on:
+  push:
+    branches: ['development/multiuser']
+    paths: ['.github/workflows/asia-v12-pilot-diagnose.yml','staging/source/V11.44-INTEGRACION/deploy/diagnose.py']
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/development/multiuser'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: asia-v12-pilot
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Consultar configuración del candidato y respuestas HTTP
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: python3 staging/source/V11.44-INTEGRACION/deploy/diagnose.py
