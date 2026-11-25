@@ -1,0 +1,8 @@
+# Continuidad: conexión GitHub–Cloudflare (V11.25)
+24/11/2026. V11.24 sigue siendo la última versión staging confirmada por el usuario. V11.25 es candidato local, no desplegado.
+Producción personal: main, commit 061bb34dc3735d38dfd14eeb77f1054f34b63578. No modificar.
+Rama de desarrollo: development/multiuser.
+Worker staging: asia-v1111-identity-staging. D1 staging: asia-v11-db-staging. No consultar ni migrar D1 en esta fase.
+Workflow asia-staging-connection.yml: únicamente GET settings del Worker fijo, sin checkout ni ejecución de código del repositorio. Se activa por push de staging/CONNECT.md en la rama de desarrollo. No modifica Cloudflare.
+Pendiente: el propietario configura GitHub Environment asia-staging, limita ramas a development/multiuser y añade secretos de entorno CLOUDFLARE_ACCOUNT_ID y CLOUDFLARE_API_TOKEN (token inicial Workers Scripts Read, cuenta seleccionada, sin D1 ni permisos de escritura). No usar secretos globales del repositorio, ni compartirlos por chat. Confirmar configuración antes de crear CONNECT.md para disparar la prueba. Revisar resultado de Actions y verificar main intacta.
+El permiso de edición de Workers suele tener alcance de cuenta; no asumir que restringir un nombre en el workflow restringe el token. Antes de dar escritura, acordar aislamiento de cuenta staging o aceptar explícitamente el alcance, y establecer controles de despliegue. No conceder D1 Edit todavía. No publicar candidatos sin preflight, comprobación remota, respaldo, smoke y plan de reversión. No incorporar datos reales, respaldos personales ni credenciales en este repositorio público.
