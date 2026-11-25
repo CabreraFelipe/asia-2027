@@ -1,0 +1,46 @@
+name: Asia 2027 - CI de fuentes y smoke real
+on:
+  push:
+    branches: ['development/multiuser']
+    paths: ['staging/source/**', '.github/workflows/asia-source-ci.yml']
+permissions:
+  contents: read
+jobs:
+  regression:
+    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/development/multiuser'
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22.16.0'
+      - name: Probar fuentes versionadas sin utilizar ZIP ni credenciales
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir="$(mktemp -d)"
+          trap 'rm -rf "$dir"' EXIT
+          cp -a staging/source/. "$dir/"
+          cd "$dir"
+          node official/PREFLIGHT_PORTABLE_V11_24.mjs
+          cp -a official/V11.24-STAGING/. BASE_V11.24/
+          node recuperar-v106.mjs "$GITHUB_WORKSPACE"
+          node VERIFICAR_V11_25.mjs
+          echo 'CI de fuentes versionadas OK. Sin escrituras remotas.'
+  smoke:
+    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/development/multiuser'
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22.16.0'
+      - name: Smoke original V11.24, GET sin sesión
+        run: node staging/source/official/V11.24-STAGING/scripts/smoke1124.mjs
