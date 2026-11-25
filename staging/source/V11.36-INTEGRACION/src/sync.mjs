@@ -51,19 +51,25 @@ async function seal(payload,id,passphrase){return encrypt84({format,accountId:id
 async function unseal(envelope,id,passphrase,policy){
  const x=await decrypt84(envelope,passphrase);check(exact(x,['format','accountId','payload'])&&x.format===format&&x.accountId===id,'Copia remota incompatible o de otra cuenta');return validatePayload(x.payload,policy)
 }
-export async function prepareSync({readSession,origin,fetcher=fetch,repository,policy,passphrase,maintenanceConfirmed}){
+export async function prepareSync({readSession,origin,fetcher=fetch,repository,policy,passphrase,maintenanceConfirmed,transport=null,allowTransportChange=false}){
  check(maintenanceConfirmed===true,'Cerrá la interfaz antes de sincronizar');
  const identity=await readSession();check(valid(identity),'Sesión inválida');const id=identity.accountId;
  async function verify(){const s=await readSession();check(valid(s)&&s.accountId===id&&s.csrf===identity.csrf,'La sesión cambió');return s}
- const request=createIntegralRequest({origin,csrf:identity.csrf,fetcher});
- async function head(){await verify();const list=validateList844(await request('GET'));await verify();return list.head}
+ const namespace=transport?.namespace??'integral-v1125';
+ check(namespace==='integral-v1125'||namespace==='objects-v1138','Transporte inválido');
+ const request=transport?.request??createIntegralRequest({origin,csrf:identity.csrf,fetcher}),validEnvelope=transport?.validEnvelope??validIntegralEnvelope,validateList=transport?.validateList??validateList844;
+ const marker=(remote,local,modules)=>({remote,local,modules,...(transport?{namespace}: {})});
+ async function head(){await verify();const list=validateList(await request('GET'));await verify();return list.head}
  const row=await repository.readSync(id),{payload:local,devices}=await localPayload({row,readSession:verify,passphrase,policy});
  const remoteRevision=await head();
  let remote=null;
- if(remoteRevision){const r=await request('GET',null,remoteRevision);check(r.ok===true&&r.revision===remoteRevision&&validIntegralEnvelope(r.envelope),'Copia remota inválida');remote=await unseal(r.envelope,id,passphrase,policy);await verify()}
+ if(remoteRevision){const r=await request('GET',null,remoteRevision);check(r.ok===true&&r.revision===remoteRevision&&validEnvelope(r.envelope),'Copia remota inválida');remote=await unseal(r.envelope,id,passphrase,policy);await verify()}
  const lh=await checksum84(local),rh=remote?await checksum84(remote):null;
  const empty=local.entries.length===0&&Object.keys(local.modules).length===0;
- const base=row.baseline,localChanged=!base||base.local!==rev(row.local)||base.modules!==rev(row.modules),remoteChanged=!base||base.remote!==remoteRevision;
+ const oldBase=row.baseline,changedTransport=oldBase&&(oldBase.namespace??'integral-v1125')!==namespace;
+ check(!changedTransport||allowTransportChange===true,'Transporte diferente: confirmá transición explícita');
+ // A different cloud namespace is an independent first comparison, never inherit revisions.
+ const base=changedTransport?null:oldBase,localChanged=!base||base.local!==rev(row.local)||base.modules!==rev(row.modules),remoteChanged=!base||base.remote!==remoteRevision;
  const kind=remote&&lh===rh?'equal':!remote?empty?'empty':base?'conflict':'push':empty&&!base?'pull':base&&!remoteChanged&&localChanged?'push':base&&remoteChanged&&!localChanged&&remoteRevision>base.remote?'pull':'conflict';
  // Only an explicit pull may replace a nonempty local copy. Its encrypted backup is provided.
  const backup=kind==='pull'&&!empty?await seal(local,id,passphrase):null;
@@ -76,7 +82,7 @@ export async function prepareSync({readSession,origin,fetcher=fetch,repository,p
    check(await head()===remoteRevision,'Conflicto de revisión remota');
    let nextRemote=remoteRevision;
    if(kind==='push'){
-    const envelope=await seal(local,id,passphrase);check(validIntegralEnvelope(envelope),'Copia supera límite remoto de 1,4 MB');
+    const envelope=await seal(local,id,passphrase);check(validEnvelope(envelope),'Copia supera límite remoto');
     await verify();check(JSON.stringify(await repository.readSync(id))===JSON.stringify(row),'Conflicto de revisión local');
     const saved=await request('POST',{expectedRevision:remoteRevision,envelope});
     check(saved.ok===true&&saved.revision===remoteRevision+1,'Guardado remoto no confirmado');
@@ -90,8 +96,8 @@ export async function prepareSync({readSession,origin,fetcher=fetch,repository,p
     const localRecord={revision:lr,envelope:await encrypt84({format:'asia-v1126-local-vault-v1',accountId:id,revision:lr,entries:[...remote.entries,...devices]},passphrase)};
     const modulesRecord={revision:mr,envelope:await encrypt84({format:'asia-v1128-modules-v1',accountId:id,revision:mr,modules:Object.fromEntries(Object.entries(remote.modules).map(([name,payload])=>[name,{name,revision:mr,payload}]))},passphrase)};
     await verify();check(await head()===remoteRevision,'Conflicto de revisión remota');
-    await repository.commitSync(id,row,{local:localRecord,modules:modulesRecord,baseline:{remote:remoteRevision,local:lr,modules:mr}});
-   }else await repository.commitSync(id,row,{baseline:{remote:nextRemote,local:rev(row.local),modules:rev(row.modules)}});
+    await repository.commitSync(id,row,{local:localRecord,modules:modulesRecord,baseline:marker(remoteRevision,lr,mr)});
+   }else await repository.commitSync(id,row,{baseline:marker(nextRemote,rev(row.local),rev(row.modules))});
    return {kind,remoteRevision:nextRemote};
   }
  });

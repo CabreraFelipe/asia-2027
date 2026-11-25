@@ -20,6 +20,10 @@ jobs:
           node-version: '22.16.0'
       - run: node staging/source/V11.38-INTEGRACION/tests/worker.test.mjs
       - run: node staging/source/V11.29-INTEGRACION/tests/build-candidate.mjs
+      - name: Chrome real sincronización de copia grande
+        env:
+          ASIA_BROWSER_PREFIX: /staging/source/V11.38-INTEGRACION/tests
+        run: node staging/source/V11.26-INTEGRACION/tests/run-browser.mjs
       - name: Regresión sincronización V11.36
         env:
           ASIA_BROWSER_PREFIX: /staging/source/V11.36-INTEGRACION/tests
