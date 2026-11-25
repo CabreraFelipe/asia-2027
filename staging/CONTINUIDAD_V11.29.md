@@ -1,0 +1,8 @@
+# Continuidad V11.29 — 25/11/2026
+Base V11.28: 9c1a1788d1ce2f9a23e4ef7fce8ce016c70957d6, cuatro corridas SUCCESS. main de referencia 061bb34dc3735d38dfd14eeb77f1054f34b63578. No despliegue, migración ni datos reales.
+
+Candidato CI aislado: genera copia desechable de fuentes verificadas (110/110), inventaría referencias de almacenamiento/servicios de todos los scripts y rutas, preserva CSS y controles. Solo cambia en la copia index.html (bootstrap lexical de Storage, no Object.defineProperty sobre APIs del navegador), store84.mjs (openStore explícito y sin fallback nativo) y release831.mjs (permite únicamente comprobar el puente Gym en CI localhost; no habilita sus servicios). Candidato usa adaptador modular V11.28 dentro de su propio realm. Las rutas auxiliares HTML, conexiones externas y SW no se habilitan. No es un montaje de producción ni una barrera contra scripts same-origin; sesión sintética y frase suministrada por fixture padre.
+
+Prueba prevista: sesión PRO histórica cifrada A visible desde el control original Revisar sesiones PRO, B no la ve, A conserva altura del diario y detección/bloqueo de sesión activa al reabrir. CI pendiente; no declarar aprobación antes de consultar resultados. El código original en raíz y los datos personales no se modifican. No habilitar servicios externos ni rutas reales.
+
+Pendientes: completar inventario de consumidores directos y adaptar rutas auxiliares una a una; integrar autenticación real, política persistente para claves de dispositivo, lifecycle y recuperación de cambios pendientes, respaldo y sincronización integral. Los flujos Dieta/Coach/Salud/Progreso, fotos, preferencias y PWA reales aún requieren pruebas. Mantener V11.24 instalada hasta aprobación y rollback. iPhone y Android físicos pendientes.

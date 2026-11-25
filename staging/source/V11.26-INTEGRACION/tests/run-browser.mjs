@@ -20,6 +20,10 @@ const server=createServer(async(req,res)=>{
    data=original.replace('<head>','<head><script src="/staging/source/V11.27-INTEGRACION/tests/original-preload.js"></script>');
    res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'none'; worker-src 'none'; object-src 'none'; frame-src 'none'; form-action 'none'; base-uri 'none'; frame-ancestors 'self'");
   }
+  if(process.env.ASIA_CANDIDATE==='1'&&path.startsWith('/staging/source/V11.29-INTEGRACION/tests/candidate/')){
+   if(path.endsWith('.html')&&!path.endsWith('/index.html'))throw Error('Ruta auxiliar no integrada');
+   res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'none'; worker-src 'none'; object-src 'none'; frame-src 'none'; form-action 'none'; base-uri 'none'; frame-ancestors 'self'");
+  }
   if(path==='/sw.js'||path.endsWith('/sw.js'))throw Error('SW deshabilitado en pruebas');
   res.writeHead(200,{'Content-Type':mime[extname(file)],'Cache-Control':'no-store'});res.end(data);
  }catch(e){console.log('CI HTTP 404:',req.url, e.code||e.message);res.writeHead(404);res.end()}
