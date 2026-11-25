@@ -45,6 +45,18 @@ export async function openUnifiedRepository(factory=globalThis.indexedDB){
    check(validRecord(local)&&validRecord(modules)&&local.revision===1&&modules.revision===1,'Importación inválida');
    return tx(id,true,(row,s)=>{check(row===null,'La cuenta ya contiene datos');s.add({local,modules},id);return true});
   },
+  // Reconcile an offline branch only when the exact original snapshot is unchanged.
+  reconcileOffline(id,expected,working){
+   const rev=r=>r?.revision??0;
+   for(const k of ['local','modules'])check(working[k]===null?expected[k]===null:validRecord(working[k])&&rev(working[k])>=rev(expected[k]),'Rama offline inválida');
+   check(JSON.stringify(working.baseline)===JSON.stringify(expected.baseline),'Marcador offline inválido');
+   return tx(id,true,(row,s)=>{
+    const now={local:row?.local??null,modules:row?.modules??null,baseline:row?.baseline??null};
+    if(JSON.stringify(now)===JSON.stringify(working))return 'already-applied';
+    check(JSON.stringify(now)===JSON.stringify(expected),'Conflicto de revisión local; conservá la rama offline');
+    s.put({...row,...working},id);return 'applied';
+   });
+  },
   close(){closed=true;db.close()}
  });
 }

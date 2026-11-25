@@ -5,7 +5,7 @@ import {createServer} from 'node:http';
 import {tmpdir} from 'node:os';
 import {resolve,join,extname} from 'node:path';
 import {once} from 'node:events';
-const dir=await mkdtemp(join(tmpdir(),'asia-chrome-'));
+let dir;
 const root=process.cwd(),prefix=process.env.ASIA_BROWSER_PREFIX||'/staging/source/V11.26-INTEGRACION/tests';
 const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.png':'image/png','.json':'application/json'};
 const server=createServer(async(req,res)=>{
@@ -31,13 +31,24 @@ const server=createServer(async(req,res)=>{
 server.listen(0,'127.0.0.1');await once(server,'listening');
 const url='http://127.0.0.1:'+server.address().port+prefix+'/browser.html';
 let chrome,ws;
+async function stopChrome(){if(chrome&&chrome.exitCode===null&&chrome.signalCode===null){chrome.kill();await Promise.race([once(chrome,'exit'),sleep(3000)])}if(dir)await rm(dir,{recursive:true,force:true,maxRetries:3,retryDelay:200});chrome=null;dir=null}
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 try{
- chrome=spawn(process.env.CHROME_BIN||'google-chrome',['--headless=new','--no-sandbox','--disable-dev-shm-usage','--no-first-run','--no-default-browser-check','--disable-background-networking','--remote-debugging-address=127.0.0.1','--remote-debugging-port=0','--user-data-dir='+dir,url],{stdio:'ignore'});
- let spawnError;chrome.on('error',e=>{spawnError=e});
- let port;
- for(let i=0;i<150;i++){if(spawnError)throw spawnError;try{port=Number((await readFile(join(dir,'DevToolsActivePort'),'utf8')).split('\n')[0]);if(port)break}catch{}await sleep(100)}
- if(!port)throw Error('Chrome no inició CDP');
+ // Retry ONLY process startup, before any test page is opened.
+ let port=0;
+ for(let attempt=1;attempt<=3;attempt++){
+  dir=await mkdtemp(join(tmpdir(),'asia-chrome-'));
+  chrome=spawn(process.env.CHROME_BIN||'google-chrome',['--headless=new','--no-sandbox','--disable-dev-shm-usage','--no-first-run','--no-default-browser-check','--disable-background-networking','--remote-debugging-address=127.0.0.1','--remote-debugging-port=0','--user-data-dir='+dir,'about:blank'],{stdio:['ignore','ignore','pipe']});
+  let spawnError,stderr='';chrome.on('error',e=>{spawnError=e});chrome.stderr.on('data',d=>{stderr=(stderr+d.toString()).slice(-6000)});
+  for(let i=0;i<300;i++){if(spawnError||chrome.exitCode!==null||chrome.signalCode!==null)break;try{port=Number((await readFile(join(dir,'DevToolsActivePort'),'utf8')).split('\n')[0]);if(port){const r=await fetch('http://127.0.0.1:'+port+'/json/version',{signal:AbortSignal.timeout(1000)});if(r.ok)break;port=0}}catch{port=0}await sleep(100)}
+  if(port)break;
+  console.log('Chrome startup attempt '+attempt+' failed:',spawnError?.message||'exit '+chrome.exitCode,stderr);
+  await stopChrome();
+ }
+ if(!port)throw Error('Chrome no inició CDP después de 3 intentos');
+ // Navigate once, only after CDP is ready. Never retry application assertions.
+ const opened=await fetch('http://127.0.0.1:'+port+'/json/new?'+encodeURIComponent(url),{method:'PUT'});
+ if(!opened.ok)throw Error('No se pudo abrir página CDP: '+opened.status);
  let page;
  for(let i=0;i<100;i++){try{const pages=await (await fetch('http://127.0.0.1:'+port+'/json/list')).json();page=pages.find(x=>x.type==='page'&&x.url===url);if(page)break}catch{}await sleep(100)}
  if(!page)throw Error('Página de pruebas no disponible');
@@ -72,6 +83,5 @@ try{
  if(!result?.ok)throw Error('Resultado inválido');
  console.log('Chrome real OK:',result.checks);
 }finally{
- ws?.close();chrome?.kill();if(chrome&&chrome.exitCode===null&&chrome.signalCode===null)await Promise.race([once(chrome,'exit'),sleep(3000)]);
- server.close();await rm(dir,{recursive:true,force:true,maxRetries:3,retryDelay:200});
+ ws?.close();await stopChrome();server.close();
 }
