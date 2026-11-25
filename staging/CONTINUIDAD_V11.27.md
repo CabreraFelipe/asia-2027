@@ -1,0 +1,11 @@
+# Continuidad V11.27 — 25/11/2026
+
+V11.24 sigue activa en Cloudflare; V11.26/V11.27 son candidatos de integración, no despliegues. main verificada en 061bb34dc3735d38dfd14eeb77f1054f34b63578. Commits 8a44e19 y 4ee66ce. 110/110 archivos originales intactos.
+
+V11.26: run 45539901792 SUCCESS. Pruebas Node y Chrome con IndexedDB real, CAS simultáneo, cifrado AES-GCM, reapertura, frase incorrecta, cambio de cuenta y aislamiento. Fallos anteriores de import del harness y comprobación de mensaje vacío WebCrypto corregidos.
+
+V11.27: run 45539901749 SUCCESS. Bridge de claves portables/temporales, rechazo de credenciales y claves desconocidas; coordinador serializado de flush/cierre. Prueba original index.html en iframe localhost con dos cuentas sintéticas: controles altura, navegación Dieta/Gym, persistencia cifrada y recuperación en UI. Fixture modifica APIs del navegador exclusivamente en iframe de CI, bloquea conexiones externas y SW. No es un montaje de producción ni seguridad contra scripts same-origin. IndexedDB modular original en fixture está separado por cuenta pero NO cifrado. Claves de dispositivo temporales aún no persistentes. Autenticación real Google, estados de guardado durable, conflictos/revocación con cambios pendientes, fotos, módulos, datos reales, sincronización, servicios externos y PWA móviles aún pendientes. No usar datos reales. No afirmar paridad completa.
+
+Regresiones 45539813041 SUCCESS; nueva corrida 45539901743 smoke original aprobado, job regresión aún en curso al documentar, revisar estado final. Wrangler dry-run anterior 45539149401 SUCCESS. Ninguna escritura Cloudflare realizada.
+
+Siguiente bloque: convertir fixture en integración explícita en candidato aislado con sesión real y política de almacenamiento completa (sin monkey patch de producción), adaptar módulos IndexedDB a cifrado/atomicidad, persistir claves de dispositivo adecuadas, implementar lifecycle de guardado/recuperación y pruebas de flujos originales Dieta/Gym/Coach/Salud/Progreso. Mantener V10.6 intacta, no activar rutas de usuario ni habilitar servicios personales. Agrupar cambios antes de desplegar, mantener aprobación y rollback. No subir secretos ni datos de usuario al repo público. Recomendación: migrar a chat nuevo antes del siguiente bloque grande, usando este archivo, CONTINUIDAD_V11.26.md y contrato original.
