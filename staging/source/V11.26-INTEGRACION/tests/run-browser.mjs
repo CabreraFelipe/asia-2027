@@ -39,11 +39,32 @@ try{
  if(!page)throw Error('Página de pruebas no disponible');
  ws=new WebSocket(page.webSocketDebuggerUrl);
  await new Promise((ok,fail)=>{ws.addEventListener('open',ok,{once:true});ws.addEventListener('error',fail,{once:true})});
- const result=await new Promise((ok,fail)=>{
-  const timeout=setTimeout(()=>fail(Error('Timeout prueba navegador')),90000);
-  ws.addEventListener('message',event=>{const m=JSON.parse(event.data);if(m.id!==1)return;clearTimeout(timeout);if(m.error||m.result?.exceptionDetails)fail(Error(JSON.stringify(m.error||m.result.exceptionDetails)));else ok(m.result.result.value)});
-  ws.send(JSON.stringify({id:1,method:'Runtime.evaluate',params:{expression:"(async()=>{for(let i=0;i<150&&!globalThis.__asiaTestPromise;i++)await new Promise(r=>setTimeout(r,100));if(!globalThis.__asiaTestPromise)throw Error('Harness no inicializado: '+location.href+' '+document.title+' '+document.readyState);return await globalThis.__asiaTestPromise})()",awaitPromise:true,returnByValue:true}}));
- });
+ // CDP can expose the final URL while the initial navigation is still replacing its context.
+ // Wait for a ready document in the expected origin before awaiting its test promise.
+ let commandId=0;
+ function evaluate(expression,awaitPromise=false,timeoutMs=90000){
+  return new Promise((ok,fail)=>{
+   const id=++commandId;
+   const finish=()=>{clearTimeout(timeout);ws.removeEventListener('message',receive)};
+   const receive=event=>{const m=JSON.parse(event.data);if(m.id!==id)return;finish();
+    if(m.error){const e=Error(JSON.stringify(m.error));e.cdpCode=m.error.code;fail(e)}
+    else if(m.result?.exceptionDetails)fail(Error(JSON.stringify(m.result.exceptionDetails)));
+    else ok(m.result.result.value)};
+   const timeout=setTimeout(()=>{finish();fail(Error('Timeout prueba navegador'))},timeoutMs);
+   ws.addEventListener('message',receive);
+   ws.send(JSON.stringify({id,method:'Runtime.evaluate',params:{expression,awaitPromise,returnByValue:true}}));
+  });
+ }
+ const readyExpression='location.href==='+JSON.stringify(url)+' && document.readyState==="complete" && !!globalThis.__asiaTestPromise';
+ let ready=false;
+ for(let i=0;i<150;i++){
+  try{if(await evaluate(readyExpression,false,5000)){ready=true;break}}
+  catch(e){if(e.cdpCode!==-32000||!/context|navigat/i.test(e.message))throw e}
+  await sleep(100);
+ }
+ if(!ready)throw Error('Harness no inicializado en '+url);
+ // No retry of assertions or application failures: one real test evaluation.
+ const result=await evaluate('globalThis.__asiaTestPromise',true);
  if(!result?.ok)throw Error('Resultado inválido');
  console.log('Chrome real OK:',result.checks);
 }finally{

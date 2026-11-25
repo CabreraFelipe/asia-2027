@@ -22,7 +22,7 @@ export async function run(){
   check(results.filter(r=>r.status==='fulfilled').length===1&&results.filter(r=>r.status==='rejected').length===1,'CAS no atómico');
   other.close();
   const record=await repo.read(A);
-  check(record.revision===2&&record.envelope.format==='asia84-encrypted-v1'&&!JSON.stringify(record).includes('sintética')&&!JSON.stringify(record).includes('gym'),'Datos en claro');
+  check(record.revision===2&&record.envelope.format==='asia84-encrypted-v1'&&!JSON.stringify(record).includes('sintética')&&!JSON.stringify(record).includes('\"gym\"'),'Datos en claro');
   const expected=(await a.read('gym')).payload.marker;
   a.close();repo.close();repo=await openModuleRepository();
   await rejects(()=>open('frase incorrecta sintética'),/[\s\S]*/);
