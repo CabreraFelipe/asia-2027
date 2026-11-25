@@ -1,0 +1,63 @@
+name: Asia 2027 - publicar piloto independiente (aprobación manual)
+on:
+  push:
+    branches: ['development/multiuser']
+    paths: ['staging/PILOT_DEPLOY_APPROVED.md']
+permissions:
+  contents: read
+concurrency:
+  group: asia-v12-pilot-deploy
+  cancel-in-progress: false
+jobs:
+  deploy:
+    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/development/multiuser'
+    environment: asia-v12-pilot
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22.16.0'
+      - run: node staging/source/V11.29-INTEGRACION/tests/build-candidate.mjs
+      - run: node staging/source/V11.39-INTEGRACION/tests/patch-candidate.mjs
+      - run: node staging/source/V11.40-INTEGRACION/tests/patch-candidate.mjs
+      - run: node staging/source/V11.42-INTEGRACION/tests/build.mjs
+      - run: node staging/source/V11.42-INTEGRACION/tests/package.test.mjs
+      - run: node staging/source/V11.43-INTEGRACION/tests/package-browser.mjs
+      - name: Instalar Wrangler con versión fija sin secretos
+        run: npm install --prefix "$RUNNER_TEMP/asia-pilot-cli" --no-audit --no-fund --save-exact wrangler@4.164.0
+      - name: Verificar destinos y preparar configuración privada
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          STAGING_GOOGLE_CLIENT_ID: ${{ secrets.STAGING_GOOGLE_CLIENT_ID }}
+          STAGING_GOOGLE_CLIENT_SECRET: ${{ secrets.STAGING_GOOGLE_CLIENT_SECRET }}
+          STAGING_ALLOWED_EMAILS: ${{ secrets.STAGING_ALLOWED_EMAILS }}
+        run: python3 staging/source/V11.44-INTEGRACION/deploy/prepare.py
+      - name: Publicar exclusivamente Worker nuevo
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          WRANGLER_SEND_METRICS: 'false'
+        shell: bash
+        working-directory: staging/source/V11.42-INTEGRACION/dist
+        run: |
+          set -euo pipefail
+          cli="$RUNNER_TEMP/asia-pilot-cli/node_modules/.bin/wrangler"
+          trap 'rm -f "$RUNNER_TEMP/asia-v12-oauth.json" "$RUNNER_TEMP/asia-deploy.log"' EXIT
+          if ! "$cli" deploy --config wrangler.toml --dry-run >"$RUNNER_TEMP/asia-deploy.log" 2>&1; then
+            echo "Empaquetado Wrangler falló; no se publicó nada."; exit 1
+          fi
+          if ! "$cli" deploy --config wrangler.toml --secrets-file "$RUNNER_TEMP/asia-v12-oauth.json" >"$RUNNER_TEMP/asia-deploy.log" 2>&1; then
+            echo "Publicación no confirmada. Inspeccionar el Worker antes de reintentar."; exit 1
+          fi
+          echo "Wrangler confirmó publicación del candidato."
+      - name: Smoke real sin sesión
+        run: python3 staging/source/V11.44-INTEGRACION/deploy/smoke.py
+      - name: Limpiar archivos temporales privados
+        if: always()
+        run: rm -f "$RUNNER_TEMP/asia-v12-oauth.json" "$RUNNER_TEMP/asia-deploy.log"
