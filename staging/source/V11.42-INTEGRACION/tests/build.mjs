@@ -2,6 +2,7 @@
 import {cpSync,mkdirSync,readFileSync,writeFileSync,readdirSync,existsSync,statSync} from 'node:fs';
 import {join,dirname,resolve,relative} from 'node:path';
 import {createHash} from 'node:crypto';
+import {execFileSync} from 'node:child_process';
 const base='staging/source/V11.42-INTEGRACION',out=base+'/dist',web=out+'/assets/v11.42',candidate='staging/source/V11.29-INTEGRACION/tests/candidate';
 if(existsSync(out))throw Error('Build debe ser nuevo');
 mkdirSync(web,{recursive:true});cpSync(base+'/web',web,{recursive:true});
@@ -54,9 +55,10 @@ function walk(dir){return readdirSync(dir).flatMap(n=>{const p=join(dir,n);retur
 // Compute before adding the comment, so the build is reproducible and noncircular.
 const fingerprint=createHash('sha256');
 for(const p of walk(web).sort()){
- const bytes=readFileSync(p);fingerprint.update(JSON.stringify([relative(web,p),bytes.length])+'\\n');fingerprint.update(bytes);
+ const bytes=readFileSync(p);fingerprint.update(JSON.stringify([relative(web,p),bytes.length])+String.fromCharCode(10));fingerprint.update(bytes);
 }
-const entryFile=web+'/entry.js';writeFileSync(entryFile,readFileSync(entryFile,'utf8')+'\\n// asia-pilot-assets-sha256: '+fingerprint.digest('hex')+'\\n');
+const entryFile=web+'/entry.js',lf=String.fromCharCode(10);writeFileSync(entryFile,readFileSync(entryFile,'utf8')+lf+'// asia-pilot-assets-sha256: '+fingerprint.digest('hex')+lf);
+execFileSync(process.execPath,['--check',entryFile],{stdio:'inherit'});
 const paths=walk(web).map(p=>'/'+p.slice((out+'/assets/').length)).filter(p=>!p.endsWith('/diary/manifest.json'));
 writeFileSync(server+'/index.mjs',"import {createPwaWorker} from './staging/source/V11.42-INTEGRACION/src/worker.mjs';\nexport default createPwaWorker({assetPaths:new Set("+JSON.stringify(paths)+")});\n");
 cpSync(base+'/wrangler.template.toml',out+'/wrangler.template.toml');
