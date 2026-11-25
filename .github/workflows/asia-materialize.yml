@@ -1,0 +1,70 @@
+name: Asia 2027 - materializar fuentes de staging
+on:
+  push:
+    branches: ['development/multiuser']
+    paths: ['.github/workflows/asia-materialize.yml']
+permissions:
+  contents: read
+jobs:
+  materialize:
+    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/development/multiuser'
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+      - name: Extraer archivos ya publicados, sin ejecutar su código
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config core.autocrlf false
+          python3 - <<'PY'
+          import io,zipfile,pathlib,hashlib,stat
+          zpath=pathlib.Path('staging/import/asia-ci-base.zip')
+          raw=zpath.read_bytes()
+          assert hashlib.sha256(raw).hexdigest()=='6749b8a70ea2f9bd87b87467df74a38eebf0c17b524d19cf8dccd5e8caa56ba6'
+          out=pathlib.Path('staging/source')
+          assert not out.exists()
+          out.mkdir()
+          def extract(z,dst,count,skip=()):
+              infos=z.infolist()
+              assert len(infos)==count and sum(i.file_size for i in infos)<20_000_000 and z.testzip() is None
+              seen=set()
+              for i in infos:
+                  p=pathlib.PurePosixPath(i.filename)
+                  assert not p.is_absolute() and not any(s.startswith('.') or not s for s in p.parts)
+                  assert '\\' not in i.filename and ':' not in i.filename and i.filename.lower() not in seen
+                  assert not i.is_dir() and not stat.S_ISLNK(i.external_attr>>16)
+                  assert p.suffix.lower() in ('.txt','.svg','.sql','.md','.html','.mjs','.toml','.webmanifest','.css','.cmd','.js','.json','.zip')
+                  seen.add(i.filename.lower())
+                  if i.filename in skip: continue
+                  assert p.suffix.lower()!='.zip'
+                  target=dst/p
+                  target.parent.mkdir(parents=True,exist_ok=True)
+                  with target.open('xb') as f: f.write(z.read(i))
+          with zipfile.ZipFile(io.BytesIO(raw)) as z:
+              nested='Asia_2027_V11.24_UX_ACUMULATIVA_STAGING.zip'
+              extract(z,out,35,(nested,))
+              with zipfile.ZipFile(io.BytesIO(z.read(nested))) as official:
+                  extract(official,out/'official',726)
+          files=list(p for p in out.rglob('*') if p.is_file())
+          assert len(files)==760
+          print('760 archivos extraídos exactamente del ZIP ya publicado.')
+          PY
+          git add -f -- staging/source
+          python3 - <<'PY'
+          import pathlib,subprocess,hashlib
+          paths=subprocess.check_output(['git','diff','--cached','--name-only','-z']).split(b'\0')
+          paths=[p.decode() for p in paths if p]
+          assert len(paths)==760 and all(p.startswith('staging/source/') for p in paths)
+          for p in paths:
+              blob=subprocess.check_output(['git','show',':'+p])
+              assert hashlib.sha256(blob).digest()==hashlib.sha256(pathlib.Path(p).read_bytes()).digest(),p
+          print('760/760 archivos coinciden byte a byte con índice Git.')
+          PY
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'build: materialize verified V11.24 and V11.25 source'
+          git push origin HEAD:refs/heads/development/multiuser
+          echo 'No se ejecutaron instaladores, código importado ni acciones de Cloudflare.'
