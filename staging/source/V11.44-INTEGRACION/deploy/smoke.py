@@ -16,8 +16,13 @@ else:sys.exit('Worker publicado no disponible; inspeccionar antes de reintentar'
 status,h,b=get('/v11.42/manifest.json')
 if status!=200 or json.loads(b).get('scope')!='/v11.42/':sys.exit('Manifest inválido')
 for p,expected in [('/v11.42/app.mjs',401),('/v11.42/diary/index.html',401),('/v11.11/auth/me',401),('/v11.38/sync',401),('/v11.24/',404)]:
-    if get(p)[0]!=expected:sys.exit('Smoke de aislamiento falló en '+p)
+    actual=get(p)[0]
+    print(p+': HTTP '+str(actual)+' (esperado '+str(expected)+')',flush=True)
+    if actual!=expected:sys.exit('Smoke de aislamiento falló en '+p)
+print('Manifest correcto; comprobaciones de aislamiento aprobadas.',flush=True)
+# Una sola solicitud de inicio genera un flujo OAuth temporal. Nunca se sigue a Google.
 status,h,b=get('/v11.11/auth/start')
+print('Inicio OAuth: HTTP '+str(status),flush=True)
 location=urllib.parse.urlparse(h.get('Location',''))
 params=urllib.parse.parse_qs(location.query)
 if status not in [302,303] or location.scheme!='https' or location.hostname!='accounts.google.com' or params.get('redirect_uri')!=[origin+'/v11.11/auth/callback'] or params.get('code_challenge_method')!=['S256']:sys.exit('Inicio OAuth no verificado')

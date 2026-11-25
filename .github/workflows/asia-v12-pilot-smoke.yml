@@ -1,0 +1,21 @@
+name: Asia 2027 - verificación externa del piloto sin desplegar
+on:
+  push:
+    branches: ['development/multiuser']
+    paths: ['.github/workflows/asia-v12-pilot-smoke.yml','staging/source/V11.44-INTEGRACION/deploy/smoke.py']
+permissions:
+  contents: read
+concurrency:
+  group: asia-v12-pilot-public-smoke
+  cancel-in-progress: false
+jobs:
+  smoke:
+    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/development/multiuser'
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Verificar acceso público, aislamiento e inicio OAuth sin seguir redirección
+        run: python3 staging/source/V11.44-INTEGRACION/deploy/smoke.py
