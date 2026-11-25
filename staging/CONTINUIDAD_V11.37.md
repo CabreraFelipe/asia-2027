@@ -8,7 +8,7 @@ CI: Chrome offline, regresión V11.36, V11.34 y fuentes por cambios de dependenc
 Siguiente: cerrar pruebas, integración del modo offline y recuperación en shell original, aumentar límite remoto de 1,4 MB y empaquetar recursos autenticados, servicios por cuenta, PWA y pruebas físicas.
 
 Validación sobre 42c3668: Chrome real offline y regresión V11.36 SUCCESS. El lanzador corregido permitió ejecutar las aserciones, sin reintentar fallos funcionales. 110/110 archivos originales intactos por comparación de árboles Git. Resultados:
-- [Asia 2027 - sincronización y puerta servidor V11.36](https://github.com/CabreraFelipe/asia-2027/actions/runs/45546265327): pendiente al cierre
+- [Asia 2027 - sincronización y puerta servidor V11.36](https://github.com/CabreraFelipe/asia-2027/actions/runs/45546265327): SUCCESS confirmado posteriormente
 - [Asia 2027 - integración V11.26](https://github.com/CabreraFelipe/asia-2027/actions/runs/45546265265): success
 - [Asia 2027 - migración integral atómica V11.34](https://github.com/CabreraFelipe/asia-2027/actions/runs/45546265343): success
 - [Asia 2027 - integración original V11.27](https://github.com/CabreraFelipe/asia-2027/actions/runs/45546265354): success

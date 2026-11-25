@@ -7,3 +7,9 @@ Gateway de servicios read-only de Salud y workouts, fixtures exclusivamente sint
 CI pendiente: Worker SQLite, copia cifrada >1,4 MB, CAS, corrupción, aislamiento, revocación y fixtures por cuenta; regresiones V11.36/V11.37 Chrome y 110/110 fuentes.
 
 Segunda actualización del mismo bloque: se integra transporte amplio con sincronización; CI pendiente de ejecución del bloque completo. No habilitar transición en producción hasta probar almacenamiento real y revisar respaldo de ambos namespaces.
+
+Validación: primera entrega [45546607279](https://github.com/CabreraFelipe/asia-2027/actions/runs/45546607279) SUCCESS (Worker SQLite, almacenamiento emulado, Chrome V11.36/V11.37), fuentes/smoke 45546607141 SUCCESS. Segunda entrega b4acd3d: Worker y prueba Chrome de sincronización grande SUCCESS, incluyendo imagen sintética íntegra, cambio explícito de namespace, copia >1,4 MB y descarga a segundo IndexedDB. Estado de las ejecuciones completas:
+- [45546680091](https://github.com/CabreraFelipe/asia-2027/actions/runs/45546680091): en curso al cierre
+- [45546680155](https://github.com/CabreraFelipe/asia-2027/actions/runs/45546680155): en curso al cierre
+- [45546680077](https://github.com/CabreraFelipe/asia-2027/actions/runs/45546680077): success
+110/110 originales verificados por build; main sin cambios. R2 real, Google real, proveedores reales, UI de servicios y PWA aún pendientes. No desplegar.
