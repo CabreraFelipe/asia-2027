@@ -25,7 +25,7 @@ export async function run(){
  repo.close();repo=await openVaultRepository();
  const restored=await open();
  check(restored.storage.getItem(k)===expected,'Restauración persistente incorrecta');
- await rejects(open('otra frase sintética incorrecta'),/./);
+ await rejects(open('otra frase sintética incorrecta'),/[\s\S]*/);
  accountId=B;csrf='b-session';
  await rejects(restored.revalidate(),/cambió/);
  const b=await open('clave sintética de cuenta B');

@@ -22,7 +22,7 @@ const server=createServer(async(req,res)=>{
   }
   if(path==='/sw.js'||path.endsWith('/sw.js'))throw Error('SW deshabilitado en pruebas');
   res.writeHead(200,{'Content-Type':mime[extname(file)],'Cache-Control':'no-store'});res.end(data);
- }catch{res.writeHead(404);res.end()}
+ }catch(e){console.log('CI HTTP 404:',req.url, e.code||e.message);res.writeHead(404);res.end()}
 });
 server.listen(0,'127.0.0.1');await once(server,'listening');
 const url='http://127.0.0.1:'+server.address().port+prefix+'/browser.html';
@@ -42,7 +42,7 @@ try{
  const result=await new Promise((ok,fail)=>{
   const timeout=setTimeout(()=>fail(Error('Timeout prueba navegador')),90000);
   ws.addEventListener('message',event=>{const m=JSON.parse(event.data);if(m.id!==1)return;clearTimeout(timeout);if(m.error||m.result?.exceptionDetails)fail(Error(JSON.stringify(m.error||m.result.exceptionDetails)));else ok(m.result.result.value)});
-  ws.send(JSON.stringify({id:1,method:'Runtime.evaluate',params:{expression:"(async()=>{if(document.readyState!=='complete')await new Promise(r=>addEventListener('load',r,{once:true}));if(!globalThis.__asiaTestPromise)throw Error('Harness no inicializado');return await globalThis.__asiaTestPromise})()",awaitPromise:true,returnByValue:true}}));
+  ws.send(JSON.stringify({id:1,method:'Runtime.evaluate',params:{expression:"(async()=>{for(let i=0;i<150&&!globalThis.__asiaTestPromise;i++)await new Promise(r=>setTimeout(r,100));if(!globalThis.__asiaTestPromise)throw Error('Harness no inicializado: '+location.href+' '+document.title+' '+document.readyState);return await globalThis.__asiaTestPromise})()",awaitPromise:true,returnByValue:true}}));
  });
  if(!result?.ok)throw Error('Resultado inválido');
  console.log('Chrome real OK:',result.checks);
