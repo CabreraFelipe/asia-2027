@@ -22,7 +22,7 @@ for(const row of rows){
 }
 const originalIndex=sources.get('index.html').toString('utf8');
 const scriptTags=[...originalIndex.matchAll(/<script(?:\s[^>]*)?>/g)];
-check(scriptTags.length===51,'Inventario de scripts inesperado');
+check(scriptTags.length===53&&scriptTags.filter(x=>/\bsrc=/.test(x[0])).length===51,'Inventario de scripts inesperado: 51 externos y 2 inline');
 const replaceOnce=(s,from,to)=>{check(s.split(from).length===2,'Parche no único: '+from);return s.replace(from,to)};
 sources.set('index.html',Buffer.from(replaceOnce(originalIndex,'<head>','<head><script src="candidate-preload.js"></script>')));
 const originalStore=sources.get('store84.mjs').toString('utf8'),marker='export function openStore(factory=globalThis.indexedDB) {';
@@ -40,5 +40,5 @@ for(const [path,bytes] of sources){
  const target=join(dest,path);mkdirSync(dirname(target),{recursive:true});writeFileSync(target,bytes);
 }
 for(const name of ['candidate-preload.js','candidate-store.mjs'])writeFileSync(join(dest,name),readFileSync(join(here,'src',name)));
-console.log('110/110 originales intactos; 51 scripts; excepciones candidatas:',[...exceptions]);
+console.log('110/110 originales intactos; 51 scripts externos y 2 inline; excepciones candidatas:',[...exceptions]);
 console.log('Inventario de referencias (incluye rutas auxiliares no montadas):',JSON.stringify(report));
