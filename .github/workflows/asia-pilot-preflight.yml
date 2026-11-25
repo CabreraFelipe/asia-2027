@@ -1,0 +1,56 @@
+name: Asia 2027 - preflight piloto Cloudflare (solo lectura)
+on:
+  push:
+    branches: ['development/multiuser']
+    paths: ['staging/PILOT_PREFLIGHT.md','.github/workflows/asia-pilot-preflight.yml']
+permissions: {}
+concurrency:
+  group: asia-pilot-preflight
+  cancel-in-progress: false
+jobs:
+  preflight:
+    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/development/multiuser'
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    environment: asia-staging-deploy
+    steps:
+      - name: Consultar destinos exactos del piloto sin escrituras
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json, os, re, sys, urllib.request, urllib.error
+          token=os.environ.get('CLOUDFLARE_API_TOKEN','')
+          account=os.environ.get('CLOUDFLARE_ACCOUNT_ID','')
+          if not token or not re.fullmatch(r'[a-fA-F0-9]{32}',account):
+              sys.exit('Entorno de despliegue sin secretos válidos.')
+          base='https://api.cloudflare.com/client/v4/accounts/'+account
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self,*args,**kwargs): return None
+          opener=urllib.request.build_opener(NoRedirect)
+          def query(label,path):
+              req=urllib.request.Request(base+path,headers={'Authorization':'Bearer '+token,'Accept':'application/json'},method='GET')
+              try:
+                  with opener.open(req,timeout=15) as r: data=json.load(r)
+                  if data.get('success') is not True:
+                      print(label+': respuesta no confirmada');return None
+                  return data.get('result')
+              except urllib.error.HTTPError as e:
+                  print(label+': HTTP '+str(e.code)+' (no se muestran cuerpo ni identificadores)')
+                  return None
+              except Exception:
+                  print(label+': consulta no completada');return None
+          old=query('Worker staging existente','/workers/scripts/asia-v1111-identity-staging/settings')
+          print('Conexión al staging anterior: '+('confirmada' if isinstance(old,dict) else 'no confirmada'))
+          new=query('Worker candidato','/workers/scripts/asia-v1142-candidate-staging/settings')
+          print('Worker candidato existente: '+('confirmado' if isinstance(new,dict) else 'no confirmado'))
+          db=query('D1 candidato','/d1/database?name=asia-v1142-new-synthetic-db')
+          if isinstance(db,list):
+              print('D1 candidato: '+('nombre encontrado' if any(isinstance(x,dict) and x.get('name')=='asia-v1142-new-synthetic-db' for x in db) else 'nombre no encontrado en respuesta'))
+          bucket=query('R2 candidato','/r2/buckets/asia-v1142-new-synthetic-objects')
+          print('Bucket candidato: '+('confirmado' if isinstance(bucket,dict) else 'no confirmado'))
+          print('Solo GET. No se han impreso secretos, configuraciones, IDs, ni contenido de bases. No demuestra permisos de escritura ni autoriza desplegar.')
+          if not isinstance(old,dict):sys.exit('No se confirmó la conexión al entorno existente.')
+          PY

@@ -1,0 +1,6 @@
+# Preflight del piloto independiente (V11.44)
+La validación V11.43 terminó satisfactoriamente: 45548695593, 45548695576 y 45548695650 SUCCESS. Antes de continuar con más versiones sintéticas, comprobar vía entorno GitHub Actions existente asia-staging-deploy si hay conexión real de Cloudflare y si se pueden consultar los tres nombres de recursos destinados al candidato independiente. El propietario ya había confirmado la configuración de ese entorno en CONNECT_DEPLOY.md.
+
+Esta comprobación solo ejecuta GET a settings del Worker existente y candidato, D1 filtrada por nombre y bucket R2 exacto; no lee tablas, objetos, secretos ni devuelve IDs o contenido. Un 403 o 404 no demuestra capacidad de creación o escritura; no reutilizar recursos encontrados hasta verificar aislamiento y propósito. El workflow puede requerir aprobación del propietario del entorno. No desplegar automáticamente.
+
+Siguiente paso operativo: según resultado, aprovisionar exclusivamente Worker/D1/R2 nuevos y configurar OAuth de pruebas, después validar el paquete en dispositivos físicos. Los proveedores reales y recuperación selectiva de conflictos offline siguen pendientes. No afirmar V12.0 ni migrar datos personales. main y producción V10.6 no se modifican.
