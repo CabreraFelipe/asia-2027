@@ -59,6 +59,21 @@ try{
  // Only log failed network paths and browser diagnostic errors from this synthetic fixture.
  ws.addEventListener('message',e=>{const m=JSON.parse(e.data);if(m.method==='Network.responseReceived'&&m.params.response.status>=400){const u=new URL(m.params.response.url);console.log('Browser HTTP',m.params.response.status,u.pathname)}if(m.method==='Runtime.exceptionThrown')console.log('Browser exception',m.params.exceptionDetails.exception?.description?.slice(0,500)||m.params.exceptionDetails.text);if(m.method==='Log.entryAdded'&&m.params.entry.level==='error')console.log('Browser error',m.params.entry.text.slice(0,500))});
  await cmd('Network.enable');await cmd('Runtime.enable');await cmd('Log.enable');
+ // Intercept only the original photo origin inside isolated Chrome. Use a valid
+ // local PNG for decoding; the original URL and CSP must still be exercised.
+ const photoSource='https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/',photoRequests=new Set(),unexpectedPhotoRequests=[];
+ const fixturePhoto=readFileSync(root+'assets/v11.42/asia-icon-v4-192.png').toString('base64');
+ ws.addEventListener('message',async e=>{
+  const m=JSON.parse(e.data);if(m.method!=='Fetch.requestPaused')return;
+  const {requestId,request,resourceType}=m.params;
+  const url=request.url;
+  try{
+   if(resourceType==='Image'&&url.startsWith(photoSource)&&/^[A-Za-z0-9_-]+\/[01]\.jpg$/.test(url.slice(photoSource.length))){
+    photoRequests.add(url);await cmd('Fetch.fulfillRequest',{requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'image/png'},{name:'Cache-Control',value:'no-store'}],body:fixturePhoto});
+   }else{unexpectedPhotoRequests.push(url);await cmd('Fetch.failRequest',{requestId,errorReason:'BlockedByClient'})}
+  }catch(e){console.log('CI photo interception error',e.message)}
+ });
+ await cmd('Fetch.enable',{patterns:[{urlPattern:'https://raw.githubusercontent.com/*'}]});
  const evalJS=async(expression,awaitPromise=false)=>(await cmd('Runtime.evaluate',{expression,awaitPromise,returnByValue:true})).result.value;
  async function ready(expr){for(let i=0;i<200;i++){try{if(await evalJS(expr))return}catch{}await sleep(100)}throw Error('Página no disponible: '+expr)}
  await ready("location.href==="+JSON.stringify(home)+"&&document.readyState==='complete'&&typeof document.getElementById('openAccount')?.onclick==='function'");
@@ -72,7 +87,21 @@ try{
   el('open1140').click();await wait(()=>{if(el('message1140').textContent.startsWith('No se completó:'))throw Error(el('message1140').textContent);return document.querySelector('iframe')?.contentWindow?.asiaGym84Ready===true&&!el('close1140').disabled},'Diario empaquetado no inició');
   check(!document.querySelector('iframe').inert,'Interacción no habilitada tras verificar Gym');
   if(document.querySelector('iframe').contentDocument.querySelector('img[src*="12345678"]'))check(document.querySelector('iframe').contentDocument.readyState!=='complete','La prueba no ejercitó apertura con carga secundaria pendiente');
-  const d=document.querySelector('iframe').contentDocument;d.getElementById('height').value='1.86';d.getElementById('saveHeight').click();
+  const d=document.querySelector('iframe').contentDocument;
+  const routine=d.getElementById('routine');routine.value='0';routine.dispatchEvent(new Event('change'));
+  const reference=d.querySelector('.gymPhoto571[data-photo="Barbell_Bench_Press_-_Medium_Grip"]');
+  check(reference,'Referencia original de press banca no disponible');
+  reference.open=true;
+  await wait(()=>{const images=[...reference.querySelectorAll('.gymPhotoGrid571 img')];return images.length===2&&images.every(x=>x.complete&&x.naturalWidth>0)},'No cargaron las dos posiciones de Gym');
+  const tiles=[...reference.querySelectorAll('.gymPhotoTile571')];check(tiles.length===2&&tiles.every(x=>!x.disabled),'No se habilitó ampliación de fotos');
+  check(tiles[0].querySelector('img').src.endsWith('/Barbell_Bench_Press_-_Medium_Grip/0.jpg'),'Se cambió URL original');
+  tiles[0].click();const dialog=d.querySelector('.gymPhotoDialog571');check(dialog.open,'No se amplió la foto original');dialog.close();reference.open=false;
+  // A different path on the same origin must remain blocked by both CSPs.
+  const forbidden=d.createElement('img');forbidden.hidden=true;
+  const violation=new Promise(resolve=>{d.addEventListener('securitypolicyviolation',e=>{if(e.effectiveDirective==='img-src')resolve(true)},{once:true})});
+  forbidden.src='https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/README.md';d.body.append(forbidden);
+  check(await Promise.race([violation,new Promise(r=>setTimeout(()=>r(false),3000))]),'No se bloqueó ruta externa ajena a fotos');forbidden.remove();
+  d.getElementById('height').value='1.86';d.getElementById('saveHeight').click();
   await wait(()=>el('status1140').textContent.includes('saved'),'No guardó');
   check(localStorage.getItem('asia2027-v1')===null,'Diario en almacenamiento nativo');
   el('close1140').click();await wait(()=>!document.querySelector('iframe')&&!el('reconcile1140').disabled,'No cerró');
@@ -82,7 +111,7 @@ try{
   const keys=await caches.keys();check(keys.length===1&&keys[0]==='asia-v1142-public-notice-v1','Caché inesperada');
   const entries=await (await caches.open(keys[0])).keys();check(entries.length===1&&new URL(entries[0].url).pathname==='/v11.42/offline.html','Caché privada');
   return true;
- }.toString()+')()',true);assert.equal(result,true);if(slowMode)assert.ok(slowRequested,'Recurso lento no solicitado');
+ }.toString()+')()',true);assert.equal(result,true);assert.ok(photoRequests.has(photoSource+'Barbell_Bench_Press_-_Medium_Grip/0.jpg'));assert.ok(photoRequests.has(photoSource+'Barbell_Bench_Press_-_Medium_Grip/1.jpg'));assert.deepEqual(unexpectedPhotoRequests,[],'Se permitió tráfico no autorizado a proveedor de fotos');if(slowMode)assert.ok(slowRequested,'Recurso lento no solicitado');
  await cmd('Page.navigate',{url:home});await ready("document.readyState==='complete'&&typeof document.getElementById('openAccount')?.onclick==='function'&&!document.getElementById('shell1140')");
  const wrongPhrase=await evalJS('('+async function(){
   const el=id=>document.getElementById(id),wait=async(f,m)=>{for(let i=0;i<200;i++){if(f())return;await new Promise(r=>setTimeout(r,100))}throw Error(m+' | '+(el('message1140')?.textContent||'sin mensaje')+' | '+(el('status1140')?.textContent||'sin estado'))};
