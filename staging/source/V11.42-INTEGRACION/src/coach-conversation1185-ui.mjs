@@ -13,7 +13,7 @@ if(anchor&&window.asiaCoachContext1181&&window.asiaCoachPersist1184){
  const choices=field('choices','Ejercicios cuya disponibilidad y técnica confirmás (opcional)','select');choices.multiple=true;choices.size=5;
  const status=n('p');status.id='coachConversationStatus1185';status.setAttribute('role','status');const output=n('div');output.id='coachConversationOutput1185';
  const prep=n('button','Revisar datos de la consulta');prep.type='button';prep.id='coachConversationPrepare1185';panel.append(prep,output,status);
- let displayed=null,operationFields=[],locked=false;
+ let displayed=null,operationFields=[],locked=false;panel.setAttribute('aria-busy','false');
  const button=(parent,id,label,fn)=>{const x=n('button',label);x.type='button';x.id=id;parent.append(x);x.onclick=()=>run(fn);return x};
  function refreshChoices(){const selected=new Set([...choices.selectedOptions].map(x=>x.value));choices.replaceChildren(...api.Gym.names104(data.settings).map(name=>{const o=new Option(name,name);o.selected=selected.has(name);return o}));}
  function input(parent,k,value,index){const l=n('label',({at:'Posición (1 = primer ejercicio)',to:'Destino (1 = primer ejercicio)',sets:'Series',min:'Repeticiones mínimas',max:'Repeticiones máximas',rest:'Descanso (s)'})[k]),x=n('input');x.type='number';x.step='1';x.id='cc1185-op-'+index+'-'+k;l.htmlFor=x.id;x.value=String(k==='at'||k==='to'?value+1:value);parent.append(l,x);return x}
@@ -40,7 +40,15 @@ if(anchor&&window.asiaCoachContext1181&&window.asiaCoachPersist1184){
   }
   if(['consent','answer','review'].includes(v.phase))button(output,'coachConversationReject1185','Descartar y continuar manualmente',()=>{c.discard();draw(c.view());status.textContent='Descartado. Sin cambios.'});
  }
- async function run(fn){if(locked)return;locked=true;status.textContent='';try{await fn()}catch(e){status.textContent=e.message||'No se completó la operación.';if(c.view().phase==='unconfirmed'){output.replaceChildren(n('p','Guardado no confirmado. Cerrá y verificá la rama antes de volver a editar.'));prep.disabled=true;}}finally{locked=false}}
+ function run(fn){
+  if(locked)return;locked=true;panel.setAttribute('aria-busy','true');status.textContent='';
+  const saved=new Map();
+  const disable=()=>{for(const x of panel.querySelectorAll('button,input,textarea,select'))if(!saved.has(x)){saved.set(x,x.disabled);x.disabled=true}};
+  const finish=()=>{for(const [x,was] of saved)if(x.isConnected)x.disabled=was;locked=false;panel.setAttribute('aria-busy','false');if(c.view().phase==='unconfirmed')prep.disabled=true};
+  const fail=e=>{status.textContent=e.message||'No se completó la operación.';if(c.view().phase==='unconfirmed')output.replaceChildren(n('p','Guardado no confirmado. Cerrá y verificá la rama antes de volver a editar.'))};
+  try{const result=fn();if(result&&typeof result.then==='function'){disable();return Promise.resolve(result).catch(fail).finally(finish)}finish()}
+  catch(e){fail(e);finish()}
+ }
  prep.onclick=()=>run(()=>{const selection={day:day.value,scope:scope.value,question:question.value,goal:goal.value,availableExercises:[...choices.selectedOptions].map(x=>x.value)};draw(c.prepare(selection));status.textContent='Contexto revisable. No se enviaron datos.'});
  for(const x of [question,goal,day,scope,choices])x.addEventListener('input',()=>{try{c.discard();draw(c.view());status.textContent='Consulta modificada; revisá nuevamente.'}catch{}});
  panel.ontoggle=()=>{if(panel.open)refreshChoices();else{try{c.discard();draw(c.view())}catch{}}};refreshChoices();
