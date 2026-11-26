@@ -21,6 +21,25 @@ function calculate(data,kind,proposal,today){
  inspectLegacy88(next);return {next,dates,sportRows};
 }
 function proCheck(gym,result){const {dates,sportRows}=result;check(gym&&Number.isSafeInteger(gym.revision)&&gym.revision>=0,'Gym PRO no disponible');if(gym.revision){validateGym(gym.payload);check(!gym.payload.active&&!gym.payload.planned.some(r=>dates.includes(r.date))&&!gym.payload.sessions.some(r=>dates.includes(r.date)),'Sesión PRO activa o fechas ocupadas');}if(sportRows)api().Sport.proCalendarGuard(gym,sportRows);}
+// Inverse guard only for new/changed future PRO prescriptions. Never block logging history.
+export function guardProPlan1195(diary,previous,next,today){
+ check(day(today),'Fecha inválida');validateGym(next);
+ if(previous!==null)validateGym(previous);
+ const old=new Map((previous?.planned??[]).map(r=>[r.id,r]));
+ const changed=next.planned.filter(r=>r.date>=today&&!eq(old.get(r.id),r));
+ if(!changed.length)return;
+ if(diary===null)return;
+ const d=JSON.parse(diary);inspectLegacy88(d);
+ const x=api(),g=x.G(d.settings?.goals101),book=x.Sport.validate(d.sport1177,g),rows=x.Sport.effective(book);
+ for(const p of changed)for(const r of rows){
+  check(p.date!==r.day,'Coincidencia con sesión deportiva el '+r.day);
+  if(r.drills.some(drill=>x.Sport.find(drill.exerciseId).impact==='moderada'))check(![-1,1].some(n=>p.date===x.Sport.add(r.day,n)),'Gym PRO próximo a carga deportiva moderada el '+r.day);
+ }
+}
+// One local flight across coach applies and ordinary module writes.
+export function createLocalPlanningFence1195(){
+ let active=false;return async fn=>{check(!active,'Hay un guardado coordinado en curso');active=true;try{return await fn()}finally{active=false}};
+}
 export function createCoachCommit1184({editing,verify,today,canUse}){
  check(typeof editing?.coachSnapshot==='function'&&typeof editing?.commitCoachDiary==='function'&&typeof editing?.moduleStore?.read==='function'&&typeof verify==='function'&&typeof today==='function'&&typeof canUse==='function','Coach no disponible');
  let pending=null,flight=false,closed=false,epoch=0;

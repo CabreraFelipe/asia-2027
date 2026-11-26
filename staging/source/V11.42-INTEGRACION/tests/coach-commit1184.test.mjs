@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {createCoachCommit1184} from '../dist/assets/v11.42/staging/source/V11.42-INTEGRACION/src/coach-commit1184.mjs';
+import {createCoachCommit1184,guardProPlan1195,createLocalPlanningFence1195} from '../dist/assets/v11.42/staging/source/V11.42-INTEGRACION/src/coach-commit1184.mjs';
 import {seedGym,applyGym} from '../dist/assets/v11.42/gym84.mjs';
 const today='2026-11-26',accountId='acct_'+'a'.repeat(32),id='coachchange-'+'b'.repeat(32),pid='prog-'+'c'.repeat(32);
 const api={A:globalThis.asiaCoachActions1179,Gym:globalThis.asiaGym826,S:globalThis.asiaSchedule829,T:globalThis.asiaTraining102,R:globalThis.asiaRunning1174,Sport:globalThis.asiaSport1177,N:globalThis.asiaNutrition103,G:globalThis.asiaExtras830.goals101};
@@ -34,3 +34,17 @@ await c.review('bundle',bundle,snap.diary);const saved=await c.apply('bundle',bu
  await c.review('sportReduction',reductionRequest,reductionBefore);c.discard();await assert.rejects(()=>c.apply('sportReduction',reductionRequest,reductionBefore));assert.equal(writes,3);
  await c.review('sportReduction',reductionRequest,reductionBefore);const reducedSaved=await c.apply('sportReduction',reductionRequest,reductionBefore);assert.equal(writes,4);
  const reducedSport=JSON.parse(reducedSaved.diary);assert.deepEqual(reducedSport.sport1177.plans[sportPlan],afterSport.sport1177.plans[sportPlan]);assert.deepEqual(reducedSport.sport1177.plans[reductionPlan].rows,reduction.plan.rows);assert.deepEqual(reducedSport.work,sporty.work);console.log('Sport coordinated commit: exact review, stale revision, discard and preserved original PASS');
+
+ // V11.95: inverse ordinary PRO planning guard. Unchanged conflicts do not block history.
+ const originalGym=seedGym(),sportDay=draft.rows[0].day;
+ const planGym=(state,date,id='new-plan')=>applyGym(state,{type:'plan',id,date,routineId:state.routines[0].id});
+ const conflictGym=planGym(originalGym,sportDay);
+ assert.throws(()=>guardProPlan1195(sportSaved.diary,originalGym,conflictGym,today),/Coincidencia/);
+ assert.doesNotThrow(()=>guardProPlan1195(sportSaved.diary,conflictGym,conflictGym,today));
+ assert.doesNotThrow(()=>guardProPlan1195(sportSaved.diary,conflictGym,originalGym,today));
+ assert.doesNotThrow(()=>guardProPlan1195(sportSaved.diary,originalGym,planGym(originalGym,'2026-11-20'),today));
+ const moderateRow=draft.rows.find(r=>r.drills.some(d=>api.Sport.find(d.exerciseId).impact==='moderada'));
+ assert.ok(moderateRow);assert.throws(()=>guardProPlan1195(sportSaved.diary,originalGym,planGym(originalGym,api.Sport.add(moderateRow.day,1)),today),/moderada|Coincidencia/);
+ assert.doesNotThrow(()=>guardProPlan1195(JSON.stringify(original),originalGym,conflictGym,today));
+ const fence=createLocalPlanningFence1195();let release;const hold=fence(()=>new Promise(r=>{release=r}));await assert.rejects(()=>fence(async()=>{}),/curso/);release();await hold;assert.equal(await fence(async()=>42),42);await assert.rejects(()=>fence(async()=>{throw Error('test')}));assert.equal(await fence(async()=>43),43);
+ console.log('Inverse sports PRO planning guard and local write fence PASS');
