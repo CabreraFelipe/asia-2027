@@ -251,7 +251,7 @@ try{
  const advanced=await evalJS('('+async function(){
   const el=id=>document.getElementById(id),wait=async(f,m)=>{for(let i=0;i<200;i++){if(f())return;await new Promise(r=>setTimeout(r,100))}throw Error(m)};
   el('advancedUnlock').checked=true;el('phrase').value='frase sintética paquete completo';el('openAccount').click();await wait(()=>el('unlock').hidden&&!!el('open1140')&&!el('open1140').disabled,'Herramientas avanzadas no disponibles');
-  if(document.querySelector('iframe')||!el('maintenance1141')||!el('import1141')||!el('restore1141')||!el('review1167')||el('review1167').disabled||!el('reviewFile1167').disabled)throw Error('Apertura avanzada no preservó recuperación');
+  if(document.querySelector('iframe')||!el('maintenance1141')||!el('import1141')||!el('restore1141')||!el('review1167')||el('review1167').disabled||!el('reviewFile1167').disabled||!el('recover1169')||el('recover1169').disabled||!el('reload1169').hidden)throw Error('Apertura avanzada no preservó recuperación');
   el('open1140').click();await wait(()=>document.querySelector('iframe')?.contentWindow?.asiaGym84Ready===true&&!el('close1140').disabled,'Apertura manual no disponible');
   const d=document.querySelector('iframe').contentDocument;d.getElementById('goals101').open=true;await wait(()=>d.getElementById('goalActive101').textContent.includes('Constancia'),'Motivación no persistió');
   if(!d.getElementById('pilotGoals1149').hidden||d.getElementById('goalBrand101').textContent!=='Meta principal · Mi meta B'||d.getElementById('goalActive101').textContent.includes('Asia 2027'))throw Error('Meta v2 perdida o heredada');return true;

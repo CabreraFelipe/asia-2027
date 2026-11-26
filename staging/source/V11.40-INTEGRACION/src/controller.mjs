@@ -8,16 +8,17 @@ import {createAccountServices} from '../../V11.39-INTEGRACION/src/service-client
 const check=(x,m)=>{if(!x)throw Error(m)};
 const same=(a,b)=>a.accountId===b.accountId&&a.csrf===b.csrf;
 function transient(){const m=new Map();return Object.freeze({getItem:k=>m.get(k)??null,setItem:(k,v)=>m.set(k,String(v)),removeItem:k=>m.delete(k),key:i=>[...m.keys()][i]??null,get length(){return m.size}})}
-export async function createController({origin,fetcher=fetch,repository,pending,policy,passphrase,mount,beforeOpen=async()=>{},expectedIdentity=null,managedWrite=false,recoveryReview=null,onState=()=>{},now=Date.now}){
+export async function createController({origin,fetcher=fetch,repository,pending,policy,passphrase,mount,beforeOpen=async()=>{},expectedIdentity=null,managedWrite=false,recoveryOnly=false,recoveryReview=null,recoveryAction=null,onState=()=>{},now=Date.now}){
  check(/^https:\/\/asia-v1111-identity-staging\.[a-z0-9-]+\.workers\.dev$/.test(origin)&&typeof mount==='function'&&typeof beforeOpen==='function','Origen o montaje inválido');
  const read=sessionReader({origin,fetcher}),identity=await read();
  check(!expectedIdentity||same(identity,expectedIdentity),'La sesión cambió');
- let state='maintenance',busy=false,plan=null,editing=null,services=null,view=null,closing=false,locked=false;
+ let state='maintenance',busy=false,plan=null,editing=null,services=null,view=null,closing=false,locked=false,restricted=recoveryOnly===true;
  const publish=next=>{state=next;try{onState(next)}catch{}};
  async function verify(){check(!locked&&state!=='closed','Sesión bloqueada');let s;try{s=await read()}catch(e){if(e.revoked===true){locked=true;services?.close();view?.hide?.();publish('locked')}throw e}
   if(!same(s,identity)){locked=true;services?.close();view?.hide?.();publish('locked');throw Error('La sesión cambió')}return s}
  const options={readSession:verify,origin,fetcher,repository,pending,policy,passphrase,now,managedWrite};
  const maintenance=()=>check(state==='maintenance'&&!busy&&!plan,'Cerrá el diario y la operación pendiente');
+ const normal=()=>{check(!restricted,'Modo exclusivo de recuperación. Volvé a verificar el acceso antes de abrir o sincronizar.');maintenance()};
  async function operation(fn){check(!busy,'Operación en curso');busy=true;try{return await fn()}finally{busy=false}}
  async function prepare(fn){maintenance();return operation(async()=>{
   await verify();const p=await fn();plan=p;let active=true;
@@ -28,8 +29,8 @@ export async function createController({origin,fetcher=fetch,repository,pending,
  })}
  publish('maintenance');
  return Object.freeze({
-  get state(){return state},get hasPlan(){return plan!==null},get busy(){return busy},get status(){return editing?.status??null},
-  async openDiary(){maintenance();return operation(async()=>{
+  get state(){return state},get recoveryOnly(){return restricted},get hasPlan(){return plan!==null},get busy(){return busy},get status(){return editing?.status??null},
+  async openDiary(){normal();return operation(async()=>{
    await verify();const initialSetup=(await beforeOpen())===true;await verify();editing=await openOfflineEditing({...options,onStatus:()=>{try{onState(state)}catch{}}});
    try{
     services=await createAccountServices({origin,readSession:verify,fetcher});
@@ -44,13 +45,14 @@ export async function createController({origin,fetcher=fetch,repository,pending,
   async closeDiary(){check(state==='editing'&&!busy&&!closing,'Diario no disponible');return operation(async()=>{
    closing=true;try{check(view.pending()===0,'Hay operaciones en curso');await editing.flush();await editing.close();services.close();view.remove();view=null;editing=null;services=null;publish('maintenance')}finally{closing=false}
   })},
-  async reconcile(confirmation){maintenance();return operation(async()=>{await verify();return reconcileOffline({...options,maintenanceConfirmed:true,confirmed:confirmation===true})})},
+  async reconcile(confirmation){normal();return operation(async()=>{await verify();return reconcileOffline({...options,maintenanceConfirmed:true,confirmed:confirmation===true})})},
   async inspectPending(){maintenance();return operation(async()=>{await verify();const p=await pending.inspect(identity.accountId);return p?{phase:p.phase}:null})},
-  async exportConflict(backupPhrase){maintenance();return operation(()=>exportOfflineConflict({...options,backupPhrase}))},
+  async exportConflict(backupPhrase){normal();return operation(()=>exportOfflineConflict({...options,backupPhrase}))},
   prepareRecoveryReview({oldPhrase,backupPhrase}){return prepare(async()=>{check(typeof recoveryReview==='function','Revisión no disponible');return recoveryReview({...options,oldPhrase,backupPhrase,maintenanceConfirmed:true})})},
-  prepareSync({allowTransportChange=false}={}){return prepare(async()=>{check(!await pending.inspect(identity.accountId),'Conciliá primero los cambios pendientes');return prepareLargeSync({...options,maintenanceConfirmed:true,allowTransportChange})})},
-  prepareImport({envelope,sourcePhrase}){return prepare(async()=>{check(!await pending.inspect(identity.accountId),'Conciliá primero los cambios pendientes');return prepareFullImport({...options,envelope,sourcePhrase,accountPhrase:passphrase})})},
-  prepareRestore({envelope,recoveryPhrase,backupPhrase}){return prepare(async()=>{check(!await pending.inspect(identity.accountId),'Conciliá primero los cambios pendientes');return prepareSelectiveRestore({...options,repository:repository.local,envelope,recoveryPhrase,backupPhrase})})},
+  prepareRecoveryAction({oldPhrase,backupPhrase}){return prepare(async()=>{check(typeof recoveryAction==='function','Recuperación no disponible');const p=await recoveryAction({...options,oldPhrase,backupPhrase,maintenanceConfirmed:true});return Object.freeze({...p,async apply(c){if(['ready','ready-finalize'].includes(p.kind))restricted=true;return p.apply(c)}})})},
+  prepareSync({allowTransportChange=false}={}){normal();return prepare(async()=>{check(!await pending.inspect(identity.accountId),'Conciliá primero los cambios pendientes');return prepareLargeSync({...options,maintenanceConfirmed:true,allowTransportChange})})},
+  prepareImport({envelope,sourcePhrase}){normal();return prepare(async()=>{check(!await pending.inspect(identity.accountId),'Conciliá primero los cambios pendientes');return prepareFullImport({...options,envelope,sourcePhrase,accountPhrase:passphrase})})},
+  prepareRestore({envelope,recoveryPhrase,backupPhrase}){normal();return prepare(async()=>{check(!await pending.inspect(identity.accountId),'Conciliá primero los cambios pendientes');return prepareSelectiveRestore({...options,repository:repository.local,envelope,recoveryPhrase,backupPhrase})})},
   async logout(){maintenance();return operation(async()=>{await verify();check(!await pending.inspect(identity.accountId),'Conciliá primero los cambios pendientes');const r=await fetcher(origin+'/v11.11/auth/logout',{method:'POST',credentials:'same-origin',cache:'no-store',redirect:'error',headers:{'X-Asia-CSRF':identity.csrf}});check(r.ok&&(await r.json()).ok===true,'Cierre remoto no confirmado');publish('closed')})}
  });
 }

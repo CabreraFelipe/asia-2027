@@ -10,7 +10,7 @@ function gymSession(id,date,now){
 const gymLocal=gymSession('gym-local','2026-11-25',1700000000000);
 const gymCloud=gymSession('gym-cloud','2026-11-24',1699999000000);
 
-import {preparePendingRecovery1163,prepareAdditiveRecovery1162,prepareGranularReview1168} from '../dist/assets/v11.42/staging/source/V11.42-INTEGRACION/src/recovery-apply1162.mjs';
+import {preparePendingRecovery1163,prepareAdditiveRecovery1162,prepareGranularReview1168,prepareRecoveryAction1169} from '../dist/assets/v11.42/staging/source/V11.42-INTEGRACION/src/recovery-apply1162.mjs';
 import {encrypt84,decrypt84,empty84} from '../../../../model84.mjs';
 const bookBase=empty84(),bookLocal={...bookBase,measurements:[{id:'local-measurement',day:'2026-11-25',kind:'Cintura',cm:80}]},bookCloud={...bookBase,threads:[{id:'cloud-thread',day:'2026-11-24',kind:'General',note:'nota sintética'}]};
 import {hashBytes} from '../dist/assets/v11.42/staging/source/V11.38-INTEGRACION/src/large-sync.mjs';
@@ -39,7 +39,7 @@ await assert.rejects(prepareAdditiveRecovery1162(options),/Confirmá mantenimien
 await assert.rejects(preparePendingRecovery1163({...options,repository:{...repository,commitPendingRecovery:undefined}}),/Confirmá mantenimiento y repositorio/);
 await assert.rejects(preparePendingRecovery1163({...options,pending:{inspect:pending.inspect}}),/Confirmá mantenimiento y repositorio/);
 assert.equal(writes,0);assert.equal(commits,0);assert.equal(finishes,0);
-let plan=await preparePendingRecovery1163(options);assert.equal(plan.kind,'blocked');assert.equal(plan.reason,'freeze-required');assert.equal(writes,0);
+let plan=await prepareRecoveryAction1169(options);assert.equal(plan.kind,'blocked');assert.equal(plan.reason,'freeze-required');await assert.rejects(plan.apply({confirmed:true}));plan.cancel();assert.equal(writes,0);
 const previewPending={...pending,async freezeReviewed(account,expected){assert.equal(account,id);assert.deepEqual(branch,expected);branch.phase='frozen';return structuredClone(branch)}};
 const previewOptions={...options,pending:previewPending};
 const preview=await prepareGranularReview1168(previewOptions);
@@ -54,7 +54,7 @@ const frozen=structuredClone(branch);
 branch.working=await row({...work,modules:{...work.modules,coach:{history:['diferente']}}},5);
 plan=await preparePendingRecovery1163(options);assert.equal(plan.kind,'conflict');assert.equal(writes,0);assert.equal(finishes,0);
 branch=structuredClone(frozen);
-plan=await preparePendingRecovery1163(options);assert.equal(plan.kind,'ready');assert.equal(plan.willAppend,true);
+plan=await prepareRecoveryAction1169(options);assert.equal(plan.kind,'ready');assert.equal(plan.willAppend,true);
 loseFinish=true;await assert.rejects(apply(plan));assert.equal(writes,1);assert.equal(commits,1);assert.equal(finishes,0);assert.deepEqual(branch,frozen);assert.deepEqual(backup.branch,frozen);assert.deepEqual(backup.source,original);
 assert.equal(source.modules.revision,6);
 const recovered=await decrypt84(source.modules.envelope,newSecret);
@@ -70,7 +70,7 @@ assert.deepEqual((await decrypt84(objects[3],newSecret)).payload.modules.prefere
 const recoveredDiary=JSON.parse((await decrypt84(source.local.envelope,newSecret)).entries.find(e=>e[0]==='asia2027-v1')[1]);
 assert.deepEqual(recoveredDiary,{...cloudDiary,body:localDiary.body,journal96:pendingDiary.journal96});
 assert.deepEqual(JSON.parse((await decrypt84(objects[3],newSecret)).payload.entries[0][1]),recoveredDiary);
-plan=await preparePendingRecovery1163(options);assert.equal(plan.kind,'ready-finalize');
+plan=await prepareRecoveryAction1169(options);assert.equal(plan.kind,'ready-finalize');
 assert.equal((await apply(plan)).kind,'already-applied');assert.equal(finishes,1);assert.equal(branch,null);assert.equal(writes,1);assert.equal(commits,1);
 assert.deepEqual(backup.branch,frozen);assert.deepEqual(objects.slice(0,3),[old,migrated,latest]);
 console.log('Pending recovery: editing blocked, conflicts retained, legacy branch and original archived, revision fencing, interrupted finalization resumed without duplicate PASS.');

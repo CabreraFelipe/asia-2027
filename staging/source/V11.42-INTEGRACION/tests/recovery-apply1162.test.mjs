@@ -10,7 +10,7 @@ function gymSession(id,date,now){
 const gymLocal=gymSession('gym-local','2026-11-25',1700000000000);
 const gymCloud=gymSession('gym-cloud','2026-11-24',1699999000000);
 
-import {prepareAdditiveRecovery1162} from '../dist/assets/v11.42/staging/source/V11.42-INTEGRACION/src/recovery-apply1162.mjs';
+import {prepareAdditiveRecovery1162,prepareRecoveryAction1169} from '../dist/assets/v11.42/staging/source/V11.42-INTEGRACION/src/recovery-apply1162.mjs';
 import {encrypt84,decrypt84,empty84} from '../../../../model84.mjs';
 const bookBase=empty84(),bookLocal={...bookBase,measurements:[{id:'local-measurement',day:'2026-11-25',kind:'Cintura',cm:80}]},bookCloud={...bookBase,threads:[{id:'cloud-thread',day:'2026-11-24',kind:'General',note:'nota sintética'}]};
 import {hashBytes} from '../dist/assets/v11.42/staging/source/V11.38-INTEGRACION/src/large-sync.mjs';
@@ -38,7 +38,7 @@ source=await row({...local,modules:{...local.modules,coach:{history:['distinto']
 let plan=await prepareAdditiveRecovery1162(options);assert.equal(plan.kind,'conflict');assert.equal(plan.conflicts[0].key,'coach');assert.equal(writes,0);
 source=structuredClone(initial);branch={phase:'frozen',base:source,working:source};
 plan=await prepareAdditiveRecovery1162(options);assert.equal(plan.kind,'blocked');assert.equal(plan.reason,'pending');assert.equal(writes,0);branch=null;
-plan=await prepareAdditiveRecovery1162(options);assert.equal(plan.kind,'ready');assert.equal(plan.willAppend,true);
+plan=await prepareRecoveryAction1169(options);assert.equal(plan.kind,'ready');assert.equal(plan.willAppend,true);
 await assert.rejects(plan.apply({confirmed:true,backupSaved:true,savedArchive:{manifest:plan.archive.manifest,parts:[]}}));assert.equal(writes,0);
 plan=await prepareAdditiveRecovery1162(options);lost=true;await assert.rejects(apply(plan));assert.equal(writes,1);assert.equal(commits,0);assert.deepEqual(source,initial);
 plan=await prepareAdditiveRecovery1162(options);assert.equal(plan.kind,'ready');assert.equal(plan.willAppend,false);assert.equal((await apply(plan)).kind,'applied');assert.equal(writes,1);assert.equal(commits,1);
@@ -57,6 +57,6 @@ const recoveredDiary=JSON.parse((await decrypt84(source.local.envelope,newSecret
 assert.deepEqual(recoveredDiary,{...cloudDiary,body:localDiary.body,work:localDiary.work,journal96:localDiary.journal96});
 assert.deepEqual(JSON.parse((await decrypt84(objects[3],newSecret)).payload.entries[0][1]),recoveredDiary);
 assert.deepEqual(objects.slice(0,3),[old,migrated,latest]);
-assert.equal((await prepareAdditiveRecovery1162(options)).kind,'already-applied');
+const completed=await prepareRecoveryAction1169(options);assert.equal(completed.kind,'already-applied');await assert.rejects(completed.apply({confirmed:true}));completed.cancel();
 assert.equal(writes,1);assert.equal(commits,1);
 console.log('Additive recovery: conflicting modules and pending blocked; exact backup required; remote lost acknowledgement, no duplicate, local source and original revisions retained PASS.');

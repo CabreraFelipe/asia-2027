@@ -332,3 +332,12 @@ async function prepare(options,recoverPending){
   }
  });
 }
+
+ // One maintenance entrypoint: choose the applicable protocol from the actual
+ // branch state. Blocked and conflict results remain inspectable, never writable.
+export async function prepareRecoveryAction1169(options){
+ const branch=await options.pending.inspect(options.client.accountId);
+ const p=await (branch?preparePendingRecovery1163:prepareAdditiveRecovery1162)(options);
+ if(['ready','ready-finalize'].includes(p.kind))return p;
+ return Object.freeze({...p,archive:p.review?.archive??null,cancel(){},async apply(){throw Error('Recuperación no habilitada: '+p.kind)}});
+}
