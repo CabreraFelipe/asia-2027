@@ -2,6 +2,8 @@ import '../../../../migration88.mjs';
 import '../../../../training1184.js';
 import '../../../../nutrition1184.js';
 import '../../../../coach-bundle1184.js';
+import '../../../../goals11993.js';
+import '../../../../onboard11993.js';
 import {inspectLegacy88} from '../../../../migration88.mjs';
 import {validateGym} from '../../../../gym84.mjs';
 const check=(x,m)=>{if(!x)throw Error(m)},clone=x=>JSON.parse(JSON.stringify(x)),eq=(a,b)=>JSON.stringify(a)===JSON.stringify(b),day=d=>typeof d==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(d)&&Number.isFinite(Date.parse(d))&&new Date(d).toISOString().slice(0,10)===d;
@@ -12,6 +14,16 @@ function calculate(data,kind,proposal,today){
  check(day(today),'Fecha inválida');let next,dates,sportRows=null,qualityRows=null;const x=api();
  if(kind==='strength'){next=x.A.apply(data,proposal,today,x);dates=proposal.view.dates;}
  else if(kind==='bundle'){next=globalThis.asiaCoachBundle1180.apply(data,proposal,today,x,current(data));dates=proposal.view.affectedDates;sportRows=proposal.view.sport?.after??null;qualityRows=proposal.view.running?.after?.filter(x.R.isQuality)??null;}
+ else if(kind==='onboard'){
+  const o=globalThis.asiaOnboard1176,goalApi=globalThis.asiaGoals101;
+  check(o&&goalApi,'Onboarding no disponible');
+  next=o.apply(data,proposal,today,{G:goalApi,S:x.S,T:x.T,R:x.R,N:x.N,gym:x.Gym},current(data));
+  const strength=proposal.view.training?.config,runRows=proposal.view.run?.rows??[],strengthDates=[];
+  if(strength)for(let d=strength.start;d<=strength.end;d=x.Sport.add(d,1))if(strength.days.includes(new Date(d+'T00:00:00Z').getUTCDay()))strengthDates.push(d);
+  dates=[...new Set([...strengthDates,...runRows.map(r=>r.day)])].sort();
+  qualityRows=runRows.filter(x.R.isQuality);
+  check(!dates.some(d=>Object.keys(data.work??{}).some(k=>k.slice(0,10)===d)||Object.values(data.running1174?.sessions??{}).some(s=>s.day===d)||Object.values(data.sport1177?.sessions??{}).some(s=>s.day===d)||x.Sport.eventsOn(data.sport1177,d).length),'Hay actividad registrada o eventos en el nuevo programa');
+ }
  else if(kind==='runningQuality'||kind==='runningRecovery'){
   check(proposal&&Object.keys(proposal).length===3&&Object.hasOwn(proposal,'draft')&&Object.hasOwn(proposal,'key')&&Object.hasOwn(proposal,'view')&&/^runplan-[a-f0-9]{32}$/.test(proposal.key),'Propuesta Running inválida');
   const {draft,key,view}=proposal,g=x.G(data.settings?.goals101);

@@ -48,3 +48,17 @@ await c.review('bundle',bundle,snap.diary);const saved=await c.apply('bundle',bu
  assert.doesNotThrow(()=>guardProPlan1195(JSON.stringify(original),originalGym,conflictGym,today));
  const fence=createLocalPlanningFence1195();let release;const hold=fence(()=>new Promise(r=>{release=r}));await assert.rejects(()=>fence(async()=>{}),/curso/);release();await hold;assert.equal(await fence(async()=>42),42);await assert.rejects(()=>fence(async()=>{throw Error('test')}));assert.equal(await fence(async()=>43),43);
  console.log('Inverse sports PRO planning guard and local write fence PASS');
+
+ // V11.99.3 onboarding uses the same reviewed encrypted write boundary.
+ const onboardApi={G:globalThis.asiaGoals101,S:api.S,T:api.T,R:api.R,N:api.N,gym:api.Gym},O=globalThis.asiaOnboard1176;
+ const obData=JSON.parse(snap.diary),obIds={goal:'goal-'+'5'.repeat(32),program:'prog-'+'6'.repeat(32),running:'runplan-'+'7'.repeat(32),nutrition:'nut-'+'8'.repeat(32)};
+ const obRaw={goal:{title:'Carrera de prueba',kind:'Running',target:'10K',motivation:'',start:'2027-02-01',deadline:'2027-03-01'},primary:false,personalStart:null,strength:{config:{name:'Fuerza febrero',objective:'Bienestar general',equipment:'Mancuernas y banco',minutes:45,start:'2027-02-01',end:'2027-02-21',days:[1,4]},templates:null},running:{distanceM:10000,targetSeconds:null,raceDate:'2027-03-01',start:'2027-02-01',end:'2027-02-21',days:[3,6],weeklyMinutes:90,longestMinutes:40,profile:{level:'Habitual',surface:'Cinta',availableMinutes:40,progress:false,symptoms:'Sin síntomas preocupantes'}},nutrition:null};
+ const ob=O.review(obData,obRaw,obIds,today,onboardApi,{calories:2000,protein:150}),obBefore=snap.diary,obWrites=writes;
+ gym={revision:gym.revision+1,payload:planGym(seedGym(),'2027-02-01')};snap.proRevision++;
+ await assert.rejects(()=>c.review('onboard',ob,obBefore),/PRO|ocupadas/);assert.equal(writes,obWrites);
+ gym={revision:gym.revision+1,payload:seedGym()};snap.proRevision++;
+ await c.review('onboard',ob,obBefore);assert.equal(writes,obWrites);c.discard();await assert.rejects(()=>c.apply('onboard',ob,obBefore));assert.equal(writes,obWrites);
+ await c.review('onboard',ob,obBefore);snap.proRevision++;await assert.rejects(()=>c.apply('onboard',ob,obBefore));
+ await c.review('onboard',ob,obBefore);const obSaved=await c.apply('onboard',ob,obBefore);assert.equal(writes,obWrites+1);const obAfter=JSON.parse(obSaved.diary);
+ assert.deepEqual(obAfter,O.apply(obData,ob,today,onboardApi,{calories:2000,protein:150}));assert.deepEqual(obAfter.work,obData.work);assert.deepEqual(obAfter.sport1177,obData.sport1177);assert.ok(obAfter.running1174.plans[obIds.running]);await assert.rejects(()=>c.apply('onboard',ob,obBefore));
+ console.log('Coordinated onboarding: native proposal, PRO collision, discard, stale revision, historical preservation PASS');

@@ -323,3 +323,8 @@ Reconstruido V11.99.1 sobre 72f62488c266537e39b920107c6b7c2b9b884c11; original 7
 Base V11.99.1 7fc142c4491d9efc3c1f58c484b9d6c1716b7969; no promover antes de gates anteriores. Captura opcional de fechas, fuerza, Running y nutrición revisados por usuario junto a meta sintética, sin enviar parámetros al proveedor ni inferirlos del texto libre. Transferencia validada a borrador manual, limpia parámetros anteriores, conserva registro y preferencias; nutrición solo guardar tras revisión, no aplicar. No añade prescripción deportiva inicial ni interpreta automáticamente respuestas libres. Pruebas aisladas y CI/browser propios pendientes. Producción intacta.
 
 Reconstruido V11.99.2 sobre e657c3dd3eb7b05192079727bdae70c1c8d255f3; original add1e3101447243c9a61c3ea4c6c57087e58af3d. CI pendiente.
+
+## V11.99.3 — candidato onboarding con guardado coordinado
+Base V11.99.2 add1e3101447243c9a61c3ea4c6c57087e58af3d. Sin promoción antes de gates anteriores. Importa motores puros de metas y onboarding al shell para recálculo exacto, revisión de fechas afectadas y guardado cifrado CAS diario/PRO; bloquea coincidencias con registros y eventos. UI manual usa frontera compartida y descarte, no escribe directamente. Ajusta recorrido Chrome para elegir explícitamente campos limpiados tras traspaso. Prueba de integración preparada, no ejecutada aún; no garantiza coordinación distribuida. No habilita proveedor real ni modifica producción.
+
+Reconstruido V11.99.3 sobre 634336d70eb42a3f40b228a236be505de48b4b7c; original 07cecdf87eaa8414fd6fae91714e59e428dec536. Corrección Chrome conservada. CI pendiente. No integrar ramas de validación ni producción.
