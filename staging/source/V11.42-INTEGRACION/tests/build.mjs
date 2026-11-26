@@ -100,6 +100,31 @@ const server=out+'/server',sroot=server+'/staging/source';
 for(const d of dirs){const src='staging/source/'+d+'/src';if(!existsSync(src))continue;for(const n of readdirSync(src).filter(n=>n.endsWith('.mjs'))){const p=server+'/'+src+'/'+n;mkdirSync(dirname(p),{recursive:true});writeFileSync(p,patch(readFileSync(src+'/'+n,'utf8')))}}
 for(const n of rootFiles.filter(n=>n.endsWith('.mjs')))cpSync(n,server+'/'+n);
 const official='staging/source/official/V11.24-STAGING/src';for(const n of readdirSync(official).filter(n=>n.endsWith('.mjs'))){const p=server+'/'+official+'/'+n;mkdirSync(dirname(p),{recursive:true});writeFileSync(p,patch(readFileSync(official+'/'+n,'utf8')))}
+// V11.51: only the packaged identity Worker gets the persistent session
+// policy. Original identity sources, existing schema and cookie name intact.
+const identityFile=server+'/'+official+'/worker1124.mjs';
+let identityText=readFileSync(identityFile,'utf8');
+function replaceIdentity(from,to){if(identityText.split(from).length!==2)throw Error('Marcador identidad no único: '+from);identityText=identityText.replace(from,to)}
+replaceIdentity('SESSION_MS=3600000,','SESSION_MS=30*86400000,SESSION_ABSOLUTE_MS=180*86400000,');
+replaceIdentity('cookie(SESSION_COOKIE,raw,3600)','cookie(SESSION_COOKIE,raw,SESSION_MS/1000)');
+const renewRoute=`  if(path==='/v11.11/auth/renew'&&request.method==='POST'&&!u.search){
+   try{
+    const s=await basic(request,env);if(!s)return err(401,'NO_AUTORIZADO');
+    if(!validWrite(request,env,s))return err(403,'CSRF_INVALIDO');
+    if(!noBody(request))return err(400,'CUERPO_NO_PERMITIDO');
+    const now=Date.now();
+    // Single conditional UPDATE; no INSERT and no renewal of a deleted,
+    // expired or differently authenticated session. Preserve CSRF/token
+    // while operations are in flight; rotation is a separate future gate.
+    const row=await env.STAGING_DB.prepare('UPDATE auth_oidc_sessions_v1111 SET expires_at=MIN(created_at+?,MAX(expires_at,?)) WHERE token_digest=? AND account_id=? AND csrf=? AND expires_at>? AND created_at+?>? RETURNING expires_at').bind(SESSION_ABSOLUTE_MS,now+SESSION_MS,s.digest,s.id,s.csrf,now,SESSION_ABSOLUTE_MS,now).first();
+    if(!row||!Number.isSafeInteger(row.expires_at)||row.expires_at<=now)return err(401,'NO_AUTORIZADO');
+    return json({ok:true,expiresAt:row.expires_at},200,{'Set-Cookie':cookie(SESSION_COOKIE,readCookie(request,SESSION_COOKIE),Math.floor((row.expires_at-now)/1000))});
+   }catch{return err(503,'RENOVACION_NO_DISPONIBLE');}
+  }
+`;
+replaceIdentity("  if(path==='/v11.11/auth/logout'&&request.method==='POST'&&!u.search)",renewRoute+"  if(path==='/v11.11/auth/logout'&&request.method==='POST'&&!u.search)");
+writeFileSync(identityFile,identityText);
+execFileSync(process.execPath,['--check',identityFile],{stdio:'inherit'});
 const worker=sroot+'/V11.42-INTEGRACION/src/worker.mjs';mkdirSync(dirname(worker),{recursive:true});cpSync(base+'/src/worker.mjs',worker);
 function walk(dir){return readdirSync(dir).flatMap(n=>{const p=join(dir,n);return statSync(p).isDirectory()?walk(p):[p]})}
 // Public entry carries a fingerprint of the complete private and public asset set.

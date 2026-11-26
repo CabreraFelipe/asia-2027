@@ -11,7 +11,7 @@ export function createPwaWorker({assetPaths,fetchImpl=fetch}={}){
   const u=new URL(request.url),p=u.pathname;
   if(env.STAGING_ALLOW_V1142_TESTS!=='true'||!originPattern.test(env.STAGING_ORIGIN||'')||u.origin!==env.STAGING_ORIGIN||!env.STAGING_PWA_ASSETS||['X-Asia-Account','X-Account-ID','X-User-ID','Authorization'].some(k=>request.headers.has(k)))return deny(403);
   if((p==='/'||p===scope)&&request.method==='GET'&&!u.search)return new Response(null,{status:303,headers:{...common,Location:home}});
-  if(['/v11.11/auth/start','/v11.11/auth/callback','/v11.11/auth/me','/v11.11/auth/logout'].includes(p)){
+  if(['/v11.11/auth/start','/v11.11/auth/callback','/v11.11/auth/me','/v11.11/auth/renew','/v11.11/auth/logout'].includes(p)){
    const r=await original.fetch(request,env);
    if(p.endsWith('/callback')&&r.status===303){const h=new Headers(r.headers);h.set('Location',home);return new Response(null,{status:303,headers:h})}return r;
   }
