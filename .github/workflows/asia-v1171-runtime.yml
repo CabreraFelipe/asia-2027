@@ -23,9 +23,9 @@ jobs:
       - run: node staging/source/V11.40-INTEGRACION/tests/patch-candidate.mjs
       - run: node staging/source/V11.42-INTEGRACION/tests/build.mjs
       - name: Instalar runtime local fijado, sin secretos
-        run: npm install --prefix "$RUNNER_TEMP/asia-local-runtime" --no-audit --no-fund --save-exact wrangler@4.164.0
+        run: npm install --prefix "$RUNNER_TEMP/asia-local-runtime" --no-audit --no-fund --save-exact miniflare@4.20260730.0
       - name: Validar migraciones y concurrencia contra D1 y R2 desechables
         shell: bash
         run: |
-          export ASIA_WRANGLER_ROOT="$RUNNER_TEMP/asia-local-runtime"
+          export ASIA_MINIFLARE_ROOT="$RUNNER_TEMP/asia-local-runtime"
           node staging/source/V11.42-INTEGRACION/tests/local-runtime1171.test.mjs

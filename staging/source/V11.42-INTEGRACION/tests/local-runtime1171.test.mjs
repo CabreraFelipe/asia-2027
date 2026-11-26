@@ -8,9 +8,10 @@ import {digest} from '../dist/server/staging/source/official/V11.24-STAGING/src/
 import {hashBytes} from '../dist/server/staging/source/V11.38-INTEGRACION/src/large-sync.mjs';
 import {generateAccountSecret} from '../src/account-key1150.mjs';
 import {encrypt84,decrypt84} from '../../../../model84.mjs';
-const root=process.env.ASIA_WRANGLER_ROOT;assert.ok(root);
+const root=process.env.ASIA_MINIFLARE_ROOT;assert.ok(root);
 const require=createRequire(join(root,'package.json'));
 const {Miniflare}=require('miniflare');
+// Pin stable v4 API independently of Wrangler's changing beta dependency.
 const mf=new Miniflare({modules:true,script:"export default {fetch(){return new Response('synthetic')}}",d1Databases:{STAGING_DB:'asia-ci-local-d1'},r2Buckets:{STAGING_SYNC_OBJECTS:'asia-ci-local-r2'}});
 try{
  const db=await mf.getD1Database('STAGING_DB'),bucket=await mf.getR2Bucket('STAGING_SYNC_OBJECTS');
