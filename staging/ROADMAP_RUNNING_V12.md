@@ -29,3 +29,5 @@ Especificación aceptada para roadmap; implementación de running aún no inicia
 
 ## V11.74 (candidato)
 Fundamento funcional integrado: objetivos por ID, registros manuales, métricas por superficie, borrador suave y activación, vista semanal, validación y recuperación granular. Pendientes pruebas CI, replanificación/edición, coordinación inversa al crear fuerza después del running, Coach, nutrición personalizada, catálogo complementario, salud y wearable. No confundir fundamento con plan completo de competición.
+
+V11.74.1: se corrige aislamiento de la prueba de Running por colisión de módulos clásicos originales/candidato en Node; nueva CI pendiente. No se declara módulo validado hasta pasar Chrome completo.
