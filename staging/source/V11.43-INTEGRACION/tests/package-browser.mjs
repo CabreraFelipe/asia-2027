@@ -269,6 +269,12 @@ try{
   diaryB.getElementById('sportReject1177').click();diaryB.getElementById('sportReview1177').click();
   try{w.confirm=()=>true;diaryB.getElementById('sportApply1177').click()}finally{w.confirm=originalConfirm}
   await wait(()=>spStatus.textContent==='Bloque deportivo guardado.'&&el('status1140').textContent.includes('saved'),'Bloque deportivo no guardado: '+spStatus.textContent);
+  const metricToday=sp('metricDay').value,comparison=diaryB.getElementById('sportComparisons1191');
+  for(const [k,v] of Object.entries({metric:'Sprint 10 m',metricDay:addDay(metricToday,-1),metricValue:'2.5',protocol:'Cronómetro sintético B',metricSurface:'Césped',side:'No aplica'}))sp(k).value=v;
+  diaryB.getElementById('sportSaveMetric1177').click();await wait(()=>spStatus.textContent==='Medición deportiva guardada.'&&el('status1140').textContent.includes('saved'),'Medición B no guardada: '+spStatus.textContent);
+  if(!comparison.textContent.includes('Sin tendencia')||!comparison.textContent.includes('Cronómetro sintético B'))throw Error('Comparación inicial inválida');
+  sp('metricDay').value=metricToday;sp('metricValue').value='2';
+  diaryB.getElementById('sportSaveMetric1177').click();await wait(()=>comparison.textContent.includes('Mejora:')&&el('status1140').textContent.includes('saved'),'Marcas comparables no visibles');
   const cat=diaryB.getElementById('catalog1178');cat.open=true;const catSearch=diaryB.getElementById('catalogSearch1178'),catCount=diaryB.getElementById('catalogCount1178'),catRows=diaryB.getElementById('catalogRows1178');
   if(!catCount.textContent.includes('391 ejercicios'))throw Error('Catálogo incompleto: '+catCount.textContent);
   catSearch.value='Remo unilateral con mancuerna';catSearch.dispatchEvent(new w.Event('input'));const unilateralCat=[...catRows.querySelectorAll('details')].find(x=>x.querySelector('summary')?.textContent==='Remo unilateral con mancuerna');if(!unilateralCat||[...unilateralCat.querySelectorAll('button')].some(x=>x.textContent==='Añadir a biblioteca clásica'))throw Error('Unilateral superior indebidamente habilitado');

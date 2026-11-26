@@ -53,5 +53,25 @@ function assertCalendar(raw,settings,running,S,R){if(!raw)return;for(const r of 
 function draft(input,raw,g,settings,running,today,S,R,work={}){const b=validate(raw,g),p=b.profiles[input.profileId];check(exact(input,['profileId','start','end','days','replaces'])&&p&&g.items.some(x=>x.id===p.goalId&&x.status==='Activa')&&p.symptoms==='Sin síntomas preocupantes'&&p.safeSpace&&day(today)&&day(input.start)&&day(input.end)&&input.start>=today&&input.end>=input.start&&Date.parse(input.end)-Date.parse(input.start)<=27*86400000&&list(input.days,[0,1,2,3,4,5,6],1,3),'Completá el perfil, espacio seguro y fechas. Si hay síntomas preocupantes, no aumentes carga sin valoración.');if(input.replaces!==null){const old=b.plans[input.replaces];check(old&&b.profiles[old.profileId].goalId===p.goalId&&input.start>today&&input.start>old.start&&input.start<=old.end&&!Object.values(b.plans).some(x=>x.replaces===old.id)&&!Object.values(b.sessions).some(x=>x.day>=input.start&&x.day<=old.end),'No se puede reemplazar ese tramo deportivo.');}
  const occupied=new Set(effective(b,input).map(r=>r.day)),rows=[];for(let d=input.start;d<=input.end;d=add(d,1))if(input.days.includes(weekday(d))){check(!occupied.has(d)&&!eventsOn(b,d).length&&!R.planned(running,d)&&S.planned(d,settings)===null&&!Object.keys(work).some(k=>k.slice(0,10)===d),'Hay una sesión o evento previsto/registrado el '+d);const nearby=[-1,1].some(n=>eventsOn(b,add(d,n)).length||R.planned(running,add(d,n))||S.planned(add(d,n),settings)!==null||occupied.has(add(d,n))||rows.some(r=>r.day===add(d,n)));const moderate=!nearby&&!input.days.includes((weekday(d)+1)%7)&&!input.days.includes((weekday(d)+6)%7);rows.push({day:d,minutes:p.minutes,drills:choose(p,rows.length,moderate)});}check(rows.length,'No hay días en ese tramo');return {...clone(input),rows};}
 function activate(raw,proposal,key,g,settings,running,today,S,R,work){const {rows,...input}=proposal,actual=draft(input,raw,g,settings,running,today,S,R,work);check(JSON.stringify(actual)===JSON.stringify(proposal),'Cambió el borrador o el calendario');const b=clone(validate(raw,g));check(!Object.hasOwn(b.plans,key),'Plan deportivo ya existe');b.plans[key]={id:key,...actual};validate(b,g);assertCalendar(b,settings,running,S,R);return b;}
-root.asiaSport1177=Object.freeze({sports,capacities,equipment,locations,levels,surfaces,eventTypes,symptoms,catalog,metricKinds,empty,validate,put,eligible,draft,activate,effective,planned,eventsOn,assertCalendar,add,find});
+// Derived read-only comparisons; never infer equivalence or mutate training prescriptions.
+function metricComparisons(raw,g,profileId,asOf){
+ const b=validate(raw,g);check(day(asOf),'Fecha de comparación inválida');if(!Object.hasOwn(b.profiles,profileId))return [];
+ const groups=new Map();
+ for(const m of Object.values(b.metrics)){
+  if(m.profileId!==profileId||m.day>asOf)continue;
+  const key=JSON.stringify([m.kind,m.unit,m.protocol,m.surface,m.side]);
+  if(!groups.has(key))groups.set(key,[]);groups.get(key).push(m);
+ }
+ return [...groups.entries()].sort(([a],[b])=>a.localeCompare(b)).map(([,rows])=>{
+  const {kind,unit,protocol,surface,side}=rows[0];
+  const lower=['Sprint 10 m','Sprint 20 m','Sprint 30 m','Cambio de dirección 505'].includes(kind);
+  const bestOf=values=>lower?Math.min(...values):Math.max(...values);
+  const daily=new Map();
+  for(const m of rows){if(!daily.has(m.day))daily.set(m.day,[]);daily.get(m.day).push(m.value);}
+  const days=[...daily.keys()].sort(),firstDay=days[0],lastDay=days.at(-1),first=bestOf(daily.get(firstDay)),latest=bestOf(daily.get(lastDay));
+  const improvement=days.length>1?(lower?first-latest:latest-first):null;
+  return {kind,unit,protocol,surface,side,lower,count:rows.length,days:days.length,firstDay,lastDay,first,latest,best:bestOf(rows.map(m=>m.value)),improvement};
+ });
+}
+root.asiaSport1177=Object.freeze({sports,capacities,equipment,locations,levels,surfaces,eventTypes,symptoms,catalog,metricKinds,metricComparisons,empty,validate,put,eligible,draft,activate,effective,planned,eventsOn,assertCalendar,add,find});
 })(globalThis);
