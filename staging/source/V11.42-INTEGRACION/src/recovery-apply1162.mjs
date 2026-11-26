@@ -7,7 +7,8 @@ import {validLargeEnvelope,hashBytes} from '../../V11.38-INTEGRACION/src/large-s
 import {MODULES} from '../../../../store84.mjs';
 import {inspectLegacy88} from '../../../../migration88.mjs';
 import {validateGym} from '../../../../gym84.mjs';
-import {encrypt84,decrypt84,checksum84} from '../../../../model84.mjs';
+import {encrypt84,decrypt84,checksum84,validate84} from '../../../../model84.mjs';
+import {historyKey810} from '../../../../history810-schema.mjs';
 const check=(x,m)=>{if(!x)throw Error(m)},eq=(a,b)=>JSON.stringify(a)===JSON.stringify(b),rev=r=>r?.revision??0;
 const sha=x=>hashBytes(new TextEncoder().encode(JSON.stringify(x)));
 const missing=Symbol('missing');
@@ -91,6 +92,51 @@ export function reconcileGym1165(historical,local,cloud){
  try{validateGym(result)}catch{conflict('gym','invalid-combined-gym');return {conflicts,additions,value:undefined}}
  return {conflicts,additions,value:result};
 }
+// Conservative recovery of the original advanced book. Whole validated rows
+// only; preferences, audit, and deletion history remain indivisible.
+export function reconcileBook1166(historical,local,cloud){
+ const [h,l,c]=[historical,local,cloud];
+ const conflicts=[],additions=[];
+ const conflict=(key,reason)=>conflicts.push({group:'preferences',key,reason});
+ const add=(key,from)=>additions.push({group:'preferences',key,from});
+ const own=(x,k)=>x!=null&&Object.hasOwn(x,k);
+ const keys=(...xs)=>[...new Set(xs.flatMap(x=>Object.keys(x??{})))];
+ const areas=['foods','library','wellness','measurements','plans','threads','strategies','reminders','reviews'];
+ const lists=[...areas.map(k=>[k,e=>e.id]),['legacyHistory810',historyKey810],['reviewedMemory810',e=>e.id],['legacyLibrary89',e=>e.id]];
+ const special=new Set(lists.map(([k])=>k));
+ for(const x of [h,l,c])if(x!==undefined)validate84(x);
+ if(!l&&!c){if(h)conflict('preferences','historical-only');return {conflicts,additions,value:undefined}}
+ const result=structuredClone(c??l);
+ for(const k of keys(h,l,c)){
+  if(special.has(k))continue;
+  if(l&&c&&(own(l,k)!==own(c,k)||own(l,k)&&!eq(l[k],c[k])))conflict(k,'different-values');
+  else if(own(h,k)&&!own(l,k)&&!own(c,k))conflict(k,'historical-only');
+ }
+ // Non-identifiable audit and deletion records are not inferred from timestamps.
+ for(const k of ['audit','trash','legacyMigration84']){
+  if(own(h,k)&&!eq(h[k],result[k]))conflict(k,'historical-review-required');
+ }
+ for(const [name,identity] of lists){
+  const [a,b,d]=[h,l,c].map(x=>new Map((x?.[name]??[]).map(v=>[identity(v),v])));
+  if(own(h,name)&&!own(l,name)&&!own(c,name))conflict(name,'historical-only');
+  if(own(l,name)&&!own(result,name))result[name]=[];
+  for(const id of new Set([...a.keys(),...b.keys(),...d.keys()])){
+   const path=name+'/'+id,inL=b.has(id),inC=d.has(id);
+   if(!inL&&!inC){conflict(path,'historical-only');continue}
+   if(inL&&inC){if(!eq(b.get(id),d.get(id)))conflict(path,'different-values');continue}
+   add(path,inL?'local':'cloud');
+   if(inL&&c)result[name].push(structuredClone(b.get(id)));
+  }
+ }
+ for(const [name,key] of [['wellness',x=>x.day],['measurements',x=>x.day+'/'+x.kind]]){
+  const seen=new Set();
+  for(const x of result[name]){const id=key(x);if(seen.has(id))conflict(name+'/'+id,'semantic-duplicate');seen.add(id)}
+ }
+ for(const t of result.trash)if(result[t.area].some(x=>x.id===t.item.id))conflict(t.area+'/'+t.item.id,'active-trash-collision');
+ if(conflicts.length)return {conflicts,additions,value:undefined};
+ try{validate84(result)}catch{conflict('preferences','invalid-combined-book');return {conflicts,additions,value:undefined}}
+ return {conflicts,additions,value:result};
+}
 function union(reference,local,cloud,policy){
  const entries=[],modules={},conflicts=[],additions=[];
  function choose(group,key,h,l,c){
@@ -113,6 +159,10 @@ function union(reference,local,cloud,policy){
  for(const k of MODULES){
   if(k==='gym'){
    const merged=reconcileGym1165(reference.modules[k],local.modules[k],cloud.modules[k]);
+   conflicts.push(...merged.conflicts);additions.push(...merged.additions);
+   if(merged.value!==undefined)modules[k]=merged.value;
+  }else if(k==='preferences'){
+   const merged=reconcileBook1166(reference.modules[k],local.modules[k],cloud.modules[k]);
    conflicts.push(...merged.conflicts);additions.push(...merged.additions);
    if(merged.value!==undefined)modules[k]=merged.value;
   }else{const v=choose('module',k,getM(reference,k),getM(local,k),getM(cloud,k));if(v!==missing)modules[k]=v}
