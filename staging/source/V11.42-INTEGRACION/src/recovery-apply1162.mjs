@@ -1,14 +1,54 @@
 // Synthetic-only private additive recovery. No arbitrary conflict resolution,
-// no deletion, no pending mutation, no UI. Remote append CAS precedes local CAS.
+// no deletion, no UI. Remote append CAS precedes local CAS.
 import {prepareRecoveryReview1161,verifyRecoveryArchive1161} from './recovery-review1161.mjs';
 import {localPayload,validatePayload} from '../../V11.36-INTEGRACION/src/sync.mjs';
 import {validateLargeList} from '../../V11.38-INTEGRACION/src/large-sync-client.mjs';
 import {validLargeEnvelope,hashBytes} from '../../V11.38-INTEGRACION/src/large-sync.mjs';
 import {MODULES} from '../../../../store84.mjs';
+import {inspectLegacy88} from '../../../../migration88.mjs';
 import {encrypt84,decrypt84,checksum84} from '../../../../model84.mjs';
 const check=(x,m)=>{if(!x)throw Error(m)},eq=(a,b)=>JSON.stringify(a)===JSON.stringify(b),rev=r=>r?.revision??0;
 const sha=x=>hashBytes(new TextEncoder().encode(JSON.stringify(x)));
 const missing=Symbol('missing');
+// Only V10.6 identity maps are eligible. Complete records, never nested arrays
+// or fields, are the unit of recovery. Unknown fields/settings must agree.
+// The historical snapshot is evidence, not a proven common ancestor.
+export function reconcileDiary1164(historical,local,cloud){
+ const [h,l,c]=[historical,local,cloud].map(v=>v===undefined?null:JSON.parse(v));
+ for(const x of [h,l,c])if(x!==null)inspectLegacy88(x);
+ const conflicts=[],additions=[],maps=['body','diet','work','photos','journal96'];
+ const conflict=(key,reason)=>conflicts.push({group:'diary',key,reason});
+ const add=(key,from)=>additions.push({group:'diary',key,from});
+ const own=(x,k)=>x!==null&&Object.hasOwn(x,k);
+ const keys=(...xs)=>[...new Set(xs.flatMap(x=>Object.keys(x??{})))];
+ if(!l&&!c){if(h)conflict('asia2027-v1','historical-only');return {conflicts,additions,value:undefined}}
+ const result=structuredClone(c??l);
+ let changed=false;
+ for(const k of keys(h,l,c)){
+  if(maps.includes(k))continue;
+  if(l&&c&&(own(l,k)!==own(c,k)||own(l,k)&&!eq(l[k],c[k])))conflict(k,'different-values');
+  else if(own(h,k)&&!own(l,k)&&!own(c,k))conflict(k,'historical-only');
+ }
+ for(const name of maps){
+  const a=h?.[name]??{},b=l?.[name]??{},d=c?.[name]??{};
+  for(const k of keys(a,b,d)){
+   const inL=Object.hasOwn(b,k),inC=Object.hasOwn(d,k),path=name+'/'+k;
+   if(!inL&&!inC){conflict(path,'historical-only');continue}
+   if(inL&&inC){if(!eq(b[k],d[k]))conflict(path,'different-values');continue}
+   add(path,inL?'local':'cloud');
+   if(inL&&c){
+    if(!Object.hasOwn(result,name))result[name]={};
+    result[name][k]=structuredClone(b[k]);changed=true;
+   }
+  }
+  // Retain explicit empty optional maps as well as populated maps.
+  if(own(l,name)&&!own(result,name)){result[name]={};changed=true;add(name,'local')}
+ }
+ if(conflicts.length)return {conflicts,additions,value:undefined};
+ try{inspectLegacy88(result)}catch{conflict('asia2027-v1','invalid-combined-diary');return {conflicts,additions,value:undefined}}
+ // Prefer exact cloud bytes if no additions: important for lost-ack retry.
+ return {conflicts,additions,value:changed?JSON.stringify(result):(cloud??local)};
+}
 function union(reference,local,cloud,policy){
  const entries=[],modules={},conflicts=[],additions=[];
  function choose(group,key,h,l,c){
@@ -20,7 +60,13 @@ function union(reference,local,cloud,policy){
  }
  const [r,l,c]=[reference,local,cloud].map(x=>new Map(x.entries));
  const get=(m,k)=>m.has(k)?m.get(k):missing;
- for(const k of policy.portable){const v=choose('entry',k,get(r,k),get(l,k),get(c,k));if(v!==missing)entries.push([k,v])}
+ for(const k of policy.portable){
+  if(k==='asia2027-v1'){
+   const merged=reconcileDiary1164(r.get(k),l.get(k),c.get(k));
+   conflicts.push(...merged.conflicts);additions.push(...merged.additions);
+   if(merged.value!==undefined)entries.push([k,merged.value]);
+  }else{const v=choose('entry',k,get(r,k),get(l,k),get(c,k));if(v!==missing)entries.push([k,v])}
+ }
  const getM=(p,k)=>Object.hasOwn(p.modules,k)?p.modules[k]:missing;
  for(const k of MODULES){const v=choose('module',k,getM(reference,k),getM(local,k),getM(cloud,k));if(v!==missing)modules[k]=v}
  return {conflicts,additions,payload:conflicts.length?null:validatePayload({entries,modules},policy)};
