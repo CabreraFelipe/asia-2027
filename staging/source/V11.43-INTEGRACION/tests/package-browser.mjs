@@ -11,15 +11,17 @@ import {DatabaseSync} from 'node:sqlite';
 import worker from '../../V11.42-INTEGRACION/dist/server/index.mjs';
 import {digest} from '../../V11.42-INTEGRACION/dist/server/staging/source/official/V11.24-STAGING/src/security1111.mjs';
 const host='asia-v1142-candidate-staging.example.workers.dev',origin='https://'+host,home=origin+'/v11.42/index.html',root=new URL('../../V11.42-INTEGRACION/dist/',import.meta.url).pathname;
-const A='acct_'+'a'.repeat(32),B='acct_'+'b'.repeat(32),ta='A'.repeat(43),tb='B'.repeat(43),db=new DatabaseSync(':memory:');
+const A='acct_'+'a'.repeat(32),B='acct_'+'b'.repeat(32),C='acct_'+'c'.repeat(32),ta='A'.repeat(43),tb='B'.repeat(43),tc='C'.repeat(43),db=new DatabaseSync(':memory:');
 db.exec('PRAGMA foreign_keys=ON');
 for(const n of ['0001_staging.sql','0006_identity_oidc.sql','0007_synthetic_journal_v115.sql','0009_large_sync.sql'])db.exec(readFileSync(root+'migrations/'+n,'utf8'));
-for(const [id,t,email,csrf] of [[A,ta,'a@example.invalid','a'.repeat(43)],[B,tb,'b@example.invalid','b'.repeat(43)]]){
+db.exec(readFileSync(new URL('../../V11.42-INTEGRACION/migrations/0010_managed_keys.proposed.sql',import.meta.url),'utf8'));
+for(const [id,t,email,csrf] of [[A,ta,'a@example.invalid','a'.repeat(43)],[B,tb,'b@example.invalid','b'.repeat(43)],[C,tc,'c@example.invalid','c'.repeat(43)]]){
  db.prepare('INSERT INTO accounts_v11 VALUES(?,?,?,?)').run(id,'https://accounts.google.com',email,new Date().toISOString());
  db.prepare('INSERT INTO auth_oidc_sessions_v1111(token_digest,account_id,csrf,email_digest,created_at,expires_at) VALUES(?,?,?,?,?,?)').run(await digest(t),id,csrf,await digest(email),Date.now(),Date.now()+600000);
 }
+db.prepare('INSERT INTO managed_account_keys_v1152(account_id) VALUES(?)').run(C);
 const objects=new Map(),mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.json':'application/json','.png':'image/png','.css':'text/css; charset=utf-8'};
-const env={STAGING_MODE:'asia-v1111-identity-private',STAGING_ORIGIN:origin,STAGING_ALLOW_V1142_TESTS:'true',STAGING_ALLOW_V1138_TESTS:'true',STAGING_ALLOW_V1139_TESTS:'true',STAGING_GOOGLE_CLIENT_ID:'test.apps.googleusercontent.com',STAGING_GOOGLE_CLIENT_SECRET:'synthetic-only',STAGING_ALLOWED_EMAILS:'a@example.invalid,b@example.invalid',
+const env={STAGING_MODE:'asia-v1111-identity-private',STAGING_ORIGIN:origin,STAGING_ALLOW_V1142_TESTS:'true',STAGING_ALLOW_V1138_TESTS:'true',STAGING_ALLOW_V1139_TESTS:'true',STAGING_GOOGLE_CLIENT_ID:'test.apps.googleusercontent.com',STAGING_GOOGLE_CLIENT_SECRET:'synthetic-only',STAGING_ALLOWED_EMAILS:'a@example.invalid,b@example.invalid,c@example.invalid',STAGING_ALLOW_MANAGED_KEYS_1152:'true',STAGING_MANAGED_KEK_ID_1152:'ci-v1',STAGING_MANAGED_KEK_1152:Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString('base64url'),
  STAGING_DB:{prepare(sql){let args=[];return {bind(...a){args=a;return this},async first(){return db.prepare(sql).get(...args)||null},async all(){return {results:db.prepare(sql).all(...args)}},async run(){return db.prepare(sql).run(...args)}}}},
  STAGING_SYNC_OBJECTS:{async put(k,v){objects.set(k,new Uint8Array(v))},async get(k){const v=objects.get(k);return v?{size:v.length,arrayBuffer:async()=>v.buffer.slice(0)}:null},async delete(k){objects.delete(k)}},
  STAGING_PWA_ASSETS:{async fetch(r){const p=new URL(r.url).pathname;try{return new Response(await readFile(root+'assets'+p),{headers:{'Content-Type':mime[extname(p)]||'application/octet-stream'}})}catch{return new Response(null,{status:404})}}}
@@ -32,7 +34,7 @@ try{
   try{
    if(offline){req.socket.destroy();return}
    const u=new URL(req.url,origin);
-   if(['/__ci/a','/__ci/b'].includes(u.pathname)){res.writeHead(200,{'Set-Cookie':'__Host-asia1111_session='+(u.pathname.endsWith('/a')?ta:tb)+'; Path=/; Secure; HttpOnly; SameSite=Lax','Cache-Control':'no-store'});res.end('fixture');return}
+   if(['/__ci/a','/__ci/b','/__ci/c'].includes(u.pathname)){res.writeHead(200,{'Set-Cookie':'__Host-asia1111_session='+(u.pathname.endsWith('/a')?ta:u.pathname.endsWith('/b')?tb:tc)+'; Path=/; Secure; HttpOnly; SameSite=Lax','Cache-Control':'no-store'});res.end('fixture');return}
    if(u.pathname==='/__ci/offline'){res.end('offline');offline=true;return}
    if(u.pathname==='/__ci/head-fail'){failHead=true;res.end('fixture');return}
    if(u.pathname==='/__ci/head-resume'){failHead=false;res.end('fixture');return}
@@ -254,6 +256,26 @@ try{
   const d=document.querySelector('iframe').contentDocument;d.getElementById('goals101').open=true;await wait(()=>d.getElementById('goalActive101').textContent.includes('Constancia'),'Motivación no persistió');
   if(!d.getElementById('pilotGoals1149').hidden||d.getElementById('goalBrand101').textContent!=='Meta principal · Mi meta B'||d.getElementById('goalActive101').textContent.includes('Asia 2027'))throw Error('Meta v2 perdida o heredada');return true;
  }.toString()+')()',true);assert.equal(advanced,true);
+ const finishB=await evalJS('('+async function(){
+  const el=id=>document.getElementById(id),wait=async(f,m)=>{for(let i=0;i<200;i++){if(f())return;await new Promise(r=>setTimeout(r,100))}throw Error(m)};
+  el('close1140').click();await wait(()=>!document.querySelector('iframe')&&!el('reconcile1140').disabled,'B no cerró');el('reconcile1140').click();await wait(()=>!el('logout1140').disabled,'B no concilió');el('logout1140').click();return true;
+ }.toString()+')()',true);assert.equal(finishB,true);
+ await ready("document.readyState==='complete'&&typeof document.getElementById('openAccount')?.onclick==='function'&&!document.getElementById('shell1140')");
+ await evalJS("fetch('/__ci/c').then(r=>r.text())",true);await cmd('Page.navigate',{url:home});
+ await ready("document.querySelector('iframe')?.contentWindow?.asiaGym84Ready===true&&!document.getElementById('close1140').disabled");
+ const managed=await evalJS('('+async function(){
+  const el=id=>document.getElementById(id),wait=async(f,m)=>{for(let i=0;i<200;i++){if(f())return;await new Promise(r=>setTimeout(r,100))}throw Error(m)};
+  if(!el('unlock').hidden||el('phrase').value)throw Error('C solicitó frase');
+  const d=document.querySelector('iframe').contentDocument;if(d.getElementById('height').value==='1.86'||d.getElementById('goalBrand101').textContent.includes('Mi meta B'))throw Error('Datos cruzados C');
+  d.getElementById('pilotName1146').click();const name=d.getElementById('profile100-displayName');name.value='Usuario C';name.dispatchEvent(new Event('input',{bubbles:true}));d.getElementById('profileForm100').requestSubmit();
+  await wait(()=>d.querySelector('header .brand h1').textContent==='Usuario C'&&el('status1140').textContent.includes('saved'),'C no guardó nombre');
+  el('close1140').click();await wait(()=>!document.querySelector('iframe')&&!el('reconcile1140').disabled,'C no cerró');el('reconcile1140').click();await wait(()=>!el('logout1140').disabled,'C no concilió');return true;
+ }.toString()+')()',true);assert.equal(managed,true);
+ const managedRow=db.prepare('SELECT envelope FROM managed_account_keys_v1152 WHERE account_id=?').get(C).envelope;assert.ok(managedRow);
+ await cmd('Page.navigate',{url:home});await ready("document.querySelector('iframe')?.contentWindow?.asiaGym84Ready===true&&!document.getElementById('close1140').disabled");
+ assert.equal(await evalJS("document.querySelector('iframe').contentDocument.querySelector('header .brand h1').textContent"),'Usuario C');
+ assert.equal(await evalJS("document.getElementById('unlock').hidden&&document.getElementById('phrase').value===''"),true);
+ assert.equal(db.prepare('SELECT envelope FROM managed_account_keys_v1152 WHERE account_id=?').get(C).envelope,managedRow);
  await evalJS("fetch('/__ci/offline').then(r=>r.text())",true);await cmd('Page.navigate',{url:home});await ready("document.body?.textContent.includes('Volvé a conectarte para verificar tu cuenta')");
  console.log('Chrome paquete generado: autorización, diario, guardado, conciliación, Worker sync, logout, aislamiento, caché pública y fallback offline.');
 }finally{ws?.close();chrome?.kill();if(chrome&&chrome.exitCode===null)await Promise.race([once(chrome,'exit'),sleep(3000)]);server?.closeAllConnections();server?.close();db.close();await rm(dir,{recursive:true,force:true,maxRetries:3,retryDelay:100})}

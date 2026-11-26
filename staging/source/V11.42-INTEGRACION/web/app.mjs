@@ -9,7 +9,7 @@ import {devicePolicy} from './staging/source/V11.30-INTEGRACION/src/device-sessi
 import {openEncryptedModuleStore} from './staging/source/V11.28-INTEGRACION/src/encrypted-module-store.mjs';
 import {createLargeTransport} from './staging/source/V11.38-INTEGRACION/src/large-transport.mjs';
 import {validateLargeList} from './staging/source/V11.38-INTEGRACION/src/large-sync-client.mjs';
-export async function start(passphrase,{maintenanceOnly=false}={}){
+export async function start(passphrase,{maintenanceOnly=false,expectedIdentity=null}={}){
  const repository=await openUnifiedRepository(),pending=await openOfflineRepository();let shell,panel;
  const mount=async fixture=>{
   if(globalThis.__asiaCandidateFixture)throw Error('Diario ya abierto');globalThis.__asiaCandidateFixture=fixture;
@@ -37,6 +37,7 @@ export async function start(passphrase,{maintenanceOnly=false}={}){
  };
  try{
   const readSession=sessionReader({origin:location.origin}),identity=await readSession(),policy=globalThis.asiaAccounts106;
+  if(expectedIdentity&&(identity.accountId!==expectedIdentity.accountId||identity.csrf!==expectedIdentity.csrf))throw Error('La sesión cambió');
   const verify=async()=>{const t=await readSession();if(t.accountId!==identity.accountId||t.csrf!==identity.csrf)throw Error('Sesión cambió');return t};
   const snapshot=await repository.readSync(identity.accountId),branch=await pending.inspect(identity.accountId);
   for(const row of [snapshot,...(branch?[branch.working]:[])]){
@@ -55,7 +56,7 @@ export async function start(passphrase,{maintenanceOnly=false}={}){
    if(list.head>0)throw Error('Esta cuenta ya tiene una copia en la nube. Usá Comparar con nube y confirmá la recuperación antes de abrir el diario.');
    return true;
   };
-  const c=await createController({origin:location.origin,repository,pending,policy:globalThis.asiaAccounts106,passphrase,mount,beforeOpen,onState:s=>{shell?.render();panel?.render();if(s==='closed'){repository.close();pending.close();location.replace('/v11.42/index.html')}}});
+  const c=await createController({origin:location.origin,repository,pending,policy:globalThis.asiaAccounts106,passphrase,mount,beforeOpen,expectedIdentity:identity,onState:s=>{shell?.render();panel?.render();if(s==='closed'){repository.close();pending.close();location.replace('/v11.42/index.html')}}});
   shell=mountShell({doc:document,anchor:document.getElementById('shell'),controller:c,onRender:()=>panel?.render()});
   panel=mountMaintenance({doc:document,anchor:document.getElementById('shell'),controller:c,onChange:()=>shell.render()});
   // Use the same guarded shell action as manual opening. Its error handling
