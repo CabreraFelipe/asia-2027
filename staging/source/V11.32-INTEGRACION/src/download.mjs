@@ -6,3 +6,13 @@ export function downloadEncryptedCopy(envelope,{document:doc=globalThis.document
  const href=url.createObjectURL(blob),a=doc.createElement('a');a.href=href;a.download=filename;
  try{doc.body.append(a);a.click()}finally{a.remove();setTimeout(()=>url.revokeObjectURL(href),1000)}
 }
+
+// Multipart review archive: preserve the exact object and all authenticated
+// parts. Starting a download is not proof of saving or verification.
+export function downloadRecoveryArchive1167(archive,{document:doc=globalThis.document,url=globalThis.URL}={}){
+ const encrypted=e=>e?.format==='asia84-encrypted-v1'&&typeof e.cipher==='string'&&typeof e.salt==='string'&&typeof e.iv==='string';
+ if(!encrypted(archive?.manifest)||!Array.isArray(archive.parts)||archive.parts.length>16||!archive.parts.every(p=>typeof p.name==='string'&&encrypted(p.envelope)))throw Error('Archivo de revisión inválido');
+ const blob=new Blob([JSON.stringify(archive)],{type:'application/json'});
+ const href=url.createObjectURL(blob),a=doc.createElement('a');a.href=href;a.download='asia-revision-cifrada.json';
+ try{doc.body.append(a);a.click()}finally{a.remove();setTimeout(()=>url.revokeObjectURL(href),1000)}
+}

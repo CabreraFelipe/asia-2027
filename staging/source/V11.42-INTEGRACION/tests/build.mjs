@@ -93,12 +93,12 @@ function dependencies(file){
  }
 }
 function checkPath(p){if(!p.startsWith(assetRoot+'/'))throw Error('Dependencia fuera del paquete');}
-dependencies(web+'/app.mjs');
-// Private, internal migration primitives; no public route or UI.
+// Private migration primitives; the review panel exposes only read-only comparison.
 for(const n of ['prepare-rekey1153.mjs','local-rekey1158.mjs','rekey-client1159.mjs','recovery-review1161.mjs','recovery-apply1162.mjs']){
  const path=web+'/staging/source/V11.42-INTEGRACION/src/'+n;
  mkdirSync(dirname(path),{recursive:true});cpSync(base+'/src/'+n,path);
 }
+dependencies(web+'/app.mjs');
 dependencies(web+'/staging/source/V11.42-INTEGRACION/src/rekey-client1159.mjs');
 dependencies(web+'/staging/source/V11.42-INTEGRACION/src/recovery-review1161.mjs');
 dependencies(web+'/staging/source/V11.42-INTEGRACION/src/recovery-apply1162.mjs');

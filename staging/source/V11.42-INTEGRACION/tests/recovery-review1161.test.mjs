@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import '../../../../accounts106.js';
-import {prepareRecoveryReview1161,verifyRecoveryArchive1161} from '../dist/assets/v11.42/staging/source/V11.42-INTEGRACION/src/recovery-review1161.mjs';
+import {prepareRecoveryReview1161,verifyRecoveryArchive1161,makeReviewPlan1167} from '../dist/assets/v11.42/staging/source/V11.42-INTEGRACION/src/recovery-review1161.mjs';
 import {encrypt84,decrypt84,checksum84} from '../../../../model84.mjs';
 import {hashBytes} from '../dist/assets/v11.42/staging/source/V11.38-INTEGRACION/src/large-sync.mjs';
 const id='acct_'+'a'.repeat(32),oldPhrase='frase anterior sintética revisión',newSecret='X'.repeat(43),backupPhrase='respaldo separado sintético',identity={accountId:id,csrf:'a'.repeat(43)};
@@ -37,6 +37,12 @@ assert.deepEqual(source,confirmed);assert.deepEqual(branch,{phase:'editing',base
 assert.equal(JSON.stringify(review).includes('offline'),false);assert.equal(JSON.stringify(review).includes(oldPhrase),false);
 const checked=await verifyRecoveryArchive1161({archive:review.archive,backupPhrase,accountId:id});
 assert.equal(checked.verified,true);assert.equal(checked.partCount,12);
+const wrong=await makeReviewPlan1167({review,client,backupPhrase});
+await assert.rejects(wrong.apply({confirmed:true,savedArchive:{...review.archive,parts:[]}}),/no coincide/);
+const canceled=await makeReviewPlan1167({review,client,backupPhrase});canceled.cancel();await assert.rejects(canceled.apply({confirmed:true,savedArchive:review.archive}));
+const verified=await makeReviewPlan1167({review,client,backupPhrase});
+assert.equal((await verified.apply({confirmed:true,savedArchive:structuredClone(review.archive)})).kind,'verified-only');
+await assert.rejects(verified.apply({confirmed:true,savedArchive:review.archive}));
 const archived=await decrypt84(review.archive.parts.find(x=>x.name==='pending-working-modules').envelope,backupPhrase);
 assert.deepEqual(archived.value,await decrypt84(pendingWorking.modules.envelope,oldPhrase));
 await assert.rejects(verifyRecoveryArchive1161({archive:review.archive,backupPhrase,accountId:'acct_'+'b'.repeat(32)}));

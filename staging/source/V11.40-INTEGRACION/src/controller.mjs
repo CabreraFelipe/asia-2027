@@ -8,7 +8,7 @@ import {createAccountServices} from '../../V11.39-INTEGRACION/src/service-client
 const check=(x,m)=>{if(!x)throw Error(m)};
 const same=(a,b)=>a.accountId===b.accountId&&a.csrf===b.csrf;
 function transient(){const m=new Map();return Object.freeze({getItem:k=>m.get(k)??null,setItem:(k,v)=>m.set(k,String(v)),removeItem:k=>m.delete(k),key:i=>[...m.keys()][i]??null,get length(){return m.size}})}
-export async function createController({origin,fetcher=fetch,repository,pending,policy,passphrase,mount,beforeOpen=async()=>{},expectedIdentity=null,managedWrite=false,onState=()=>{},now=Date.now}){
+export async function createController({origin,fetcher=fetch,repository,pending,policy,passphrase,mount,beforeOpen=async()=>{},expectedIdentity=null,managedWrite=false,recoveryReview=null,onState=()=>{},now=Date.now}){
  check(/^https:\/\/asia-v1111-identity-staging\.[a-z0-9-]+\.workers\.dev$/.test(origin)&&typeof mount==='function'&&typeof beforeOpen==='function','Origen o montaje inválido');
  const read=sessionReader({origin,fetcher}),identity=await read();
  check(!expectedIdentity||same(identity,expectedIdentity),'La sesión cambió');
@@ -47,6 +47,7 @@ export async function createController({origin,fetcher=fetch,repository,pending,
   async reconcile(confirmation){maintenance();return operation(async()=>{await verify();return reconcileOffline({...options,maintenanceConfirmed:true,confirmed:confirmation===true})})},
   async inspectPending(){maintenance();return operation(async()=>{await verify();const p=await pending.inspect(identity.accountId);return p?{phase:p.phase}:null})},
   async exportConflict(backupPhrase){maintenance();return operation(()=>exportOfflineConflict({...options,backupPhrase}))},
+  prepareRecoveryReview({oldPhrase,backupPhrase}){return prepare(async()=>{check(typeof recoveryReview==='function','Revisión no disponible');return recoveryReview({...options,oldPhrase,backupPhrase,maintenanceConfirmed:true})})},
   prepareSync({allowTransportChange=false}={}){return prepare(async()=>{check(!await pending.inspect(identity.accountId),'Conciliá primero los cambios pendientes');return prepareLargeSync({...options,maintenanceConfirmed:true,allowTransportChange})})},
   prepareImport({envelope,sourcePhrase}){return prepare(async()=>{check(!await pending.inspect(identity.accountId),'Conciliá primero los cambios pendientes');return prepareFullImport({...options,envelope,sourcePhrase,accountPhrase:passphrase})})},
   prepareRestore({envelope,recoveryPhrase,backupPhrase}){return prepare(async()=>{check(!await pending.inspect(identity.accountId),'Conciliá primero los cambios pendientes');return prepareSelectiveRestore({...options,repository:repository.local,envelope,recoveryPhrase,backupPhrase})})},
