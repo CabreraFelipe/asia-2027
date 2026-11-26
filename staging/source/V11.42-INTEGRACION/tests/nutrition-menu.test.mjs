@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import '../src/nutrition-menu.js';
+const M=globalThis.asiaNutritionMenu;
+const f=(name,kcal,protein,carbs=null,fat=null)=>({name,basis:'1 porción',source:'manual',kcal,protein,carbs,fat});
+const settings={favorites52:[f('Desayuno A',500,25,60,15),f('Desayuno B',350,15),f('Almuerzo',650,40,70,20),f('Merienda',250,20,30,5),f('Cena',600,35,70,20)],recipes52:[{name:'Receta',servings:2,ingredients:[f('Ingrediente',800,60,80,20)]}]};
+const p={id:'nut-fixture',name:'Referencia propia',calories:2000,protein:120,fat:60,shares:[25,32,13,30]},N={validate:()=>({plans:[p]}),preview:x=>({carbs:245,meals:x.shares.map(s=>({calories:x.calories*s/100,protein:x.protein*s/100}))})};
+const pick=(i,factor=1)=>[{id:'favorite-'+i,factor}],choices=[[pick(0),pick(1)],[pick(2)],[pick(3)],[pick(4)]],before=JSON.stringify(settings);
+assert.equal(M.library(settings).length,6);assert.equal(M.library(settings)[5].kcal,400);assert.equal(M.library(settings)[5].protein,30);
+const r=M.compare(settings,p.id,choices,N);assert.equal(r.combinations,2);assert.equal(r.menus[0].totals.kcal,2000);assert.equal(r.menus[0].totals.protein,120);assert.equal(r.menus[0].delta.kcal,0);assert.equal(r.menus[1].totals.carbs,null);assert.equal(r.menus[1].totals.fat,null);assert.equal(JSON.stringify(settings),before);
+assert.throws(()=>M.compare(settings,'missing',choices,N));assert.throws(()=>M.compare(settings,p.id,[[],...choices.slice(1)],N));assert.throws(()=>M.compare(settings,p.id,[[pick(0),pick(0)],...choices.slice(1)],N));
+assert.throws(()=>M.evaluate(pick(0,NaN),M.library(settings)));assert.throws(()=>M.evaluate([{id:'missing',factor:1}],M.library(settings)));assert.throws(()=>M.evaluate([...pick(0),...pick(0)],M.library(settings)));
+assert.equal(M.evaluate(pick(0,.5),M.library(settings)).totals.kcal,250);
+assert.throws(()=>M.library({...settings,recipes52:[{name:'R',servings:0,ingredients:[f('A',500,10)]}]}));
+console.log('Local menu comparison: native library, recipes, exact portions, missing macros, no mutation, strategy reference and rejection PASS');

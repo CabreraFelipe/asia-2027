@@ -165,6 +165,7 @@ runIsolated1174(process.execPath,[new URL('./coach-intake-flow11991.test.mjs',im
 runIsolated1174(process.execPath,[new URL('./coach-intake-params11992.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
 runIsolated1174(process.execPath,[new URL('./coach-transport1181.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
 runIsolated1174(process.execPath,[new URL('./coach-client-policy.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
+runIsolated1174(process.execPath,[new URL('./nutrition-menu.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
 runIsolated1174(process.execPath,[new URL('./coach-context1181.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
 
 runIsolated1174(process.execPath,[new URL('./coach-review1182.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
