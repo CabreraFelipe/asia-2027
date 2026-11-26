@@ -26,3 +26,6 @@ Solicitud explícita del propietario, 26/11/2026. Nuevo alcance obligatorio de V
 
 ## Estado
 Especificación aceptada para roadmap; implementación de running aún no iniciada en este commit documental. Último candidato completamente validado V11.73.1 f9695cdf9f93f784623eeab61028e6bce561fbe7: fuentes 45878266747, PWA 45878266746, Chrome normal/lento 45878266828, runtime D1/R2 45878266735. Prioridad: cerrar onboarding/planning y running funcional, luego catálogo/Coach/salud/migración. No acumular versiones pequeñas; agrupar entregas y corregir gates antes de avanzar.
+
+## V11.74 (candidato)
+Fundamento funcional integrado: objetivos por ID, registros manuales, métricas por superficie, borrador suave y activación, vista semanal, validación y recuperación granular. Pendientes pruebas CI, replanificación/edición, coordinación inversa al crear fuerza después del running, Coach, nutrición personalizada, catálogo complementario, salud y wearable. No confundir fundamento con plan completo de competición.

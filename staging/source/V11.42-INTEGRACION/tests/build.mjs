@@ -34,6 +34,9 @@ replaceExtras("(g.id==='asia-2027'||/^goal-[a-f0-9]{32}$/.test(g.id))","((raw.ve
 replaceExtras("check(ids.has('asia-2027')&&(raw.primary===''||items.some(g=>g.id===raw.primary&&g.status==='Activa'))","check((raw.version===2||ids.has('asia-2027'))&&(raw.primary===''||items.some(g=>g.id===raw.primary&&g.status==='Activa'))");
 replaceExtras('return {version:1,primary:raw.primary,items};','return {version:raw.version,primary:raw.primary,items};');
 replaceExtras('profile100,goals101,goalDay101','profile100,goals101,emptyGoals1148,goalDay101');
+replaceExtras("['Peso corporal','Fuerza','Hábitos','Bienestar','Otro']","['Peso corporal','Fuerza','Hábitos','Bienestar','Otro','Running']");
+replaceExtras('function diary(d){','function diary(d){globalThis.asiaRunning1174.validate(d.running1174,goals101(d.settings?.goals101));');
+extras1148=readFileSync(base+'/src/running1174.js','utf8')+'\n'+extras1148;
 writeFileSync(web+'/diary/extras830.js',extras1148);
 execFileSync(process.execPath,['--check',web+'/diary/extras830.js'],{stdio:'inherit'});
 // V11.49: first-use invitation only with an explicitly verified empty local
@@ -104,6 +107,9 @@ dependencies(web+'/staging/source/V11.42-INTEGRACION/src/rekey-client1159.mjs');
 dependencies(web+'/staging/source/V11.42-INTEGRACION/src/recovery-review1161.mjs');
 dependencies(web+'/staging/source/V11.42-INTEGRACION/src/recovery-apply1162.mjs');
 const schedule1173=patchPlanning1173(web);
+const runningUI=web+'/diary/running1174-ui.js';cpSync(base+'/src/running1174-ui.js',runningUI);execFileSync(process.execPath,['--check',runningUI],{stdio:'inherit'});
+const runningIndex=readFileSync(diary,'utf8');const runningAnchor='<script src="nutrition103.js?v=1060"></script>';if(runningIndex.split(runningAnchor).length!==2)throw Error('Marcador Running');writeFileSync(diary,runningIndex.replace(runningAnchor,runningAnchor+'<script src="running1174-ui.js"></script>'));
+const planner1174=web+'/diary/planner820.js';let plannerText1174=readFileSync(planner1174,'utf8');const anchor1174='for(const s of d.sessions){';if(plannerText1174.split(anchor1174).length!==2)throw Error('Marcador agenda Running');plannerText1174=plannerText1174.replace(anchor1174,"const run=window.asiaRunning1174.planned(data.running1174,d.date);if(run){card.append(make('p','Running · '+run.type+' · '+run.minutes+' min'+(d.routine!==null?' · Revisá coincidencia con fuerza':'')));action(card,'Abrir Running',()=>window.asiaOpenRunning1174?.());}for(const s of d.sessions){");writeFileSync(planner1174,plannerText1174);
 const shellSchedule=web+'/schedule829.js';if(readFileSync(shellSchedule,'utf8')!==readFileSync('schedule829.js','utf8'))throw Error('Validador calendario inesperado');writeFileSync(shellSchedule,schedule1173);
 for(const n of ['schedule829.js','training102.js','planner820.js','v42.js','goals101.js'])execFileSync(process.execPath,['--check',web+'/diary/'+n],{stdio:'inherit'});
 const shellExtras=web+'/extras830.js';if(readFileSync(shellExtras,'utf8')!==extrasSource)throw Error('Validador de shell inesperado');writeFileSync(shellExtras,extras1148);

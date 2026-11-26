@@ -27,9 +27,23 @@ export function reconcileDiary1164(historical,local,cloud){
  const result=structuredClone(c??l);
  let changed=false;
  for(const k of keys(h,l,c)){
-  if(maps.includes(k))continue;
+  if(maps.includes(k)||k==='running1174')continue;
   if(l&&c&&(own(l,k)!==own(c,k)||own(l,k)&&!eq(l[k],c[k])))conflict(k,'different-values');
   else if(own(h,k)&&!own(l,k)&&!own(c,k))conflict(k,'historical-only');
+ }
+ // Running is an explicitly versioned record book; merge only complete stable-ID rows.
+ if(own(h,'running1174')||own(l,'running1174')||own(c,'running1174')){
+  const a=h?.running1174,b=l?.running1174,d=c?.running1174;
+  if(!b&&!d){conflict('running1174','historical-only')}
+  else{
+   if(!result.running1174){result.running1174=structuredClone(b??d);changed=true}
+   for(const name of ['targets','sessions','plans'])for(const k of keys(a?.[name],b?.[name],d?.[name])){
+    const inL=Object.hasOwn(b?.[name]??{},k),inC=Object.hasOwn(d?.[name]??{},k),path='running1174/'+name+'/'+k;
+    if(!inL&&!inC){conflict(path,'historical-only');continue}
+    if(inL&&inC){if(!eq(b[name][k],d[name][k]))conflict(path,'different-values');continue}
+    add(path,inL?'local':'cloud');if(inL&&c){result.running1174[name][k]=structuredClone(b[name][k]);changed=true}
+   }
+  }
  }
  for(const name of maps){
   const a=h?.[name]??{},b=l?.[name]??{},d=c?.[name]??{};
