@@ -14,7 +14,7 @@ for(const a of accounts){db.prepare('INSERT INTO accounts_v11 VALUES(?,?,?,?)').
 const env={STAGING_MODE:'asia-v1111-identity-private',STAGING_ORIGIN:origin,STAGING_ALLOW_V1142_TESTS:'true',STAGING_ALLOW_MANAGED_KEYS_1152:'true',STAGING_MANAGED_KEK_ID_1152:'fixture-v1',STAGING_MANAGED_KEK_1152:generateAccountSecret(),STAGING_GOOGLE_CLIENT_ID:'test.apps.googleusercontent.com',STAGING_GOOGLE_CLIENT_SECRET:'synthetic-only',STAGING_ALLOWED_EMAILS:accounts.map(a=>a.email).join(','),STAGING_PWA_ASSETS:{},STAGING_DB:{prepare(sql){let args=[];return {bind(...a){args=a;return this},async first(){return db.prepare(sql).get(...args)||null},async run(){return db.prepare(sql).run(...args)}}}}};
 const [A,B,C,D,E]=accounts;
 const req=(a=A,o={})=>worker.fetch(new Request(origin+'/v11.52/account-key'+(o.query||''),{method:o.method||'POST',headers:{...(o.anonymous?{}:{Cookie:'__Host-asia1111_session='+a.token}),Origin:o.origin||origin,'X-Asia-CSRF':o.csrf||a.csrf,...o.headers},...(o.body?{body:'invalid'}:{})}),{...env,...o.env});
-const enroll=a=>db.prepare('INSERT INTO managed_account_keys_v1152(account_id) VALUES(?)').run(a.id);
+const enroll=a=>db.prepare('INSERT INTO managed_account_keys_v1152(account_id,enrollment_kind) VALUES(?,\'new\')').run(a.id);
 const row=a=>db.prepare('SELECT envelope FROM managed_account_keys_v1152 WHERE account_id=?').get(a.id);
 try{
  assert.equal((await req(A,{env:{STAGING_ALLOW_MANAGED_KEYS_1152:'false'}})).status,404);

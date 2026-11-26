@@ -14,7 +14,7 @@ export function createWorker({assets,provider,fetchImpl=fetch}={}){
   async function read(){const r=await original.fetch(new Request(u.origin+'/v11.11/auth/me',{headers:{Cookie:cookie}}),env);return r.ok?await r.json():null}
   const s=await read();if(s?.ok!==true||s.syntheticOnly!==true||!/^acct_[a-f0-9]{32}$/.test(s.accountId))return deny(401);
   const session={id:s.accountId,digest:await digest(matches[0].split('=')[1])};
-  if(large)return handleLargeSync(request,{db:env.STAGING_DB,bucket:env.STAGING_SYNC_OBJECTS,session,validWrite:r=>r.headers.get('Origin')===env.STAGING_ORIGIN&&r.headers.get('X-Asia-CSRF')===s.csrf,enabled:true,fenceEnabled:env.STAGING_ALLOW_MANAGED_KEYS_1152==='true'});
+  if(large)return handleLargeSync(request,{db:env.STAGING_DB,bucket:env.STAGING_SYNC_OBJECTS,session,validWrite:r=>r.headers.get('Origin')===env.STAGING_ORIGIN&&r.headers.get('X-Asia-CSRF')===s.csrf,enabled:true,fenceEnabled:env.STAGING_ALLOW_MANAGED_KEYS_1152==='true',seedEnabled:env.STAGING_ALLOW_REMOTE_REKEY_1159==='true'});
   return handleServices(request,{session,provider,enabled:true,stillCurrent:async()=>{const x=await read();return x?.accountId===s.accountId&&x.csrf===s.csrf}});
  }};
 }

@@ -21,7 +21,7 @@ const legacy=await encrypt84({history:['legacy fixture']},'frase sintética lega
 const write=(a,expectedRevision,envelope=legacy,epoch=null,overrides={})=>worker.fetch(new Request(origin+'/v11.38/sync',{method:'POST',headers:{...headers(a),'Content-Type':'application/json',...(epoch===null?{}:{'X-Asia-Key-Epoch':epoch})},body:JSON.stringify({expectedRevision,envelope})}),{...env,...overrides});
 const read=(a,revision=null)=>worker.fetch(new Request(origin+'/v11.38/sync'+(revision===null?'':'/'+revision),{headers:headers(a)}),env);
 const rows=a=>db.prepare('SELECT * FROM sync_v1138_objects WHERE account_id=? ORDER BY revision').all(a.id);
-const enroll=a=>db.prepare('INSERT INTO managed_account_keys_v1152(account_id) VALUES(?)').run(a.id);
+const enroll=a=>db.prepare('INSERT INTO managed_account_keys_v1152(account_id,enrollment_kind) VALUES(?,\'new\')').run(a.id);
 const lock=a=>db.prepare('UPDATE managed_account_keys_v1152 SET migration_lock=? WHERE account_id=?').run(crypto.randomUUID(),a.id);
 const unlock=a=>db.prepare('UPDATE managed_account_keys_v1152 SET migration_lock=NULL WHERE account_id=?').run(a.id);
 try{

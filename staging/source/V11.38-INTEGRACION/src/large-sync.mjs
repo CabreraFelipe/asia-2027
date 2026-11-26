@@ -19,7 +19,7 @@ async function bounded(request){
 const headers={'Cache-Control':'no-store','Content-Type':'application/json; charset=utf-8','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Cross-Origin-Resource-Policy':'same-origin'};
 const json=(x,status=200)=>new Response(JSON.stringify(x),{status,headers});
 const err=(status,error)=>json({ok:false,error},status);
-export async function handleLargeSync(request,{db,bucket,session,validWrite,enabled=false,fenceEnabled=false,now=Date.now}){
+export async function handleLargeSync(request,{db,bucket,session,validWrite,enabled=false,fenceEnabled=false,seedEnabled=false,now=Date.now}){
  if(!enabled||!bucket||typeof bucket.put!=='function')return err(403,'DESACTIVADO');
  if(!session||!/^acct_[a-f0-9]{32}$/.test(session.id)||!session.digest)return err(401,'NO_AUTORIZADO');
  const u=new URL(request.url),match=/^\/v11\.38\/sync(?:\/([1-9]\d{0,2}))?$/.exec(u.pathname);
@@ -46,17 +46,21 @@ export async function handleLargeSync(request,{db,bucket,session,validWrite,enab
   // This protocol marker prevents accidental writes by older clients. It is
   // not a proof of knowledge of the encryption key or a separate auth factor.
   const epoch=request.headers.get('X-Asia-Key-Epoch');
-  if(epoch!==null&&epoch!=='managed-v1')return err(400,'EPOCA_INVALIDA');
+  if(epoch!==null&&!['managed-v1','legacy-seed-v1'].includes(epoch))return err(400,'EPOCA_INVALIDA');
   if(epoch!==null&&!fenceEnabled)return err(409,'CUSTODIA_DESACTIVADA');
+  if(epoch==='legacy-seed-v1'&&!seedEnabled)return err(409,'MIGRACION_DESACTIVADA');
   // D1 publication must check the fence atomically with remote CAS. No read
   // before an R2 put can be used as the final authorization for a write.
   const fenceSQL=!fenceEnabled?'1=1':epoch==='managed-v1'
    ?'EXISTS(SELECT 1 FROM managed_account_keys_v1152 WHERE account_id=? AND envelope IS NOT NULL AND migration_lock IS NULL)'
+   :epoch==='legacy-seed-v1'
+   ?"EXISTS(SELECT 1 FROM managed_account_keys_v1152 WHERE account_id=? AND enrollment_kind='legacy' AND envelope IS NULL AND migration_lock IS NULL) AND NOT EXISTS(SELECT 1 FROM synthetic_journal_v115 WHERE account_id=?) AND NOT EXISTS(SELECT 1 FROM encrypted_snapshots_v11 WHERE account_id=?)"
    :'NOT EXISTS(SELECT 1 FROM managed_account_keys_v1152 WHERE account_id=? AND (envelope IS NOT NULL OR migration_lock IS NOT NULL))';
-  const fenceArgs=fenceEnabled?[session.id]:[];
+  const fenceArgs=!fenceEnabled?[]:epoch==='legacy-seed-v1'?[session.id,session.id,session.id]:[session.id];
   if(!await db.prepare('SELECT 1 AS yes WHERE '+fenceSQL).bind(...fenceArgs).first())return err(409,'ESCRITURA_BLOQUEADA');
   let input;try{input=await bounded(request)}catch{return err(400,'CUERPO_INVALIDO')}
   if(!exact(input,['expectedRevision','envelope'])||!Number.isSafeInteger(input.expectedRevision)||input.expectedRevision<0||input.expectedRevision>=200||!validLargeEnvelope(input.envelope))return err(400,'SOBRE_INVALIDO_O_CUOTA');
+  if(epoch==='legacy-seed-v1'&&input.expectedRevision!==0)return err(409,'COPIA_INICIAL_REQUERIDA');
   if(!await live())return err(401,'NO_AUTORIZADO');
   const raw=bytes(JSON.stringify(input.envelope)),sha=await hashBytes(raw),key='synthetic-sync-v1138/'+session.id+'/'+crypto.randomUUID();
   // Unique object; never replace an earlier revision. No delete on ambiguous D1 outcome.

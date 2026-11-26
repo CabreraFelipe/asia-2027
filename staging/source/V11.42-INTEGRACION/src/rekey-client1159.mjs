@@ -4,7 +4,7 @@ import {localPayload,validatePayload} from '../../V11.36-INTEGRACION/src/sync.mj
 import {createLargeTransport} from '../../V11.38-INTEGRACION/src/large-transport.mjs';
 import {validateLargeList} from '../../V11.38-INTEGRACION/src/large-sync-client.mjs';
 import {hashBytes,validLargeEnvelope} from '../../V11.38-INTEGRACION/src/large-sync.mjs';
-import {decrypt84,checksum84} from '../../../../model84.mjs';
+import {encrypt84,decrypt84,checksum84} from '../../../../model84.mjs';
 const check=(x,m)=>{if(!x)throw Error(m)},eq=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 const valid=s=>/^acct_[a-f0-9]{32}$/.test(s?.accountId||'')&&/^[A-Za-z0-9_-]{43}$/.test(s.csrf||'');
 const uuid=s=>typeof s==='string'&&/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(s);
@@ -29,7 +29,8 @@ export async function createRekeyClient1159({origin,readSession,fetcher=fetch}){
   await verify();check(r.ok,'Clave no disponible');const x=await r.json();check(x?.ok===true&&x.syntheticOnly===true&&x.accountId===identity.accountId&&/^[A-Za-z0-9_-]{43}$/.test(x.secret||''),'Clave inválida');return x.secret;
  }
  const request=createLargeTransport({origin,readSession:verify,fetcher});
- return Object.freeze({accountId:identity.accountId,verify,request,discover:()=>post({action:'discover'}),inspect:operationId=>post({action:'inspect',operationId}),
+ const seedRequest=createLargeTransport({origin,readSession:verify,fetcher,legacySeed:true});
+ return Object.freeze({accountId:identity.accountId,verify,request,seed:envelope=>seedRequest('POST',{expectedRevision:0,envelope}),discover:()=>post({action:'discover'}),inspect:operationId=>post({action:'inspect',operationId}),
   begin:({operationId,expectedRevision,expectedSha,confirmed})=>post({action:'begin',operationId,expectedRevision,expectedSha,confirmed}),
   cancel:({operationId,confirmed})=>post({action:'cancel',operationId,confirmed}),
   commit:({operationId,oldPhrase,confirmed,consent})=>post({action:'commit',operationId,oldPhrase,confirmed,consent}),
@@ -44,6 +45,33 @@ export async function prepareMigration1159({client,repository,pending,policy,old
  const noPending=async()=>check(!await pending.inspect(id),'Hay cambios pendientes; conservá ambas copias');
  await verify();await noPending();
  const existing=await client.discover(),head=validateLargeList(await client.request('GET')).head;
+ if(head===0&&!existing){
+  const source=await repository.readSync(id),saved=await repository.readRekey(id);
+  check(!saved&&!source.baseline&&(source.local||source.modules),'No hay origen local independiente para la copia inicial');
+  const local=await localPayload({row:source,readSession:verify,passphrase:oldPhrase,policy});
+  check(local.payload.entries.length||Object.keys(local.payload.modules).length,'No hay registros portables para migrar');
+  const envelope=await encrypt84({format:'asia-v1136-sync-v1',accountId:id,payload:local.payload},oldPhrase);
+  check(validLargeEnvelope(envelope),'Copia inicial excede el límite');
+  await noPending();await verify();check(eq(source,await repository.readSync(id)),'La copia local cambió');
+  let active=true;
+  return Object.freeze({kind:'ready',phase:'seed',cancel(){active=false},
+   async apply({confirmed,consent}={}){
+    check(active&&confirmed===true&&consent==='transient-server-rekey-v1','Confirmá copia inicial, recifrado y consentimiento');active=false;
+    await noPending();await verify();check(eq(source,await repository.readSync(id)),'La copia local cambió');
+    check(await client.discover()===null&&validateLargeList(await client.request('GET')).head===0,'La nube cambió; revisá antes de continuar');
+    await noPending();await verify();check(eq(source,await repository.readSync(id)),'La copia local cambió');
+    // A lost response requires a fresh preflight, not a blind retry.
+    const result=await client.seed(envelope);
+    check(result.ok===true&&result.revision===1,'Copia inicial no confirmada');
+    const verified=await client.request('GET',null,1);
+    check(verified.ok===true&&verified.revision===1&&eq(verified.envelope,envelope),'No se verificó la copia inicial');
+    await noPending();await verify();check(eq(source,await repository.readSync(id)),'La copia local cambió; copia inicial preservada');
+    const next=await prepareMigration1159({client,repository,pending,policy,oldPhrase,maintenanceConfirmed:true});
+    if(next.kind!=='ready'||next.phase==='seed')return next;
+    return next.apply({confirmed:true,consent});
+   }
+  });
+ }
  const revision=existing?.sourceRevision??head;
  check(revision>=1&&revision<200&&head===(existing?.phase==='committed'?existing.revision:revision),'La copia remota cambió');
  const r=await client.request('GET',null,revision);
