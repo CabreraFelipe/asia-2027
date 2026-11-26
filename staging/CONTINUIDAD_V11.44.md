@@ -313,3 +313,8 @@ Reconstruido V11.98 sobre b8558c17e57c2c80595198a90d952b48a3cebccd; SHA original
 Base V11.98 ded891a13a2fcf4a38797bef95045e35e69012ca; no promover antes de gates anteriores. Contrato v3 mínimo de meta libre y aclaraciones consentidas, respuesta descriptiva editable sin dosis ni fechas inferidas. Adaptador OpenAI y transporte existentes aceptan v3 con validación estricta; no monta ruta, no conecta proveedor ni expone secretos. Continuación vinculada a preguntas exactas, máximo seis respuestas. Prueba proveedor con fetch inyectado, todavía sin UI inicial ni integración de formulario/guardado. CI integral pendiente. No se declara Coach real activo ni V12 liberada.
 
 Reconstruido V11.99 sobre 112bc33888d1367d0c4b0f6908551be77b35ab93; original 13610ba25c4b3a9bea128c72a096abc958ffa2df. CI pendiente.
+
+## V11.99.1 — candidato interfaz de conversación inicial y traspaso manual
+Base V11.99 13610ba25c4b3a9bea128c72a096abc958ffa2df; no promover hasta gates anteriores. Interfaz piloto explícitamente sintética sin red: revisión exacta de cada turno, preguntas/respuestas fijas, meta de ejemplo y consentimiento separado para copiar solo al formulario manual existente. Invalida revisión de formulario, desactiva acciones de fuerza/Running/nutrición previas, no guarda ni aplica nada. Controlador transportable con identidad/estado y vencimiento, sin persistencia. Pruebas de flujo y Chrome preparadas; no se habilita proveedor, no interpreta texto real ni genera prescripciones. Sin cambios producción.
+
+Reconstruido V11.99.1 sobre 72f62488c266537e39b920107c6b7c2b9b884c11; original 7fc142c4491d9efc3c1f58c484b9d6c1716b7969. CI pendiente.

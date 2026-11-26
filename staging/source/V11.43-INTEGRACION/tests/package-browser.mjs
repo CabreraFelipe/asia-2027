@@ -253,6 +253,18 @@ try{
   await wait(()=>diaryB.getElementById('runStatus1174').textContent==='Bloque guardado.'&&el('status1140').textContent.includes('saved'),'Plan híbrido no guardado');
   const onboard=diaryB.getElementById('onboard1176');if(onboard.hidden)throw Error('Asistente manual no disponible');onboard.open=true;
   const ob=id=>diaryB.getElementById('ob1176-'+id),obStart=addDay(todayB,60),obEnd=addDay(obStart,21);
+  const ci=diaryB.getElementById('coachIntake11991');if(!ci||ci.hidden)throw Error('Conversación inicial no disponible');ci.open=true;
+  const ciGet=id=>diaryB.getElementById('coachIntake'+id+'11991');
+  diaryB.getElementById('ci11991-question').value='Meta sintética B';ciGet('Prepare').click();
+  diaryB.getElementById('ci11991-consent').checked=true;ciGet('Sample').click();
+  await wait(()=>!!diaryB.getElementById('ci11991-answer-0')&&ci.getAttribute('aria-busy')==='false','Pregunta inicial ausente');
+  diaryB.getElementById('ci11991-answer-0').value='5 km ficticios';diaryB.getElementById('ci11991-answer-1').value='3 días ficticios';ciGet('Continue').click();
+  diaryB.getElementById('ci11991-consent').checked=true;ciGet('Sample').click();
+  await wait(()=>!!ciGet('Transfer')&&ci.getAttribute('aria-busy')==='false','Meta inicial ausente');
+  const intakeBefore=w.localStorage.getItem('asia2027-v1');
+  try{w.confirm=()=>true;ciGet('Transfer').click()}finally{w.confirm=originalConfirm}
+  if(ob('title').value!=='Preparar 10K de prueba'||ob('mode').value!=='Solo meta'||w.localStorage.getItem('asia2027-v1')!==intakeBefore)throw Error('Traspaso inicial no fue solo borrador');
+  ci.open=false;
   for(const [k,v] of Object.entries({title:'Plan manual B',kind:'Running',target:'5K',start:obStart,end:obEnd,mode:'Híbrido',strengthName:'Fuerza manual B',distance:'5',weekly:'80',longest:'35',level:'Habitual',surface:'Exterior',available:'35',symptoms:'Sin síntomas preocupantes',nutritionAction:'Guardar',kcal:'2400',protein:'120',fat:'70',share0:'20',share1:'30',share2:'20',share3:'30'}))ob(k).value=v;
   const review=diaryB.getElementById('onboardReview1176'),apply=diaryB.getElementById('onboardApply1176'),obStatus=diaryB.getElementById('onboardStatus1176');
   review.click();if(!diaryB.getElementById('onboardPreview1176').textContent.includes('Fuerza manual B'))throw Error('Asistente sin propuesta: '+obStatus.textContent);
