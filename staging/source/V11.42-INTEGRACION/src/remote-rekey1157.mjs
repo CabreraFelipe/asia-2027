@@ -41,6 +41,11 @@ export function createRemoteRekey1157({db,bucket,session,kekId,kekSecret,policy,
    const saved=await requireRow(operationId);check(saved.source_revision===expectedRevision&&saved.source_sha===expectedSha,'Operación incompatible');return status(saved);
   },
   async inspect(operationId){return status(await requireRow(operationId))},
+  async discover(){
+   await verify();
+   const r=await query("SELECT * FROM remote_rekeys_v1157 WHERE account_id=? AND phase IN ('locked','committed') AND "+live+" ORDER BY CASE phase WHEN 'locked' THEN 0 ELSE 1 END,created_at DESC LIMIT 1",id,...args());
+   await verify();return r?status(r):null;
+  },
   async cancel({operationId,confirmed}){
    check(confirmed===true,'Confirmá cancelación');const r=await requireRow(operationId);
    if(r.phase==='canceled')return status(r);check(r.phase==='locked','Migración ya confirmada');

@@ -3,6 +3,7 @@ import {cpSync,mkdirSync,readFileSync,writeFileSync,readdirSync,existsSync,statS
 import {join,dirname,resolve,relative} from 'node:path';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
+import {runInNewContext} from 'node:vm';
 const base='staging/source/V11.42-INTEGRACION',out=base+'/dist',web=out+'/assets/v11.42',candidate='staging/source/V11.29-INTEGRACION/tests/candidate';
 if(existsSync(out))throw Error('Build debe ser nuevo');
 mkdirSync(web,{recursive:true});cpSync(base+'/web',web,{recursive:true});
@@ -94,11 +95,11 @@ function dependencies(file){
 function checkPath(p){if(!p.startsWith(assetRoot+'/'))throw Error('Dependencia fuera del paquete');}
 dependencies(web+'/app.mjs');
 // Private, internal migration primitives; no public route or UI.
-for(const n of ['prepare-rekey1153.mjs','local-rekey1158.mjs']){
+for(const n of ['prepare-rekey1153.mjs','local-rekey1158.mjs','rekey-client1159.mjs']){
  const path=web+'/staging/source/V11.42-INTEGRACION/src/'+n;
  mkdirSync(dirname(path),{recursive:true});cpSync(base+'/src/'+n,path);
 }
-dependencies(web+'/staging/source/V11.42-INTEGRACION/src/local-rekey1158.mjs');
+dependencies(web+'/staging/source/V11.42-INTEGRACION/src/rekey-client1159.mjs');
 const shellExtras=web+'/extras830.js';if(readFileSync(shellExtras,'utf8')!==extrasSource)throw Error('Validador de shell inesperado');writeFileSync(shellExtras,extras1148);
 console.log('Shell static dependency graph:',visited.size,'modules; original pure JS dependencies included');
 // Server modules isolated from static asset binding. Preserve relative paths for imports.
@@ -135,7 +136,13 @@ replaceIdentity("  if(path==='/v11.11/auth/logout'&&request.method==='POST'&&!u.
 writeFileSync(identityFile,identityText);
 execFileSync(process.execPath,['--check',identityFile],{stdio:'inherit'});
 const worker=sroot+'/V11.42-INTEGRACION/src/worker.mjs';mkdirSync(dirname(worker),{recursive:true});cpSync(base+'/src/worker.mjs',worker);
-for(const n of ['account-key1150.mjs','managed-key1152.mjs','remote-rekey1157.mjs'])cpSync(base+'/src/'+n,dirname(worker)+'/'+n);
+for(const n of ['account-key1150.mjs','managed-key1152.mjs','remote-rekey1157.mjs','remote-rekey-route1159.mjs'])cpSync(base+'/src/'+n,dirname(worker)+'/'+n);
+// Extract policy from the immutable V10.6 source without evaluating DOM code
+// in the Worker. The server sees only portable keys and presentation groups.
+const policyContext={module:{exports:{}}};runInNewContext(readFileSync('accounts106.js','utf8'),policyContext);
+const accountPolicy=policyContext.module.exports;
+if(!Array.isArray(accountPolicy.portable)||!Array.isArray(accountPolicy.groups?.presentation))throw Error('Política original inválida');
+writeFileSync(dirname(worker)+'/rekey-policy.generated.mjs','export default '+JSON.stringify({portable:accountPolicy.portable,groups:{presentation:accountPolicy.groups.presentation}})+';\n');
 function walk(dir){return readdirSync(dir).flatMap(n=>{const p=join(dir,n);return statSync(p).isDirectory()?walk(p):[p]})}
 // Public entry carries a fingerprint of the complete private and public asset set.
 // Compute before adding the comment, so the build is reproducible and noncircular.
