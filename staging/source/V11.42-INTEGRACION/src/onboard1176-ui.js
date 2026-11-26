@@ -31,11 +31,24 @@ btn('onboardApply1176','Aceptar y aplicar plan',()=>{if(!proposal||rawAtReview!=
 btn('onboardReject1176','Descartar propuesta',()=>{proposal=null;preview.replaceChildren();message.textContent='Propuesta descartada. Sin cambios guardados.'});
 panel.append(preview,message);
 // Explicit form-only handoff from the initial conversation. Never saves or generates a plan.
-window.asiaOnboardDraft11991=Object.freeze({loadGoal(g){
+window.asiaOnboardDraft11991=Object.freeze({loadGoal(g,parameters=null){
  if(panel.hidden||busy())throw Error('Asistente manual no disponible');
  if(!g||Object.keys(g).length!==3||typeof g.title!=='string'||!g.title.trim()||g.title.length>80||typeof g.target!=='string'||g.target.length>120||![...kind.options].some(o=>o.value===g.kind))throw Error('Meta no compatible');
+ const validated=parameters===null?null:window.asiaIntakeParams11992.validate(g,parameters,date(),{kinds:window.asiaExtras830.goalKinds101,objectives:api.S.objectives,equipment:api.S.equipment,levels:api.R.levels,surfaces:api.R.modes,nutritionKinds:window.asiaExtras830.nutritionKinds103,previewNutrition:api.N.preview}).parameters;
  proposal=null;rawAtReview='';preview.replaceChildren();
  title.value=g.title;kind.value=g.kind;target.value=g.target;motivation.value='';start.value=date();deadline.value='';end.value=O.add(date(),27);primary.checked=false;personal.checked=false;mode.value='Solo meta';action.value='Sin estrategia';
+ if(validated){
+  const {dates,strength:s,running:r,nutrition:nut}=validated;
+  // Clear prior hidden inputs, then fill only explicitly reviewed facts.
+  for(const x of [name,strengthMinutes,distance,time,weekly,longest,available,kcal,protein,fat,...shares])x.value='';
+  objective.value=equipment.value=level.value=surface.value=symptoms.value=nutKind.value='';progress.checked=false;
+  for(let i=0;i<7;i++){el('ob1176-sd'+i).checked=false;el('ob1176-rd'+i).checked=false;}
+  if(dates){start.value=dates.start;end.value=dates.end;deadline.value=dates.deadline}
+  if(s){name.value='Mi plan personal';objective.value=s.objective;equipment.value=s.equipment;strengthMinutes.value=String(s.minutes);for(const d of s.days)el('ob1176-sd'+d).checked=true;}
+  if(r){distance.value=String(r.distanceM/1000);time.value=r.targetSeconds===null?'':String(r.targetSeconds/60);weekly.value=String(r.weeklyMinutes);longest.value=String(r.longestMinutes);level.value=r.level;surface.value=r.surface;available.value=String(r.minutes);symptoms.value=r.symptoms;for(const d of r.days)el('ob1176-rd'+d).checked=true;}
+  mode.value=s&&r?'Híbrido':s?'Fuerza':r?'Running':'Solo meta';
+  if(nut){nutKind.value=nut.kind;kcal.value=String(nut.calories);protein.value=String(nut.protein);fat.value=String(nut.fat);shares.forEach((x,i)=>x.value=String(nut.shares[i]));action.value='Guardar';}
+ }
  panel.open=true;message.textContent='Meta copiada al formulario. Revisá y completá los datos; no se guardó.';
 }});
 function visible(){panel.hidden=data.settings?.goals101?.version!==2;}
