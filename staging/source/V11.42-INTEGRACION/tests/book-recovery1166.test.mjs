@@ -22,6 +22,9 @@ const audited={...base,audit:[{at:1700000000000,action:'registro'}]};
 bad(audited,base,base,'historical-review-required');
 const removed={...base,trash:[{area:'foods',item:food,at:1700000000000}]};
 bad(base,removed,l,'different-values');
-bad(base,undefined,{...removed,foods:[food]},'active-trash-collision');
+// A shared object reference is rejected before domain-level reconciliation.
+assert.throws(()=>merge(base,undefined,{...removed,foods:[food]}),/Valor no admitido/);
+// A persisted JSON snapshot contains separate objects with equal values.
+bad(base,undefined,{...removed,foods:[structuredClone(food)]},'active-trash-collision');
 assert.equal(merge(base,undefined,p.value).value.foods[0].id,food.id);
 console.log('Advanced book identity recovery and explicit review boundaries PASS.');
