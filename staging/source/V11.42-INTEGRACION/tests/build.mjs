@@ -19,6 +19,21 @@ const releaseFile=web+'/diary/release831.mjs';
 const releaseText=readFileSync(releaseFile,'utf8'),catchMarker="catch{window.asiaGym84Ready=false;";
 if(releaseText.split(catchMarker).length!==2)throw Error('Marcador de diagnóstico Gym no único');
 writeFileSync(releaseFile,releaseText.replace(catchMarker,`catch(e){const m=String(e?.message||'');window.asiaPilotGymDiagnostic=/Rama bloqueada|Permiso local vencido/.test(m)?'LEASE':/Sesión|sesión|Diario bloqueado/.test(m)?'SESSION':/Revisión Gym/.test(m)?'REVISION':/Registro inicial/.test(m)?'INITIAL':/Esquema|Límite de registros|ID duplicado/.test(m)?'SCHEMA':/Candidato CI|Contexto incompleto|openStore|store\.read|store\.close/.test(m)?'ADAPTER':/read|lectura|Transacción/.test(m)?'READ':'OTHER';window.asiaGym84Ready=false;`));
+// Explicit personal goal book v2, without legacy defaults. Undefined and v1
+// keep their original semantics; no account is migrated or initialized here.
+// Both the diary and the shell backup/sync validators must use the same bytes.
+const extrasSource=readFileSync('extras830.js','utf8');
+let extras1148=extrasSource;
+function replaceExtras(from,to){if(extras1148.split(from).length!==2)throw Error('Marcador de metas no único: '+from);extras1148=extras1148.replace(from,to)}
+replaceExtras('function goals101(raw){','function emptyGoals1148(){return {version:2,primary:"",items:[]};}function goals101(raw){');
+replaceExtras('raw.version===1&&typeof raw.primary', '[1,2].includes(raw.version)&&typeof raw.primary');
+replaceExtras('raw.items.length>=1&&raw.items.length<=100','raw.items.length>=(raw.version===1?1:0)&&raw.items.length<=100');
+replaceExtras("(g.id==='asia-2027'||/^goal-[a-f0-9]{32}$/.test(g.id))","((raw.version===1&&g.id==='asia-2027')||/^goal-[a-f0-9]{32}$/.test(g.id))");
+replaceExtras("check(ids.has('asia-2027')&&(raw.primary===''||items.some(g=>g.id===raw.primary&&g.status==='Activa'))","check((raw.version===2||ids.has('asia-2027'))&&(raw.primary===''||items.some(g=>g.id===raw.primary&&g.status==='Activa'))");
+replaceExtras('return {version:1,primary:raw.primary,items};','return {version:raw.version,primary:raw.primary,items};');
+replaceExtras('profile100,goals101,goalDay101','profile100,goals101,emptyGoals1148,goalDay101');
+writeFileSync(web+'/diary/extras830.js',extras1148);
+execFileSync(process.execPath,['--check',web+'/diary/extras830.js'],{stdio:'inherit'});
 // Candidate-only header personalization uses the existing encrypted diary profile.
 // Never derive a display name from email or expose Google profile claims.
 const profileFile=web+'/diary/profile100.js';
@@ -62,6 +77,7 @@ function dependencies(file){
 }
 function checkPath(p){if(!p.startsWith(assetRoot+'/'))throw Error('Dependencia fuera del paquete');}
 dependencies(web+'/app.mjs');
+const shellExtras=web+'/extras830.js';if(readFileSync(shellExtras,'utf8')!==extrasSource)throw Error('Validador de shell inesperado');writeFileSync(shellExtras,extras1148);
 console.log('Shell static dependency graph:',visited.size,'modules; original pure JS dependencies included');
 // Server modules isolated from static asset binding. Preserve relative paths for imports.
 const server=out+'/server',sroot=server+'/staging/source';
