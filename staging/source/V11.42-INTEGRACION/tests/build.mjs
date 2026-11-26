@@ -45,7 +45,7 @@ execFileSync(process.execPath,['--check',web+'/diary/extras830.js'],{stdio:'inhe
 const preloadFile=web+'/diary/candidate-preload.js';
 const preloadText=readFileSync(preloadFile,'utf8');
 if(preloadText.split('moduleStore:f.moduleStore,').length!==2)throw Error('Marcador preload metas');
-writeFileSync(preloadFile,preloadText.replace('moduleStore:f.moduleStore,','initialGoalSetup:f.initialGoalSetup===true,coachCommit:f.coachCommit,coachInference:f.coachInference,healthSources:f.healthSources,moduleStore:f.moduleStore,'));
+writeFileSync(preloadFile,preloadText.replace('moduleStore:f.moduleStore,','initialGoalSetup:f.initialGoalSetup===true,coachCommit:f.coachCommit,coachInference:f.coachInference,healthSources:f.healthSources,foodLookup:f.foodLookup,moduleStore:f.moduleStore,'));
 const goalsFile=web+'/diary/goals101.js';
 let goalsText=readFileSync(goalsFile,'utf8');
 function replaceGoals(from,to){if(goalsText.split(from).length!==2)throw Error('Marcador onboarding metas no único: '+from);goalsText=goalsText.replace(from,to)}
@@ -119,6 +119,13 @@ writeFileSync(web+'/diary/catalog1178.js',catalog1178);writeFileSync(web+'/catal
 cpSync(base+'/src/catalog1178-ui.js',web+'/diary/catalog1178-ui.js');
 for(const n of ['catalog1178.js','catalog1178-ui.js'])execFileSync(process.execPath,['--check',web+'/diary/'+n],{stdio:'inherit'});
 const runningUI=web+'/diary/running1174-ui.js';cpSync(base+'/src/running1174-ui.js',runningUI);execFileSync(process.execPath,['--check',runningUI],{stdio:'inherit'});
+// Reuse the V10.6 barcode UI and local decoder, route only the confirmed external query through a shell capability.
+const foodFile=web+'/diary/nutrition52.js';let foodText=readFileSync(foodFile,'utf8');
+const foodPatch=(a,b)=>{if(foodText.split(a).length!==2)throw Error('Marcador consulta alimento');foodText=foodText.replace(a,()=>b)};
+foodPatch('Se envía solamente el código del producto y tu navegador realiza la conexión externa.','Se consulta solamente el código del producto mediante el servicio de tu cuenta.');
+foodPatch("const u=new URL('https://world.openfoodfacts.org/api/v2/product/'+raw+'.json');u.searchParams.set('fields','code,product_name,product_name_es,nutriments,nutrition_data_per');const res=await fetch(u.href,{signal:controller.signal,credentials:'omit',referrerPolicy:'no-referrer',cache:'no-store',redirect:'error'});","const service=asiaCandidateSession.foodLookup;if(!service?.available?.())throw Error('Consulta externa no habilitada');const result=await service.lookup(raw,true);const res={status:result.status===0?404:200,ok:result.status===1,json:async()=>result};");
+writeFileSync(foodFile,foodText);
+execFileSync(process.execPath,['--check',foodFile],{stdio:'inherit'});
 const runningIndex=readFileSync(diary,'utf8');const runningAnchor='<script src="nutrition103.js?v=1060"></script>';if(runningIndex.split(runningAnchor).length!==2)throw Error('Marcador Running');writeFileSync(diary,runningIndex.replace(runningAnchor,runningAnchor+'<script src="running1174-ui.js"></script>'));
 for(const file of ['onboard1176.js','onboard1176-ui.js','sport1177-ui.js','coach-actions1179-ui.js','coach-bundle1180.js','coach-bundle1180-ui.js','coach-context1181.js','coach-persist1184.js','calendar1198.js','calendar1198-ui.js','coach-intake-params11992.js','nutrition-menu.js','nutrition-menu-ui.js']){const to=web+'/diary/'+file;cpSync(base+'/src/'+file,to);execFileSync(process.execPath,['--check',to],{stdio:'inherit'});}
 for(const file of ['coach-contract1185.mjs','coach-conversation1185.mjs','coach-conversation1185-ui.mjs','coach-hybrid-contract1187.mjs','coach-hybrid1187.mjs','coach-hybrid-sample1188.mjs','coach-hybrid1188-ui.mjs','coach-calendar1189.mjs','coach-intake1199.mjs','coach-intake-flow11991.mjs','coach-intake11991-ui.mjs','coach-transport1181.mjs','coach-client-policy.mjs','health-sources.mjs','health-source-view.mjs','health-source-ui.mjs']){const to=web+'/diary/'+file;cpSync(base+'/src/'+file,to);execFileSync(process.execPath,['--check',to],{stdio:'inherit'});}

@@ -349,3 +349,6 @@ Proyección pura de agregados diarios normalizados con procedencia, revisión y 
 
 ## Salud — integración de lectura dentro de Salud original
 Se añade vista de fuentes autorizadas dentro de Comparar pasos manuales y Apple Salud, solo si el shell otorga capacidad real; no aparece en piloto sin grant. Fachada verifica identidad al iniciar/antes/después, descarta consultas, no expone identificadores de cuenta, no suma ni persiste. Fecha y selección explícita; se limpian al cerrar o cambiar día. Se preservan gráficos y registro original. No hay adaptador de proveedor ni alta de conexión real aún. Pruebas de dominio añadidas; UI pendiente navegador autorizado. Sin despliegue.
+
+## Paridad nutrición — consulta de códigos de barras
+Se preserva el lector local, selector de base, ficha, edición y registro original. Solo la consulta externa pasa a capacidad del shell; piloto sin grant no llama red. Adaptador real no montado: validación GTIN, origen fijo OFF, campos mínimos, contacto técnico explícito, consentimiento, identidad antes/después, límite y timeout, sin datos de diario. No realiza consultas reales, no incluye credenciales. Falta montaje, cuotas y aceptación del proveedor. Prueba añadida al paquete.
