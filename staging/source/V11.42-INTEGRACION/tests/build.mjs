@@ -130,6 +130,12 @@ cpSync(base+'/src/coach-commit1184.mjs',shellCoach1184);
 const training1184=readFileSync(web+'/diary/training102.js','utf8'),trainingMarker1184="const el=id=>document.getElementById(id),anchor=el('gymTemplates826')";if(training1184.split(trainingMarker1184).length!==2)throw Error('Marcador fuerza shell');writeFileSync(web+'/training1184.js',training1184.slice(0,training1184.indexOf(trainingMarker1184))+'})(globalThis);\n');
 let nut1184=readFileSync(web+'/diary/nutrition103.js','utf8');const nutMarker1184='const el=id=>document.getElementById(id)';if(nut1184.split(nutMarker1184).length!==2)throw Error('Marcador nutrición shell');writeFileSync(web+'/nutrition1184.js',nut1184.slice(0,nut1184.indexOf(nutMarker1184))+'})();\n');
 cpSync(base+'/src/coach-bundle1180.js',web+'/coach-bundle1184.js');
+const goalShell11993=readFileSync(web+'/diary/goals101.js','utf8'),goalMarker11993="const el=id=>document.getElementById(id),make=";
+if(goalShell11993.split(goalMarker11993).length!==2)throw Error('Marcador goals shell');
+const goalPure11993=goalShell11993.slice(0,goalShell11993.indexOf(goalMarker11993));
+writeFileSync(web+'/goals11993.js',goalPure11993+'globalThis.asiaGoals101=Object.freeze(api);})();\n');
+cpSync(base+'/src/onboard1176.js',web+'/onboard11993.js');
+for(const n of ['goals11993.js','onboard11993.js'])execFileSync(process.execPath,['--check',web+'/'+n],{stdio:'inherit'});
 const ctrl1184=web+'/staging/source/V11.40-INTEGRACION/src/controller.mjs';let ctrlText1184=readFileSync(ctrl1184,'utf8');
 function coachReplace1184(a,b){if(ctrlText1184.split(a).length!==2)throw Error('Marcador controller Coach '+a);ctrlText1184=ctrlText1184.replace(a,b)}
 ctrlText1184="import {createCoachCommit1184,guardProPlan1195,createLocalPlanningFence1195} from '../../V11.42-INTEGRACION/src/coach-commit1184.mjs';\n"+ctrlText1184;
