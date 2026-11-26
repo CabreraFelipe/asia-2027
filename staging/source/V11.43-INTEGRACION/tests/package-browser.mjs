@@ -293,6 +293,17 @@ try{
   diaryB.getElementById('bundleReview1180').click();await wait(()=>bs.textContent==='Conjunto revisado. Sin cambios guardados.','No repitió revisión conjunta');
   try{w.confirm=()=>true;diaryB.getElementById('bundleApply1180').click()}finally{w.confirm=originalConfirm}
   await wait(()=>bs.textContent==='Conjunto guardado.'&&el('status1140').textContent.includes('saved'),'Conjunto no guardado: '+bs.textContent);
+  // Explicit fixed local response, never represented as AI. Exercise real reviewed commit.
+  const cc=diaryB.getElementById('coachConversation1185');await wait(()=>!!diaryB.getElementById('coachConversation1185'),'Conversación candidata no montada');diaryB.getElementById('coachConversation1185').open=true;
+  const ccf=k=>diaryB.getElementById('cc1185-'+k),ccs=diaryB.getElementById('coachConversationStatus1185'),ccb=k=>diaryB.getElementById('coachConversation'+k+'1185');
+  ccf('day').value=addDay(changeDay,7);ccf('question').value='Prueba fija local B';ccb('Prepare').click();
+  if(!ccb('Send')?.disabled||!ccb('Sample'))throw Error('Proveedor real indebidamente habilitado');
+  ccf('consent').checked=true;ccb('Sample').click();await wait(()=>!!ccb('Review'),'Respuesta fija no visible: '+ccs.textContent);
+  ccb('Reject').click();if(!ccs.textContent.includes('Sin cambios'))throw Error('No descartó conversación');
+  ccb('Prepare').click();ccf('consent').checked=true;ccb('Sample').click();await wait(()=>!!ccb('Review'),'No repitió conversación');
+  ccf('material').checked=true;ccb('Review').click();await wait(()=>!!ccb('Apply'),'No revisó efecto: '+ccs.textContent);
+  try{w.confirm=()=>true;ccb('Apply').click()}finally{w.confirm=originalConfirm}
+  await wait(()=>ccs.textContent.includes('guardada localmente')&&el('status1140').textContent.includes('saved'),'No guardó conversación: '+ccs.textContent);
   // Independent synthetic account exercises actual IndexedDB paired CAS.
   const {openOfflineRepository:openCoachFence}=await import('/v11.42/staging/source/V11.37-INTEGRACION/src/offline-repository.mjs');
   const {encrypt84:encryptCoachFence}=await import('/v11.42/model84.mjs');
