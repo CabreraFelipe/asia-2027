@@ -5,7 +5,7 @@ const input={version:1,question:'Agregar espalda',goal:'Fuerza',routine:[{name:'
 const reply={kind:'proposal',answer:'Agregar remo',questions:[],operations:[{type:'add',at:1,to:null,choice:'e1',sets:2,min:8,max:10,rest:90}]};
 let s=session,time=10000,calls=0;
 const response=()=>new Response(JSON.stringify({ok:true,reply}),{headers:{'Content-Type':'application/json'}});
-const factory=()=>createCoachTransport1181({origin,readSession:async()=>s,now:()=>time,ttlMs:1000,fetcher:async(url,opts)=>{calls++;assert.equal(url,origin+'/coach/v1/suggest');assert.equal(opts.headers['X-Asia-CSRF'],session.csrf);assert.equal(opts.headers['X-Asia-Coach-Consent'],'reviewed-v1');assert.deepEqual(JSON.parse(opts.body),input);return response()}});
+const factory=()=>createCoachTransport1181({origin,readSession:async()=>s,now:()=>time,ttlMs:1000,fetcher:async(url,opts)=>{calls++;assert.equal(url,origin+'/coach/v1/suggest');assert.equal(opts.headers['X-Asia-CSRF'],session.csrf);assert.equal(opts.headers['X-Asia-Coach-Consent'],'reviewed-v1');assert.match(opts.headers['X-Asia-Coach-Request'],/^[0-9a-f-]{36}$/);assert.ok(opts.signal instanceof AbortSignal);assert.deepEqual(JSON.parse(opts.body),input);return response()}});
 const c=await factory(),p=c.preview(input);assert.equal(calls,0);
 await assert.rejects(()=>c.send(p,false));await assert.rejects(()=>c.send({...p,payload:{...input,question:'Otro texto'}},true));assert.equal(calls,0);
 const result=await c.send(p,true);assert.equal(calls,1);assert.deepEqual(result.reply,reply);await assert.rejects(()=>c.send(p,true));assert.deepEqual(await c.take(result),result);await assert.rejects(()=>c.take(result));
@@ -15,4 +15,5 @@ const changed=c.preview(input);s={...session,accountId:'acct_'+'b'.repeat(32)};a
 s={...session,syntheticOnly:true};await assert.rejects(factory);s=session;
 const swapped=await createCoachTransport1181({origin,readSession:async()=>s,now:()=>time,fetcher:async()=>{s={...session,accountId:'acct_'+'b'.repeat(32)};return response()}});await assert.rejects(()=>swapped.send(swapped.preview(input),true));s=session;
 let release;const cancelled=await createCoachTransport1181({origin,readSession:async()=>session,now:()=>time,fetcher:async()=>new Promise(resolve=>{release=resolve})});const pending=cancelled.send(cancelled.preview(input),true);while(!release)await Promise.resolve();cancelled.discard();release(response());await assert.rejects(()=>pending);assert.equal(cancelled.available(),true);
+const timed=await createCoachTransport1181({origin,readSession:async()=>session,now:()=>time,timeoutMs:5,fetcher:()=>new Promise(()=>{})});await assert.rejects(()=>timed.send(timed.preview(input),true));assert.equal(timed.available(),true);
 console.log('Coach transport: exact reviewed payload, single use, expiration, no send on rejection, synthetic/other-account rejection PASS');

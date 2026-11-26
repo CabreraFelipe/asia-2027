@@ -7,6 +7,8 @@ import worker from '../dist/server/index.mjs';
 import {digest} from '../dist/server/staging/source/official/V11.24-STAGING/src/security1111.mjs';
 import {hashBytes} from '../dist/server/staging/source/V11.38-INTEGRACION/src/large-sync.mjs';
 import {generateAccountSecret} from '../src/account-key1150.mjs';
+import {createCoachQuota1186} from '../dist/server/staging/source/V11.42-INTEGRACION/src/coach-quota1186.mjs';
+import {createCoachRoute1186} from '../dist/server/staging/source/V11.42-INTEGRACION/src/coach-route1186.mjs';
 import {encrypt84,decrypt84} from '../../../../model84.mjs';
 const root=process.env.ASIA_MINIFLARE_ROOT;assert.ok(root);
 const require=createRequire(join(root,'package.json'));
@@ -15,7 +17,7 @@ const {Miniflare}=require('miniflare');
 const mf=new Miniflare({modules:true,script:"export default {fetch(){return new Response('synthetic')}}",d1Databases:{STAGING_DB:'asia-ci-local-d1'},r2Buckets:{STAGING_SYNC_OBJECTS:'asia-ci-local-r2'}});
 try{
  const db=await mf.getD1Database('STAGING_DB'),bucket=await mf.getR2Bucket('STAGING_SYNC_OBJECTS');
- const files=['0001_staging.sql','0006_identity_oidc.sql','0007_synthetic_journal_v115.sql','0009_large_sync.sql'].map(n=>new URL('../dist/migrations/'+n,import.meta.url).pathname).concat(['0010_managed_keys.proposed.sql','0011_remote_rekey.proposed.sql'].map(n=>new URL('../migrations/'+n,import.meta.url).pathname));
+ const files=['0001_staging.sql','0006_identity_oidc.sql','0007_synthetic_journal_v115.sql','0009_large_sync.sql'].map(n=>new URL('../dist/migrations/'+n,import.meta.url).pathname).concat(['0010_managed_keys.proposed.sql','0011_remote_rekey.proposed.sql','0012_coach_quota.proposed.sql'].map(n=>new URL('../migrations/'+n,import.meta.url).pathname));
  // SQLite's own complete_statement handles triggers, quoted semicolons and comments.
  const split="import sqlite3,sys,json\na=[]\nfor path in sys.argv[1:]:\n s=''\n for line in open(path):\n  if not s.strip() and line.lstrip().startswith('--'): continue\n  s+=line\n  if sqlite3.complete_statement(s): a.append(s.strip());s=''\n if s.strip() and not all(x.strip().startswith('--') or not x.strip() for x in s.splitlines()): raise ValueError('Incomplete SQL')\nprint(json.dumps(a))";
  const statements=JSON.parse(execFileSync('python3',['-c',split,...files],{encoding:'utf8'}));
@@ -28,6 +30,23 @@ try{
  await run("INSERT INTO managed_account_keys_v1152(account_id,enrollment_kind) VALUES(?,'legacy')",id);
  const env={STAGING_MODE:'asia-v1111-identity-private',STAGING_ORIGIN:origin,STAGING_ALLOW_V1142_TESTS:'true',STAGING_ALLOW_V1138_TESTS:'true',STAGING_ALLOW_MANAGED_KEYS_1152:'true',STAGING_ALLOW_REMOTE_REKEY_1159:'true',STAGING_MANAGED_KEK_ID_1152:'ci-v1',STAGING_MANAGED_KEK_1152:generateAccountSecret(),STAGING_GOOGLE_CLIENT_ID:'test.apps.googleusercontent.com',STAGING_GOOGLE_CLIENT_SECRET:'synthetic-only',STAGING_ALLOWED_EMAILS:'a@example.invalid,b@example.invalid',STAGING_PWA_ASSETS:{},STAGING_DB:db,STAGING_SYNC_OBJECTS:bucket};
  const call=(s,path,body,epoch)=>worker.fetch(new Request(origin+path,{method:body===undefined?'GET':'POST',headers:{Cookie:'__Host-asia1111_session='+s.token,Origin:origin,'X-Asia-CSRF':s.csrf,...(body===undefined?{}:{'Content-Type':'application/json'}),...(epoch?{'X-Asia-Key-Epoch':epoch}:{})},...(body===undefined?{}:{body:JSON.stringify(body)})}),env);
+ // Real D1 atomic reservations; no provider request from synthetic account.
+ let clock=Date.now();const quota=createCoachQuota1186({db,now:()=>clock,perMinute:2,perDay:3,globalPerDay:4});
+ const reqId=()=>crypto.randomUUID(),duplicate=reqId();
+ const repeat=await Promise.all([quota(id,duplicate),quota(id,duplicate)]);assert.equal(repeat.filter(Boolean).length,1);
+ const race=await Promise.all([quota(id,reqId()),quota(id,reqId()),quota(id,reqId())]);assert.equal(race.filter(Boolean).length,1);
+ assert.equal(await quota(other,reqId()),true);
+ clock+=60001;assert.equal(await quota(id,reqId()),true);assert.equal(await quota(id,reqId()),false);assert.equal(await quota(other,reqId()),false);
+ clock+=86400001;assert.equal(await quota(id,duplicate),false);assert.equal(await quota(other,reqId()),true);
+ assert.equal(await quota('acct_'+'f'.repeat(32),reqId()),false);
+ const session={ok:true,syntheticOnly:false,accountId:id,csrf:'fixture-csrf-token-long-123'},input={version:1,question:'Prueba sintética',goal:'Fuerza',routine:[{name:'Press banca con barra',sets:3,min:8,max:10,rest:90}],availableMinutes:60,scope:'once',choices:[]},reply={kind:'advice',answer:'Respuesta inyectada de prueba',questions:[],operations:[]};
+ let auth=session,upstream=0;const setup={origin,authenticate:async()=>auth,db,now:()=>clock,apiKey:'fixture-not-real-secret-123456',model:'test-model',limits:{perMinute:2,perDay:3,globalPerDay:4},fetchImpl:async()=>{upstream++;return new Response(JSON.stringify({status:'completed',output:[{type:'message',role:'assistant',content:[{type:'output_text',text:JSON.stringify(reply)}]}]}),{headers:{'Content-Type':'application/json'}})}};
+ assert.throws(()=>createCoachRoute1186(setup));const route=createCoachRoute1186({...setup,enabled:true}),request=reqId();
+ const ask=()=>new Request(origin+'/coach/v1/suggest',{method:'POST',headers:{Origin:origin,'Content-Type':'application/json','X-Asia-CSRF':session.csrf,'X-Asia-Coach-Consent':'reviewed-v1','X-Asia-Coach-Request':request},body:JSON.stringify(input)});
+ auth={...session,syntheticOnly:true};assert.equal((await route.fetch(ask())).status,401);assert.equal(upstream,0);
+ auth=session;const calls=await Promise.all([route.fetch(ask()),route.fetch(ask())]);assert.deepEqual(calls.map(x=>x.status).sort(),[200,429]);assert.equal(upstream,1);
+ assert.deepEqual(await calls.find(x=>x.status===200).json(),{ok:true,reply});
+ assert.equal((await worker.fetch(ask(),env)).status,405); // production composition NOT mounted in pilot
  const [a,b,c]=sessions,phrase='frase sintética runtime D1';
  const plain={format:'asia-v1136-sync-v1',accountId:id,payload:{entries:[['asia2027-v1',JSON.stringify({body:{'2026-11-26':{weight:81}},diet:{},work:{},settings:{},photos:{}})]],modules:{}}};
  const envelope=await encrypt84(plain,phrase),write=(s,expectedRevision,e=envelope,epoch)=>call(s,'/v11.38/sync',{expectedRevision,envelope:e},epoch);

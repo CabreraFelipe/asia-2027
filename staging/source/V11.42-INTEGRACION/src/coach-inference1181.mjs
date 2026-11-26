@@ -1,5 +1,6 @@
 // Server-only provider and gateway; not mounted in synthetic pilot.
 import {replySchema,validateInput,validateReply} from './coach-contract1185.mjs';
+import {requestId1186} from './coach-quota1186.mjs';
 export {replySchema,validateInput,validateReply} from './coach-contract1185.mjs';
 const fail=()=>{throw Error('Coach no disponible o respuesta inválida')};
 const check=v=>{if(!v)fail()},obj=x=>x!==null&&typeof x==='object'&&!Array.isArray(x),exact=(x,ks)=>obj(x)&&Object.keys(x).length===ks.length&&ks.every(k=>Object.hasOwn(x,k)),integer=(x,a,b)=>Number.isInteger(x)&&x>=a&&x<=b,txt=(s,max,min=1)=>typeof s==='string'&&s.trim().length>=min&&s.length<=max&&!/data:image\/|-----BEGIN [A-Z ]*PRIVATE KEY-----|Bearer\s+[a-zA-Z0-9._-]{16,}|sk-[a-zA-Z0-9_-]{16,}/i.test(s),nullable=(x,f)=>x===null||f(x);
@@ -23,10 +24,11 @@ export function createCoachGateway1181({origin,authenticate,reserve,provider}){
  return Object.freeze({async fetch(request){try{
  const url=new URL(request.url);if(url.origin!==origin||url.pathname!=='/coach/v1/suggest'||url.search||request.method!=='POST'||request.headers.get('Origin')!==origin||['Authorization','X-Asia-Account','X-Account-ID','X-User-ID'].some(k=>request.headers.has(k)))return error(403);
  const session=await authenticate(request);if(!valid(session))return error(401);if(request.headers.get('X-Asia-CSRF')!==session.csrf||request.headers.get('X-Asia-Coach-Consent')!=='reviewed-v1')return error(403);
+ const requestId=request.headers.get('X-Asia-Coach-Request');if(!requestId1186(requestId))return error(400);
  if(!/^application\/json(?:\s*;\s*charset=utf-8)?$/i.test(request.headers.get('Content-Type')||'')||!request.body)return error(400);
  let input;try{input=validateInput(await boundedJson(new Response(request.body,{headers:{'Content-Type':request.headers.get('Content-Type')||''}}),16000));}catch{return error(400)}
  const current=async()=>{const s=await authenticate(request);return valid(s)&&s.accountId===session.accountId&&s.csrf===session.csrf};
- if(!await current())return error(401);if(await reserve(session.accountId)!==true)return error(429);if(!await current())return error(401);
+ if(!await current())return error(401);if(await reserve(session.accountId,requestId)!==true)return error(429);if(!await current())return error(401);
  const reply=validateReply(await provider.suggest(input),input);if(!await current())return error(401);return response(200,{ok:true,reply});
  }catch{return error(503)}}});
 }

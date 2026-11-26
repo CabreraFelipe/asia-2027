@@ -172,7 +172,7 @@ replaceIdentity("  if(path==='/v11.11/auth/logout'&&request.method==='POST'&&!u.
 writeFileSync(identityFile,identityText);
 execFileSync(process.execPath,['--check',identityFile],{stdio:'inherit'});
 const worker=sroot+'/V11.42-INTEGRACION/src/worker.mjs';mkdirSync(dirname(worker),{recursive:true});cpSync(base+'/src/worker.mjs',worker);
-for(const n of ['account-key1150.mjs','managed-key1152.mjs','remote-rekey1157.mjs','remote-rekey-route1159.mjs'])cpSync(base+'/src/'+n,dirname(worker)+'/'+n);
+for(const n of ['account-key1150.mjs','managed-key1152.mjs','remote-rekey1157.mjs','remote-rekey-route1159.mjs','coach-contract1185.mjs','coach-inference1181.mjs','coach-quota1186.mjs','coach-route1186.mjs'])cpSync(base+'/src/'+n,dirname(worker)+'/'+n);
 // Extract policy from the immutable V10.6 source without evaluating DOM code
 // in the Worker. The server sees only portable keys and presentation groups.
 const policyContext={module:{exports:{}}};runInNewContext(readFileSync('accounts106.js','utf8'),policyContext);

@@ -12,9 +12,10 @@ const refusal=createOpenAIProvider1181({apiKey:key,model,fetchImpl:async()=>resp
 const bad=createOpenAIProvider1181({apiKey:key,model,fetchImpl:async()=>providerResult({...reply,operations:[{...reply.operations[0],sets:99}]})});await assert.rejects(()=>bad.suggest(input));
 const timeout=createOpenAIProvider1181({apiKey:key,model,timeoutMs:5,fetchImpl:()=>new Promise(()=>{})});await assert.rejects(()=>timeout.suggest(input));
 const origin='https://candidate.example',account='acct_'+'a'.repeat(32),session={ok:true,syntheticOnly:false,accountId:account,csrf:'synthetic-csrf-token-123'};let active=session,quota=true,reserved=0,received=0;
-const gateway=createCoachGateway1181({origin,authenticate:async()=>active,reserve:async id=>{assert.equal(id,account);reserved++;return quota},provider:{suggest:async x=>{received++;assert.deepEqual(x,input);return reply}}});
-const req=(payload=input,headers={})=>new Request(origin+'/coach/v1/suggest',{method:'POST',headers:{Origin:origin,'Content-Type':'application/json','X-Asia-CSRF':session.csrf,'X-Asia-Coach-Consent':'reviewed-v1',...headers},body:JSON.stringify(payload)});
+const gateway=createCoachGateway1181({origin,authenticate:async()=>active,reserve:async (id,requestId)=>{assert.equal(id,account);assert.equal(requestId,'11111111-1111-4111-8111-111111111111');reserved++;return quota},provider:{suggest:async x=>{received++;assert.deepEqual(x,input);return reply}}});
+const req=(payload=input,headers={})=>new Request(origin+'/coach/v1/suggest',{method:'POST',headers:{Origin:origin,'Content-Type':'application/json','X-Asia-CSRF':session.csrf,'X-Asia-Coach-Consent':'reviewed-v1','X-Asia-Coach-Request':'11111111-1111-4111-8111-111111111111',...headers},body:JSON.stringify(payload)});
 assert.equal((await gateway.fetch(req(input,{'X-Asia-Coach-Consent':''}))).status,403);assert.equal((await gateway.fetch(req(input,{'X-Asia-CSRF':'bad'}))).status,403);assert.equal(received,0);
+assert.equal((await gateway.fetch(req(input,{'X-Asia-Coach-Request':'bad'}))).status,400);assert.equal(reserved,0);
 active={...session,syntheticOnly:true};assert.equal((await gateway.fetch(req())).status,401);active=session;
 quota=false;assert.equal((await gateway.fetch(req())).status,429);assert.equal(received,0);quota=true;
 const ok=await gateway.fetch(req());assert.equal(ok.status,200);assert.equal(ok.headers.get('Cache-Control'),'no-store');assert.deepEqual(await ok.json(),{ok:true,reply});assert.equal(received,1);assert.equal(reserved,2);
