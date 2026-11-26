@@ -1,13 +1,13 @@
 name: Asia 2027 - paquete PWA aislado V11.42
 on:
   push:
-    branches: ['validation/consolidated-coach-nutrition-notifications']
+    branches: ['validation/consolidated-parity-fixed']
     paths: ['staging/source/V11.42-INTEGRACION/**','.github/workflows/asia-v1142.yml']
 permissions:
   contents: read
 jobs:
   package:
-    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/validation/consolidated-coach-nutrition-notifications'
+    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/validation/consolidated-parity-fixed'
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
