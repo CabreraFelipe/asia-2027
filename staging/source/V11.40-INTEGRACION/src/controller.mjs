@@ -8,8 +8,8 @@ import {createAccountServices} from '../../V11.39-INTEGRACION/src/service-client
 const check=(x,m)=>{if(!x)throw Error(m)};
 const same=(a,b)=>a.accountId===b.accountId&&a.csrf===b.csrf;
 function transient(){const m=new Map();return Object.freeze({getItem:k=>m.get(k)??null,setItem:(k,v)=>m.set(k,String(v)),removeItem:k=>m.delete(k),key:i=>[...m.keys()][i]??null,get length(){return m.size}})}
-export async function createController({origin,fetcher=fetch,repository,pending,policy,passphrase,mount,onState=()=>{},now=Date.now}){
- check(/^https:\/\/asia-v1111-identity-staging\.[a-z0-9-]+\.workers\.dev$/.test(origin)&&typeof mount==='function','Origen o montaje inválido');
+export async function createController({origin,fetcher=fetch,repository,pending,policy,passphrase,mount,beforeOpen=async()=>{},onState=()=>{},now=Date.now}){
+ check(/^https:\/\/asia-v1111-identity-staging\.[a-z0-9-]+\.workers\.dev$/.test(origin)&&typeof mount==='function'&&typeof beforeOpen==='function','Origen o montaje inválido');
  const read=sessionReader({origin,fetcher}),identity=await read();
  let state='maintenance',busy=false,plan=null,editing=null,services=null,view=null,closing=false,locked=false;
  const publish=next=>{state=next;try{onState(next)}catch{}};
@@ -29,7 +29,7 @@ export async function createController({origin,fetcher=fetch,repository,pending,
  return Object.freeze({
   get state(){return state},get hasPlan(){return plan!==null},get busy(){return busy},get status(){return editing?.status??null},
   async openDiary(){maintenance();return operation(async()=>{
-   await verify();editing=await openOfflineEditing({...options,onStatus:()=>{try{onState(state)}catch{}}});
+   await verify();await beforeOpen();await verify();editing=await openOfflineEditing({...options,onStatus:()=>{try{onState(state)}catch{}}});
    try{
     services=await createAccountServices({origin,readSession:verify,fetcher});
     let calls=0;const guarded=fn=>(...a)=>{check(!closing&&!locked,'Diario bloqueado');calls++;return Promise.resolve().then(()=>fn(...a)).finally(()=>calls--)};

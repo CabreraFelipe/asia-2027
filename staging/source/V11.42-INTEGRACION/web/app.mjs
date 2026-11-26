@@ -7,6 +7,8 @@ import {openOfflineRepository} from './staging/source/V11.37-INTEGRACION/src/off
 import {sessionReader,openSessionVault} from './staging/source/V11.26-INTEGRACION/src/session-vault.mjs';
 import {devicePolicy} from './staging/source/V11.30-INTEGRACION/src/device-session.mjs';
 import {openEncryptedModuleStore} from './staging/source/V11.28-INTEGRACION/src/encrypted-module-store.mjs';
+import {createLargeTransport} from './staging/source/V11.38-INTEGRACION/src/large-transport.mjs';
+import {validateLargeList} from './staging/source/V11.38-INTEGRACION/src/large-sync-client.mjs';
 export async function start(passphrase,{maintenanceOnly=false}={}){
  const repository=await openUnifiedRepository(),pending=await openOfflineRepository();let shell,panel;
  const mount=async fixture=>{
@@ -42,7 +44,17 @@ export async function start(passphrase,{maintenanceOnly=false}={}){
    const modules=await openEncryptedModuleStore({readSession:verify,repository:{read:async()=>row.modules,compareAndSwap(){throw Error('Solo lectura')}},passphrase});modules.close();
   }
   await verify();
-  const c=await createController({origin:location.origin,repository,pending,policy:globalThis.asiaAccounts106,passphrase,mount,onState:s=>{shell?.render();panel?.render();if(s==='closed'){repository.close();pending.close();location.replace('/v11.42/index.html')}}});
+  // A fresh local installation is not proof of a new account. Read only the
+  // authenticated remote index before initializing a local editing branch.
+  // Existing local/pending records are never replaced by this check.
+  const beforeOpen=async()=>{
+   await verify();const row=await repository.readSync(identity.accountId),branch=await pending.inspect(identity.accountId);
+   if(row.local||row.modules||row.baseline||branch)return;
+   const request=createLargeTransport({origin:location.origin,readSession:verify});let list;
+   try{list=validateLargeList(await request('GET'));await verify();}catch{throw Error('No se pudo verificar si hay registros en la nube. Reintentá antes de abrir el diario.');}
+   if(list.head>0)throw Error('Esta cuenta ya tiene una copia en la nube. Usá Comparar con nube y confirmá la recuperación antes de abrir el diario.');
+  };
+  const c=await createController({origin:location.origin,repository,pending,policy:globalThis.asiaAccounts106,passphrase,mount,beforeOpen,onState:s=>{shell?.render();panel?.render();if(s==='closed'){repository.close();pending.close();location.replace('/v11.42/index.html')}}});
   shell=mountShell({doc:document,anchor:document.getElementById('shell'),controller:c,onRender:()=>panel?.render()});
   panel=mountMaintenance({doc:document,anchor:document.getElementById('shell'),controller:c,onChange:()=>shell.render()});
   // Use the same guarded shell action as manual opening. Its error handling

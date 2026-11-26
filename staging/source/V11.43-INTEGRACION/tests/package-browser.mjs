@@ -24,7 +24,7 @@ const env={STAGING_MODE:'asia-v1111-identity-private',STAGING_ORIGIN:origin,STAG
  STAGING_SYNC_OBJECTS:{async put(k,v){objects.set(k,new Uint8Array(v))},async get(k){const v=objects.get(k);return v?{size:v.length,arrayBuffer:async()=>v.buffer.slice(0)}:null},async delete(k){objects.delete(k)}},
  STAGING_PWA_ASSETS:{async fetch(r){const p=new URL(r.url).pathname;try{return new Response(await readFile(root+'assets'+p),{headers:{'Content-Type':mime[extname(p)]||'application/octet-stream'}})}catch{return new Response(null,{status:404})}}}
 };
-const dir=await mkdtemp(join(tmpdir(),'asia-pwa-ci-'));let chrome,ws,server,offline=false,slowRequested=false,slowMode=process.env.ASIA_SLOW_DIARY==='1';
+const dir=await mkdtemp(join(tmpdir(),'asia-pwa-ci-'));let chrome,ws,server,offline=false,slowRequested=false,failHead=false,slowMode=process.env.ASIA_SLOW_DIARY==='1';
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 try{
  execFileSync('openssl',['req','-x509','-newkey','rsa:2048','-nodes','-keyout',join(dir,'key.pem'),'-out',join(dir,'cert.pem'),'-days','1','-subj','/CN='+host,'-addext','subjectAltName=DNS:'+host],{stdio:'ignore'});
@@ -34,6 +34,9 @@ try{
    const u=new URL(req.url,origin);
    if(['/__ci/a','/__ci/b'].includes(u.pathname)){res.writeHead(200,{'Set-Cookie':'__Host-asia1111_session='+(u.pathname.endsWith('/a')?ta:tb)+'; Path=/; Secure; HttpOnly; SameSite=Lax','Cache-Control':'no-store'});res.end('fixture');return}
    if(u.pathname==='/__ci/offline'){res.end('offline');offline=true;return}
+   if(u.pathname==='/__ci/head-fail'){failHead=true;res.end('fixture');return}
+   if(u.pathname==='/__ci/head-resume'){failHead=false;res.end('fixture');return}
+   if(failHead&&u.pathname==='/v11.38/sync'&&req.method==='GET'){res.writeHead(503);res.end('fixture');return}
    const chunks=[];for await(const x of req)chunks.push(x);
    const r=await worker.fetch(new Request(u,{method:req.method,headers:req.headers,...(['GET','HEAD'].includes(req.method)?{}:chunks.length?{body:Buffer.concat(chunks)}:{})}),env);
    const h=Object.fromEntries(r.headers);if(r.headers.getSetCookie().length)h['set-cookie']=r.headers.getSetCookie();
@@ -180,8 +183,27 @@ try{
 
   el('close1140').click();await wait(()=>!document.querySelector('iframe')&&!el('reconcile1140').disabled,'No cerró');
   el('reconcile1140').click();await wait(()=>!el('logout1140').disabled,'Conciliación no terminó');
-  el('logout1140').click();return true;
+  // Simulate a new device in this disposable CI browser ONLY: remove the
+  // synthetic confirmed A row after proving its cloud copy exists. No app
+  // code deletes any local record and the remote fixture remains intact.
+  if((await (await fetch('/v11.38/sync')).json()).head!==1)throw Error('Falta copia remota sintética');
+  const fixtureDb=await new Promise((ok,fail)=>{const q=indexedDB.open('asia-v1134-unified-synthetic-staging',1);q.onsuccess=()=>ok(q.result);q.onerror=()=>fail(q.error)});
+  try{await new Promise((ok,fail)=>{const t=fixtureDb.transaction('accounts','readwrite');t.objectStore('accounts').delete('acct_'+'a'.repeat(32));t.oncomplete=ok;t.onabort=()=>fail(t.error)})}finally{fixtureDb.close()}
+  await fetch('/__ci/head-fail');return true;
  }.toString()+')()',true);assert.equal(wrongPhrase,true);
+ await cmd('Page.navigate',{url:home});await ready("document.readyState==='complete'&&typeof document.getElementById('openAccount')?.onclick==='function'&&!document.getElementById('shell1140')");
+ const freshDevice=await evalJS('('+async function(){
+  const el=id=>document.getElementById(id),wait=async(f,m)=>{for(let i=0;i<200;i++){if(f())return;await new Promise(r=>setTimeout(r,100))}throw Error(m+' | '+(el('message1140')?.textContent||'sin mensaje'))};
+  el('phrase').value='frase sintética paquete completo';el('openAccount').click();await wait(()=>el('unlock').hidden&&!!el('open1140')&&!el('open1140').disabled,'No terminó preflight');
+  if(document.querySelector('iframe')||!el('message1140').textContent.includes('No se pudo verificar'))throw Error('Red no verificada abrió diario');
+  await fetch('/__ci/head-resume');el('open1140').click();await wait(()=>!el('open1140').disabled,'No terminó segundo preflight');
+  if(document.querySelector('iframe')||!el('message1140').textContent.includes('ya tiene una copia'))throw Error('Copia existente no protegida');
+  const {openOfflineRepository}=await import('/v11.42/staging/source/V11.37-INTEGRACION/src/offline-repository.mjs');const pending=await openOfflineRepository();try{if(await pending.inspect('acct_'+'a'.repeat(32)))throw Error('Se inicializó una rama antes de recuperar')}finally{pending.close()}
+  el('sync1140').click();await wait(()=>!el('apply1140').disabled,'No preparó recuperación');el('apply1140').click();await wait(()=>el('message1140').textContent.includes('confirmada'),'Recuperación explícita no completó');
+  el('open1140').click();await wait(()=>document.querySelector('iframe')?.contentWindow?.asiaGym84Ready===true&&!el('close1140').disabled,'No abrió copia recuperada');
+  const d=document.querySelector('iframe').contentDocument;if(d.getElementById('height').value!=='1.86'||d.querySelector('header .brand h1').textContent!=='Usuario A'||d.getElementById('reminderTime821_weight').value!=='06:35')throw Error('Datos remotos no preservados');
+  el('close1140').click();await wait(()=>!document.querySelector('iframe')&&!el('reconcile1140').disabled,'No cerró');el('reconcile1140').click();await wait(()=>!el('logout1140').disabled,'No concilió');el('logout1140').click();return true;
+ }.toString()+')()',true);assert.equal(freshDevice,true);
  await ready("document.readyState==='complete'&&typeof document.getElementById('openAccount')?.onclick==='function'&&!document.getElementById('shell1140')");
  assert.equal(db.prepare('SELECT COUNT(*) AS n FROM sync_v1138_objects WHERE account_id=?').get(A).n,1);
  const isolation=await evalJS('('+async function(){
