@@ -1,5 +1,15 @@
 import assert from 'node:assert/strict';
 import '../../../../accounts106.js';
+import {seedGym,applyGym} from '../../../../gym84.mjs';
+const gymBase=seedGym();
+function gymSession(id,date,now){
+ let x=applyGym(gymBase,{type:'start',id,routineId:gymBase.routines[0].id,date},now);
+ x=applyGym(x,{type:'set',entryId:x.active.entries[0].id,index:0,values:{kg:20,reps:8,done:true}},now+1000);
+ return applyGym(x,{type:'finish'},now+2000);
+}
+const gymLocal=gymSession('gym-local','2026-11-25',1700000000000);
+const gymCloud=gymSession('gym-cloud','2026-11-24',1699999000000);
+
 import {prepareAdditiveRecovery1162} from '../dist/assets/v11.42/staging/source/V11.42-INTEGRACION/src/recovery-apply1162.mjs';
 import {encrypt84,decrypt84} from '../../../../model84.mjs';
 import {hashBytes} from '../dist/assets/v11.42/staging/source/V11.38-INTEGRACION/src/large-sync.mjs';
@@ -9,7 +19,7 @@ const diary=JSON.parse(entries[0][1]);
 const diaryEntries=x=>[['asia2027-v1',JSON.stringify(x)]];
 const localDiary={...diary,body:{...diary.body,'2026-11-25':{weight:80}},journal96:{'2026-11-25':'nota local'},work:{'2026-11-25_0':{ex:{Press:[{kg:10,reps:8,done:true}]}}}};
 const cloudDiary={...diary,diet:{'2026-11-24':{foods52:[]}},photos:{'2026-11-24_Frente':{date:'2026-11-24',view:'Frente',img:'data:image/png;base64,AAAA'}}};
-const base={entries,modules:{coach:{history:['preservar']}}},local={entries:diaryEntries(localDiary),modules:{...base.modules,recovery:{samples:['local']}}},cloud={entries:diaryEntries(cloudDiary),modules:{...base.modules,visual:{photos:['nube']}}};
+const base={entries,modules:{coach:{history:['preservar']},gym:gymBase}},local={entries:diaryEntries(localDiary),modules:{...base.modules,recovery:{samples:['local']},gym:gymLocal}},cloud={entries:diaryEntries(cloudDiary),modules:{...base.modules,visual:{photos:['nube']},gym:gymCloud}};
 const plain=payload=>({format:'asia-v1136-sync-v1',accountId:id,payload});
 const old=await encrypt84(plain(base),oldPhrase),migrated=await encrypt84(plain(base),newSecret),latest=await encrypt84(plain(cloud),newSecret);
 const sha=x=>hashBytes(new TextEncoder().encode(JSON.stringify(x)));
@@ -36,6 +46,9 @@ const recovered=await decrypt84(source.modules.envelope,newSecret);
 assert.deepEqual(recovered.modules.coach,{name:'coach',revision:1,payload:base.modules.coach});
 assert.deepEqual(recovered.modules.recovery.payload,local.modules.recovery);
 assert.deepEqual(recovered.modules.visual.payload,cloud.modules.visual);
+assert.deepEqual(recovered.modules.gym.payload.sessions,[...gymCloud.sessions,...gymLocal.sessions]);
+assert.equal(recovered.modules.gym.revision,2);
+assert.deepEqual((await decrypt84(objects[3],newSecret)).payload.modules.gym,recovered.modules.gym.payload);
 const recoveredDiary=JSON.parse((await decrypt84(source.local.envelope,newSecret)).entries.find(e=>e[0]==='asia2027-v1')[1]);
 assert.deepEqual(recoveredDiary,{...cloudDiary,body:localDiary.body,work:localDiary.work,journal96:localDiary.journal96});
 assert.deepEqual(JSON.parse((await decrypt84(objects[3],newSecret)).payload.entries[0][1]),recoveredDiary);

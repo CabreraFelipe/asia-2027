@@ -6,6 +6,7 @@ import {validateLargeList} from '../../V11.38-INTEGRACION/src/large-sync-client.
 import {validLargeEnvelope,hashBytes} from '../../V11.38-INTEGRACION/src/large-sync.mjs';
 import {MODULES} from '../../../../store84.mjs';
 import {inspectLegacy88} from '../../../../migration88.mjs';
+import {validateGym} from '../../../../gym84.mjs';
 import {encrypt84,decrypt84,checksum84} from '../../../../model84.mjs';
 const check=(x,m)=>{if(!x)throw Error(m)},eq=(a,b)=>JSON.stringify(a)===JSON.stringify(b),rev=r=>r?.revision??0;
 const sha=x=>hashBytes(new TextEncoder().encode(JSON.stringify(x)));
@@ -49,6 +50,47 @@ export function reconcileDiary1164(historical,local,cloud){
  // Prefer exact cloud bytes if no additions: important for lost-ack retry.
  return {conflicts,additions,value:changed?JSON.stringify(result):(cloud??local)};
 }
+// PRO arrays have stable IDs, unlike series/entries inside a session or routine.
+// Keep full records, preserve cloud list order and append exclusive local IDs.
+// A missing historical ID or unequal record is not an inferred deletion/edit.
+export function reconcileGym1165(historical,local,cloud){
+ const [h,l,c]=[historical,local,cloud].map(v=>v===undefined?null:v);
+ const conflicts=[],additions=[],lists=['library','routines','sessions','planned'];
+ const conflict=(key,reason)=>conflicts.push({group:'gym',key,reason});
+ const add=(key,from)=>additions.push({group:'gym',key,from});
+ const own=(x,k)=>x!==null&&Object.hasOwn(x,k);
+ const keys=(...xs)=>[...new Set(xs.flatMap(x=>Object.keys(x??{})))];
+ for(const x of [h,l,c])if(x!==null){validateGym(x);if(x.active||x.rest.end||x.rest.paused)conflict('active','active-session')}
+ if(!l&&!c){if(h)conflict('gym','historical-only');return {conflicts,additions,value:undefined}}
+ const result=structuredClone(c??l);
+ for(const k of keys(h,l,c)){
+  if(lists.includes(k))continue;
+  if(l&&c&&(own(l,k)!==own(c,k)||own(l,k)&&!eq(l[k],c[k])))conflict(k,'different-values');
+  else if(own(h,k)&&!own(l,k)&&!own(c,k))conflict(k,'historical-only');
+ }
+ for(const name of lists){
+  const [a,b,d]=[h,l,c].map(x=>new Map((x?.[name]??[]).map(v=>[v.id,v])));
+  for(const id of new Set([...a.keys(),...b.keys(),...d.keys()])){
+   const path=name+'/'+id,inL=b.has(id),inC=d.has(id);
+   if(!inL&&!inC){conflict(path,'historical-only');continue}
+   if(inL&&inC){if(!eq(b.get(id),d.get(id)))conflict(path,'different-values');continue}
+   add(path,inL?'local':'cloud');
+   if(inL&&c)result[name].push(structuredClone(b.get(id)));
+  }
+ }
+ // Name collisions and references in the resulting active plan must be usable.
+ // Historical session snapshots can legally refer to a deleted routine.
+ const lib=new Map(),routines=new Set(result.routines.map(r=>r.id));
+ for(const e of result.library){
+  const name=e.name.toLowerCase(),prior=lib.get(name);
+  if(prior&&prior!==e.id)conflict('library/'+e.id,'duplicate-exercise-name');
+  lib.set(name,e.id);
+ }
+ for(const p of result.planned)if(!routines.has(p.routineId))conflict('planned/'+p.id,'missing-routine');
+ if(conflicts.length)return {conflicts,additions,value:undefined};
+ try{validateGym(result)}catch{conflict('gym','invalid-combined-gym');return {conflicts,additions,value:undefined}}
+ return {conflicts,additions,value:result};
+}
 function union(reference,local,cloud,policy){
  const entries=[],modules={},conflicts=[],additions=[];
  function choose(group,key,h,l,c){
@@ -68,7 +110,13 @@ function union(reference,local,cloud,policy){
   }else{const v=choose('entry',k,get(r,k),get(l,k),get(c,k));if(v!==missing)entries.push([k,v])}
  }
  const getM=(p,k)=>Object.hasOwn(p.modules,k)?p.modules[k]:missing;
- for(const k of MODULES){const v=choose('module',k,getM(reference,k),getM(local,k),getM(cloud,k));if(v!==missing)modules[k]=v}
+ for(const k of MODULES){
+  if(k==='gym'){
+   const merged=reconcileGym1165(reference.modules[k],local.modules[k],cloud.modules[k]);
+   conflicts.push(...merged.conflicts);additions.push(...merged.additions);
+   if(merged.value!==undefined)modules[k]=merged.value;
+  }else{const v=choose('module',k,getM(reference,k),getM(local,k),getM(cloud,k));if(v!==missing)modules[k]=v}
+ }
  return {conflicts,additions,payload:conflicts.length?null:validatePayload({entries,modules},policy)};
 }
 export function prepareAdditiveRecovery1162(options){return prepare(options,false)}
@@ -142,7 +190,12 @@ async function prepare(options,recoverPending){
  const oldModules=source.modules?(await decrypt84(source.modules.envelope,phrase)).modules:{};
  const modules=Object.fromEntries(Object.entries(payload.modules).map(([name,value])=>{
   const candidates=[oldModules,...extraModules].flatMap(m=>Object.hasOwn(m,name)?[m[name]]:[]);
-  return [name,candidates.sort((a,b)=>b.revision-a.revision)[0]??{name,revision:1,payload:value}];
+  const latest=candidates.sort((a,b)=>b.revision-a.revision)[0];
+  if(!latest)return [name,{name,revision:1,payload:value}];
+  if(candidates.every(x=>x.revision!==latest.revision||eq(x.payload,value)))return [name,latest];
+  const revision=latest.revision+1;
+  check(Number.isSafeInteger(revision)&&revision<=mr,'Revisión interna inválida');
+  return [name,{name,revision,payload:value}];
  }));
  const localRecord={revision:lr,envelope:await encrypt84({format:'asia-v1126-local-vault-v1',accountId:id,revision:lr,entries:[...payload.entries,...devices]},newSecret)};
  const modulesRecord={revision:mr,envelope:await encrypt84({format:'asia-v1128-modules-v1',accountId:id,revision:mr,modules},newSecret)};
