@@ -1,13 +1,13 @@
 name: Asia 2027 - paquete PWA aislado V11.42
 on:
   push:
-    branches: ['development/multiuser']
+    branches: ['validation/v11993']
     paths: ['staging/source/V11.42-INTEGRACION/**','.github/workflows/asia-v1142.yml']
 permissions:
   contents: read
 jobs:
   package:
-    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/development/multiuser'
+    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/validation/v11993'
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
