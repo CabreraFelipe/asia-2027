@@ -10,7 +10,7 @@ const db=new DatabaseSync(':memory:');db.exec('PRAGMA foreign_keys=ON');
 for(const n of ['0001_staging.sql','0006_identity_oidc.sql','0007_synthetic_journal_v115.sql','0009_large_sync.sql'])db.exec(readFileSync(new URL('../dist/migrations/'+n,import.meta.url),'utf8'));
 for(const n of ['0010_managed_keys.proposed.sql','0011_remote_rekey.proposed.sql'])db.exec(readFileSync(new URL('../migrations/'+n,import.meta.url),'utf8'));
 const accounts=['a','b','c','d'].map(x=>({id:'acct_'+x.repeat(32),digest:x.repeat(64),csrf:x.repeat(43)}));
-for(const a of accounts){db.prepare('INSERT INTO accounts_v11 VALUES(?,?,?,?)').run(a.id,'https://accounts.google.com',a.id,new Date().toISOString());db.prepare('INSERT INTO auth_oidc_sessions_v1111 VALUES(?,?,?,?,?,?)').run(a.digest,a.id,a.csrf,Date.now(),Date.now()+600000);db.prepare('INSERT INTO managed_account_keys_v1152(account_id) VALUES(?)').run(a.id)}
+for(const a of accounts){db.prepare('INSERT INTO accounts_v11 VALUES(?,?,?,?)').run(a.id,'https://accounts.google.com',a.id,new Date().toISOString());db.prepare('INSERT INTO auth_oidc_sessions_v1111 VALUES(?,?,?,?,?,?)').run(a.digest,a.id,a.csrf,a.digest,Date.now(),Date.now()+600000);db.prepare('INSERT INTO managed_account_keys_v1152(account_id) VALUES(?)').run(a.id)}
 const [A,B,C,D]=accounts,objects=new Map(),oldPhrase='frase anterior sintética',kekSecret=generateAccountSecret(),kekId='fixture-v1';let onPut=null,loseCommitAck=false;
 const adapter={prepare(sql){let args=[];return {bind(...a){args=a;return this},async first(){const result=db.prepare(sql).get(...args)||null;if(loseCommitAck&&sql.startsWith("UPDATE remote_rekeys_v1157 SET phase='committed'")){loseCommitAck=false;throw Error('respuesta perdida')}return result}}}};
 const bucket={async put(k,v){objects.set(k,new Uint8Array(v));const cb=onPut;onPut=null;if(cb)await cb()},async get(k){const v=objects.get(k);return v?{size:v.length,arrayBuffer:async()=>v.buffer.slice(v.byteOffset,v.byteOffset+v.byteLength)}:null}};
@@ -51,7 +51,7 @@ try{
  // Revocation after upload prevents publishing, without discarding source.
  onPut=()=>db.prepare('DELETE FROM auth_oidc_sessions_v1111 WHERE account_id=?').run(C.id);
  await assert.rejects(sc.commit({operationId:opC.operationId,confirmed:true,oldPhrase}));assert.deepEqual(rows(C),[c.source]);assert.equal(keys(C).migration_lock,opC.operationId);assert.equal(keys(C).envelope,null);
- const resumed={...C,digest:'e'.repeat(64)};db.prepare('INSERT INTO auth_oidc_sessions_v1111 VALUES(?,?,?,?,?,?)').run(resumed.digest,C.id,C.csrf,Date.now(),Date.now()+600000);
+ const resumed={...C,digest:'e'.repeat(64)};db.prepare('INSERT INTO auth_oidc_sessions_v1111 VALUES(?,?,?,?,?,?)').run(resumed.digest,C.id,C.csrf,C.digest,Date.now(),Date.now()+600000);
  const sr=service(resumed);assert.equal((await sr.inspect(opC.operationId)).phase,'locked');
  assert.equal((await sr.commit({operationId:opC.operationId,confirmed:true,oldPhrase})).revision,2);assert.deepEqual(rows(C)[0],c.source);
  await assert.rejects(service(D).begin(operation(D,d.source)));assert.equal(keys(D).migration_lock,null);

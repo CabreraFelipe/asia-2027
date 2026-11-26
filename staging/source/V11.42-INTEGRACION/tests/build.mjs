@@ -99,6 +99,9 @@ console.log('Shell static dependency graph:',visited.size,'modules; original pur
 const server=out+'/server',sroot=server+'/staging/source';
 for(const d of dirs){const src='staging/source/'+d+'/src';if(!existsSync(src))continue;for(const n of readdirSync(src).filter(n=>n.endsWith('.mjs'))){const p=server+'/'+src+'/'+n;mkdirSync(dirname(p),{recursive:true});writeFileSync(p,patch(readFileSync(src+'/'+n,'utf8')))}}
 for(const n of rootFiles.filter(n=>n.endsWith('.mjs')))cpSync(n,server+'/'+n);
+// Server-side remote rekey uses the exact same pure domain validators as
+// the candidate shell, including independent v2 goals. No originals edited.
+for(const n of ['core105.js','extras830.js','gym826.js','schedule829.js'])cpSync(web+'/'+n,server+'/'+n);
 const official='staging/source/official/V11.24-STAGING/src';for(const n of readdirSync(official).filter(n=>n.endsWith('.mjs'))){const p=server+'/'+official+'/'+n;mkdirSync(dirname(p),{recursive:true});writeFileSync(p,patch(readFileSync(official+'/'+n,'utf8')))}
 // V11.51: only the packaged identity Worker gets the persistent session
 // policy. Original identity sources, existing schema and cookie name intact.
