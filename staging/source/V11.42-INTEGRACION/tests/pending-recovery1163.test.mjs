@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import '../../../../accounts106.js';
-import {preparePendingRecovery1163} from '../dist/assets/v11.42/staging/source/V11.42-INTEGRACION/src/recovery-apply1162.mjs';
+import {preparePendingRecovery1163,prepareAdditiveRecovery1162} from '../dist/assets/v11.42/staging/source/V11.42-INTEGRACION/src/recovery-apply1162.mjs';
 import {encrypt84,decrypt84} from '../../../../model84.mjs';
 import {hashBytes} from '../dist/assets/v11.42/staging/source/V11.38-INTEGRACION/src/large-sync.mjs';
 const id='acct_'+'b'.repeat(32),oldPhrase='frase sintética pendiente anterior',newSecret='Z'.repeat(43),backupPhrase='respaldo independiente pendiente',identity={accountId:id,csrf:'b'.repeat(43)};
@@ -20,6 +20,12 @@ const pending={inspect:async()=>structuredClone(branch),async finish(account,sna
 const client={accountId:id,verify:async()=>identity,discover:async()=>structuredClone(receipt),managedKey:async()=>newSecret,request:async(method,body,revision)=>{assert.equal(method,'GET');return revision?{ok:true,revision,envelope:structuredClone(objects[revision-1])}:{ok:true,head:objects.length,versions:[{revision:objects.length,bytes:100,created_at:'2026-11-26T00:00:00.000Z'}]}},async writeManaged({expectedRevision,envelope}){assert.equal(expectedRevision,objects.length);objects.push(structuredClone(envelope));writes++;return {ok:true,revision:objects.length}}};
 const options={client,repository,pending,policy:globalThis.asiaAccounts106,oldPhrase,backupPhrase,maintenanceConfirmed:true};
 const apply=p=>p.apply({confirmed:true,backupSaved:true,savedArchive:structuredClone(p.archive)});
+// Each flow requires its own commit adapter, not the unrelated writer.
+assert.equal(typeof repository.commitRecovery,'undefined');
+await assert.rejects(prepareAdditiveRecovery1162(options),/Confirmá mantenimiento y repositorio/);
+await assert.rejects(preparePendingRecovery1163({...options,repository:{...repository,commitPendingRecovery:undefined}}),/Confirmá mantenimiento y repositorio/);
+await assert.rejects(preparePendingRecovery1163({...options,pending:{inspect:pending.inspect}}),/Confirmá mantenimiento y repositorio/);
+assert.equal(writes,0);assert.equal(commits,0);assert.equal(finishes,0);
 let plan=await preparePendingRecovery1163(options);assert.equal(plan.kind,'blocked');assert.equal(plan.reason,'freeze-required');assert.equal(writes,0);
 branch.phase='frozen';const frozen=structuredClone(branch);
 branch.working=await row({...work,modules:{...work.modules,coach:{history:['diferente']}}},5);

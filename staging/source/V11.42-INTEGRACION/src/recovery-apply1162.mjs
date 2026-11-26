@@ -29,7 +29,7 @@ export function prepareAdditiveRecovery1162(options){return prepare(options,fals
 export function preparePendingRecovery1163(options){return prepare(options,true)}
 async function prepare(options,recoverPending){
  const {client,repository,pending,policy,oldPhrase,backupPhrase,maintenanceConfirmed}=options,id=client.accountId;
- check(maintenanceConfirmed===true&&/^acct_[a-f0-9]{32}$/.test(id)&&typeof repository.readRecovery==='function'&&typeof repository.commitRecovery==='function','Confirmá mantenimiento y repositorio');
+ check(maintenanceConfirmed===true&&/^acct_[a-f0-9]{32}$/.test(id)&&typeof repository.readRecovery==='function'&&(recoverPending?typeof repository.commitPendingRecovery==='function'&&typeof pending.finish==='function':typeof repository.commitRecovery==='function'),'Confirmá mantenimiento y repositorio');
  const identity=await client.verify();
  check(identity?.accountId===id&&/^[A-Za-z0-9_-]{43}$/.test(identity.csrf||''),'Sesión inválida');
  const verify=async()=>{const s=await client.verify();check(s?.accountId===id&&s.csrf===identity.csrf,'La sesión cambió');return s};
@@ -39,7 +39,6 @@ async function prepare(options,recoverPending){
  // Pending branches and any prior local recovery require a separate workflow.
  if(!recoverPending&&(branch||priorRekey))return {kind:'blocked',reason:branch?'pending':'prior-rekey',review};
  if(recoverPending&&(!branch||branch.phase!=='frozen'))return {kind:'blocked',reason:branch?'freeze-required':'no-pending',review};
- if(recoverPending)check(typeof repository.commitPendingRecovery==='function'&&typeof pending.finish==='function','Adaptadores de recuperación pendientes');
  const archive=review.archive,archiveSha=await checksum84(archive);
  const manifest=await decrypt84(archive.manifest,backupPhrase),head=manifest.head,receipt=manifest.receipt;
  const newSecret=await client.managedKey();check(/^[A-Za-z0-9_-]{43}$/.test(newSecret)&&newSecret!==oldPhrase&&newSecret!==backupPhrase,'Clave gestionada inválida');
