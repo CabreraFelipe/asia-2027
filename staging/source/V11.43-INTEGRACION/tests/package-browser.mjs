@@ -315,6 +315,12 @@ try{
   await hybridReview();hb('Reject').click();await wait(()=>hr()&&hs.textContent.includes('Sin cambios'),'No descartó híbrida');
   await hybridReview();try{w.confirm=()=>true;hb('Apply').click()}finally{w.confirm=originalConfirm}
   await wait(()=>hr()&&hs.textContent==='Conjunto de prueba guardado localmente.'&&el('status1140').textContent.includes('saved'),'No guardó alternativa híbrida');
+  // Generate calendar alternatives without changing the diary. New future block after the existing manual one.
+  cb('running').checked=true;cb('running').dispatchEvent(new w.Event('change'));cb('nutrition').checked=false;cb('nutrition').dispatchEvent(new w.Event('change'));
+  cb('runStart').value=addDay(obEnd,56);cb('runEnd').value=addDay(obEnd,69);for(let i=0;i<7;i++)cb('rd'+i).checked=true;
+  hf('runFrequency').value='2';hb('Generate').click();await wait(()=>hr()&&hs.textContent.includes('combinaciones verificadas'),'No generó alternativas de calendario');
+  if(!hb('Alternatives').textContent.includes('Alternativa 1')||!hs.textContent.includes('Sin cambios guardados.'))throw Error('Generación no produjo borradores');
+  hb('Clear').click();await wait(()=>hr()&&hb('Alternatives').textContent.includes('Alternativas locales · 0'),'No descartó alternativas generadas');
   // Independent synthetic account exercises actual IndexedDB paired CAS.
   const {openOfflineRepository:openCoachFence}=await import('/v11.42/staging/source/V11.37-INTEGRACION/src/offline-repository.mjs');
   const {encrypt84:encryptCoachFence}=await import('/v11.42/model84.mjs');
