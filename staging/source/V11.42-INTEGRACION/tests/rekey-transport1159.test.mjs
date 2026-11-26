@@ -14,7 +14,7 @@ const origin='https://asia-v1142-candidate-staging.example.workers.dev';
 const accounts=['a','b','c','d','e','f'].map(x=>({id:'acct_'+x.repeat(32),token:x.toUpperCase().repeat(43),csrf:x.repeat(43),email:x+'@example.invalid'}));
 for(const a of accounts){db.prepare('INSERT INTO accounts_v11 VALUES(?,?,?,?)').run(a.id,'https://accounts.google.com',a.email,new Date().toISOString());db.prepare('INSERT INTO auth_oidc_sessions_v1111 VALUES(?,?,?,?,?,?)').run(await digest(a.token),a.id,a.csrf,await digest(a.email),Date.now(),Date.now()+600000)}
 const [A,B,C,D,E,F]=accounts,objects=new Map();let onPut=null,puts=0;
-const env={STAGING_MODE:'asia-v1111-identity-private',STAGING_ORIGIN:origin,STAGING_ALLOW_V1142_TESTS:'true',STAGING_ALLOW_V1138_TESTS:'true',STAGING_ALLOW_MANAGED_KEYS_1152:'true',STAGING_ALLOW_REMOTE_REKEY_1159:'true',STAGING_MANAGED_KEK_ID_1152:'fixture-v1',STAGING_MANAGED_KEK_1152:generateAccountSecret(),STAGING_GOOGLE_CLIENT_ID:'test.apps.googleusercontent.com',STAGING_GOOGLE_CLIENT_SECRET:'synthetic-only',STAGING_ALLOWED_EMAILS:accounts.map(a=>a.email).join(','),STAGING_PWA_ASSETS:{},STAGING_DB:{prepare(sql){let args=[];return {bind(...a){args=a;return this},async first(){return db.prepare(sql).get(...args)||null},async all(){return {results:db.prepare(sql).all(...args)}},async run(){return db.prepare(sql).run(...args)}}}},
+const env={STAGING_MODE:'asia-v1111-identity-private',STAGING_ORIGIN:origin,STAGING_ALLOW_V1142_TESTS:'true',STAGING_ALLOW_V1138_TESTS:'true',STAGING_ALLOW_MANAGED_KEYS_1152:'true',STAGING_ALLOW_REMOTE_REKEY_1159:'true',STAGING_MANAGED_KEK_ID_1152:'fixture-v1',STAGING_MANAGED_KEK_1152:generateAccountSecret(),STAGING_GOOGLE_CLIENT_ID:'test.apps.googleusercontent.com',STAGING_GOOGLE_CLIENT_SECRET:'synthetic-only',STAGING_ALLOWED_EMAILS:accounts.slice(0,5).map(a=>a.email).join(','),STAGING_PWA_ASSETS:{},STAGING_DB:{prepare(sql){let args=[];return {bind(...a){args=a;return this},async first(){return db.prepare(sql).get(...args)||null},async all(){return {results:db.prepare(sql).all(...args)}},async run(){return db.prepare(sql).run(...args)}}}},
  STAGING_SYNC_OBJECTS:{async put(k,v){puts++;objects.set(k,new Uint8Array(v));const callback=onPut;onPut=null;if(callback)await callback()},async get(k){const v=objects.get(k);return v?{size:v.length,arrayBuffer:async()=>v.buffer.slice(0)}:null},async delete(k){objects.delete(k)}}};
 const headers=a=>({Cookie:'__Host-asia1111_session='+a.token,Origin:origin,'X-Asia-CSRF':a.csrf});
 const key=a=>worker.fetch(new Request(origin+'/v11.52/account-key',{method:'POST',headers:headers(a)}),env);
@@ -44,6 +44,11 @@ async function seed(a,{localOnly=false}={}){
 try{
  const a=await seed(A),b=await seed(B),c=await seed(C),d=await seed(D,{localOnly:true}),e=await seed(E,{localOnly:true});enroll(F);
  const discover={action:'discover'};
+ // The real identity Worker rejects configurations above five emails.
+ // Keep six isolated fixture rows, but never allow six identities at once.
+ const invalidAllowlist={STAGING_ALLOWED_EMAILS:accounts.map(a=>a.email).join(',')};
+ assert.equal((await send(A,discover,invalidAllowlist)).status,401);
+ assert.equal((await send(F,discover)).status,401);
  assert.equal((await send(A,discover,{STAGING_ALLOW_REMOTE_REKEY_1159:'false'})).status,404);
  assert.equal((await send(A,discover,{STAGING_ALLOW_MANAGED_KEYS_1152:'false'})).status,404);
  assert.equal((await send(A,discover,{}, {headers:{Cookie:''}})).status,401);
@@ -80,7 +85,14 @@ try{
  for(const account of [D,E]){const response=await key(account);assert.equal(response.status,409);assert.equal((await response.json()).error,'MIGRACION_REQUERIDA');assert.equal(rows(account).length,0)}
  const last=await clientFor(D),dopts={...options,client:last,repository:d.repository};
  const encryptedSeed=await encrypt84(d.plain,phrase);
- assert.equal((await write(F,0,encryptedSeed,'legacy-seed-v1')).status,409);
+ // Authenticate F in a separate five-member fixture configuration. Its
+ // empty new enrollment must reject legacy seeding, not merely fail auth.
+ const alternateAllowlist={STAGING_ALLOWED_EMAILS:[A,B,C,D,F].map(a=>a.email).join(',')};
+ const identityF=await send(F,discover,alternateAllowlist);
+ assert.equal(identityF.status,200);assert.equal((await identityF.json()).accountId,F.id);
+ assert.equal((await write(F,0,encryptedSeed,'legacy-seed-v1',alternateAllowlist)).status,409);
+ assert.equal(rows(F).length,0);
+ assert.equal(db.prepare('SELECT envelope FROM managed_account_keys_v1152 WHERE account_id=?').get(F.id).envelope,null);
  assert.equal((await write(D,0,encryptedSeed,'legacy-seed-v1',{STAGING_ALLOW_REMOTE_REKEY_1159:'false'})).status,409);
  assert.equal((await write(D,1,encryptedSeed,'legacy-seed-v1')).status,409);
  await assert.rejects(prepareMigration1159({...dopts,oldPhrase:'frase anterior incorrecta'}));
