@@ -14,15 +14,24 @@ function session(s,k){
  check(exact(s,['id','day','time','distanceM','seconds','mode','type','rpe','heartRate','elevationM','notes'])&&id(k,'run')&&s.id===k&&day(s.day)&&/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(s.time)&&int(s.distanceM,1,200000)&&int(s.seconds,1,604800)&&s.distanceM/s.seconds<=15&&modes.includes(s.mode)&&types.includes(s.type)&&(s.rpe===null||int(s.rpe,1,10))&&(s.heartRate===null||int(s.heartRate,30,250))&&(s.elevationM===null||int(s.elevationM,0,20000))&&txt(s.notes,500),'Sesión running inválida');
 }
 const levels=Object.freeze(['Inicial','Habitual','Experimentado']);
+const qualityTypes=Object.freeze(['Intervalos','Tempo']),isQuality=r=>qualityTypes.includes(r?.type);
+function qualityEligible(p,weekly,longest,days){return qualityTypes.includes(p?.quality)&&p.level!=='Inicial'&&weekly>=90&&longest>=35&&days.length>=3&&p.availableMinutes>=30&&!p.progress;}
+function qualityDetails(r){
+ if(!isQuality(r))return null;
+ check(int(r.minutes,30,240),'Duración de calidad inválida');
+ const work=r.type==='Intervalos'?4:8, recovery=r.type==='Intervalos'?6:0;
+ return {warmup:10,work,recovery,cooldown:r.minutes-10-work-recovery,repetitions:r.type==='Intervalos'?4:1,workEach:r.type==='Intervalos'?1:8,recoveryEach:r.type==='Intervalos'?2:0,effort:r.type==='Intervalos'?'Ágil controlado, no sprint; recuperación suave':'Sostenido controlado, sin buscar máxima velocidad'};
+}
 function validateProfile(p){
- check(exact(p,['level','surface','availableMinutes','progress','symptoms'])&&levels.includes(p.level)&&modes.includes(p.surface)&&int(p.availableMinutes,10,240)&&typeof p.progress==='boolean'&&p.symptoms==='Sin síntomas preocupantes','Completá tu nivel y disponibilidad; si hay dolor o síntomas preocupantes, consultá antes de aumentar la carga');
+ check(exact(p,['level','surface','availableMinutes','progress','symptoms',...(Object.hasOwn(p??{},'quality')?['quality']:[])])&&levels.includes(p.level)&&modes.includes(p.surface)&&int(p.availableMinutes,10,240)&&typeof p.progress==='boolean'&&p.symptoms==='Sin síntomas preocupantes','Completá tu nivel y disponibilidad; si hay dolor o síntomas preocupantes, consultá antes de aumentar la carga');
+ if(Object.hasOwn(p,'quality'))check(qualityTypes.includes(p.quality)&&p.level!=='Inicial'&&!p.progress,'La calidad requiere experiencia y mantener volumen');
  return p;
 }
 function plan(p,k,targets){
  check(exact(p,['id','goalId','start','end','days','weeklyMinutes','longestMinutes','rows',...(Object.hasOwn(p??{},'profile')?['profile']:[]),...(Object.hasOwn(p??{},'replaces')?['replaces']:[])])&&id(k,'runplan')&&p.id===k&&Object.hasOwn(targets,p.goalId)&&day(p.start)&&day(p.end)&&p.end>=p.start&&Date.parse(p.end)-Date.parse(p.start)<=83*86400000&&Array.isArray(p.days)&&p.days.length>=2&&p.days.length<=4&&new Set(p.days).size===p.days.length&&p.days.every(v=>int(v,0,6))&&int(p.weeklyMinutes,0,600)&&int(p.longestMinutes,0,240)&&(p.weeklyMinutes===0?p.longestMinutes===0:p.longestMinutes>0&&p.longestMinutes<=p.weeklyMinutes)&&Array.isArray(p.rows)&&p.rows.length>=1&&p.rows.length<=48,'Plan running inválido');
  if(Object.hasOwn(p,'profile'))validateProfile(p.profile);
  if(Object.hasOwn(p,'replaces'))check(id(p.replaces,'runplan')&&p.replaces!==k,'Replanificación inválida');
- let prev='';for(const r of p.rows){check(exact(r,['day','minutes','type'])&&day(r.day)&&r.day>=p.start&&r.day<=p.end&&r.day>prev&&p.days.includes(weekday(r.day))&&int(r.minutes,5,240)&&['Rodaje suave','Fondo suave','Caminar/correr','Recuperación'].includes(r.type),'Sesión prevista inválida');prev=r.day}
+ let prev='';for(const r of p.rows){check(exact(r,['day','minutes','type'])&&day(r.day)&&r.day>=p.start&&r.day<=p.end&&r.day>prev&&p.days.includes(weekday(r.day))&&int(r.minutes,5,240)&&(['Rodaje suave','Fondo suave','Caminar/correr','Recuperación'].includes(r.type)||(isQuality(r)&&qualityEligible(p.profile,p.weeklyMinutes,p.longestMinutes,p.days)&&r.type===p.profile.quality&&r.minutes>=30&&r.minutes<=p.profile.availableMinutes&&r.minutes<=p.longestMinutes&&Date.parse(r.day)-Date.parse(p.start)>=14*86400000&&(!targets[p.goalId].raceDate||Date.parse(targets[p.goalId].raceDate)-Date.parse(r.day)>7*86400000))),'Sesión prevista inválida');prev=r.day}
 }
 function validate(raw,goals){
  if(raw===undefined)return empty();
@@ -31,7 +40,8 @@ function validate(raw,goals){
  const seen=new Set();for(const [k,s] of Object.entries(raw.sessions)){session(s,k);const key=s.day+'/'+s.time;check(!seen.has(key),'Sesión duplicada en la misma fecha y hora');seen.add(key)}
  for(const [k,p] of Object.entries(raw.plans))plan(p,k,raw.targets);
  const replaced=new Set();for(const p of Object.values(raw.plans)){if(p.replaces){const old=raw.plans[p.replaces];check(old&&old.goalId===p.goalId&&p.start>old.start&&p.start<=old.end&&!replaced.has(p.replaces),'Replanificación incompatible o divergente');replaced.add(p.replaces)}}
- const dates=new Set();for(const r of effectiveRows(raw)){check(!dates.has(r.day),'Planes running superpuestos');dates.add(r.day)}
+ const effective=effectiveRows(raw),dates=new Set();for(const r of effective){check(!dates.has(r.day),'Planes running superpuestos');dates.add(r.day)}
+ for(const r of effective.filter(isQuality)){check(!dates.has(add(r.day,-1))&&!dates.has(add(r.day,1)),'Calidad Running requiere días vecinos sin Running');check(!effective.some(q=>isQuality(q)&&q.day!==r.day&&Math.abs(Date.parse(q.day)-Date.parse(r.day))<7*86400000),'Calidad Running demasiado próxima');}
  return raw;
 }
 function pace(distanceM,seconds){check(int(distanceM,1,200000)&&int(seconds,1,604800),'Distancia o duración inválida');return Math.round(seconds*1000/distanceM)}
@@ -44,22 +54,22 @@ function effectiveRows(raw,extra=null){
 }
 function planned(raw,date){const row=effectiveRows(raw).find(r=>r.day===date);return row?{day:row.day,minutes:row.minutes,type:row.type}:null}
 function assertStrengthChange(raw,before,after,today,schedule){
- for(const r of effectiveRows(raw))if(r.day>=today&&schedule.planned(r.day,before)===null)check(schedule.planned(r.day,after)===null,'Running previsto el '+r.day+'. Revisá el calendario híbrido antes de activar fuerza');
+ for(const r of effectiveRows(raw))for(const d of isQuality(r)?[add(r.day,-1),r.day,add(r.day,1)]:[r.day])if(d>=today&&schedule.planned(d,before)===null)check(schedule.planned(d,after)===null,'Running previsto el '+r.day+'. Revisá el calendario híbrido antes de activar fuerza');
 }
 function validateHybrid(raw,settings,schedule){
- for(const r of effectiveRows(raw))if(raw.plans[r.planId].profile)check(schedule.planned(r.day,settings)===null,'Plan híbrido incompatible el '+r.day);
+ for(const r of effectiveRows(raw))if(raw.plans[r.planId].profile)for(const d of isQuality(r)?[add(r.day,-1),r.day,add(r.day,1)]:[r.day])check(schedule.planned(d,settings)===null,'Plan híbrido incompatible el '+r.day);
 }
 function draft({goalId,start,end,days,weeklyMinutes,longestMinutes,profile,replaces},raw,goals,settings,today,schedule){
  const b=validate(raw,goals),t=b.targets[goalId];check(t&&goals.items.some(g=>g.id===goalId&&g.status==='Activa')&&day(today)&&day(start)&&day(end)&&start>=today&&end>=start&&Date.parse(end)-Date.parse(start)<=83*86400000&&(!t.raceDate||end<t.raceDate),'Elegí un tramo futuro de hasta 12 semanas, anterior a la carrera');
  check(Array.isArray(days)&&days.length>=2&&days.length<=4&&new Set(days).size===days.length&&days.every(v=>int(v,0,6))&&int(weeklyMinutes,0,600)&&int(longestMinutes,0,240)&&(weeklyMinutes===0?longestMinutes===0:longestMinutes>=10&&longestMinutes<=weeklyMinutes)&&schedule&&typeof schedule.planned==='function','Indicá frecuencia y volumen reciente reales');
- if(profile!==undefined)validateProfile(profile);
+ if(profile!==undefined){validateProfile(profile);if(profile.quality)check(qualityEligible(profile,weeklyMinutes,longestMinutes,days),'Calidad requiere al menos 3 días, 90 min semanales recientes, fondo de 35 min y 30 min disponibles; mantené volumen');}
  if(replaces!==undefined){const old=b.plans[replaces];check(old&&old.goalId===goalId&&start>today&&start>old.start&&start<=old.end&&!Object.values(b.plans).some(p=>p.replaces===replaces),'Elegí una fecha futura dentro del tramo vigente para replanificar');check(!Object.values(b.sessions).some(s=>s.day>=start&&s.day<=old.end),'Hay carreras registradas en el tramo a reemplazar');}
  const occupied=new Set(effectiveRows(b,{replaces,start}).map(r=>r.day));
  // Legacy drafts remain reproducible; enhanced drafts are optional and conservative.
  // No automatic intensity or volume escalation; walking intervals for new runners.
  const minutes=weeklyMinutes===0?10:Math.min(60,longestMinutes,Math.floor(weeklyMinutes/days.length));
  check(minutes>=5,'Volumen insuficiente para esa frecuencia; reducí los días o revisá el punto de partida');
- const rows=[];let last=null;
+ const rows=[];let last=null,lastQuality=null;
  for(let d=start;d<=end;d=add(d,1))if(days.includes(weekday(d))){
   check(!occupied.has(d)&&schedule.planned(d,settings)===null,'Hay una sesión de fuerza o running prevista el '+d+'. Elegí otros días o revisá el calendario');
   check(last===null||Date.parse(d)-Date.parse(last)>=86400000,'Fecha repetida');
@@ -83,9 +93,10 @@ function draft({goalId,start,end,days,weeklyMinutes,longestMinutes,profile,repla
    if(remaining<=7&&weeklyMinutes>0)duration=Math.max(5,Math.floor(duration*.8));
   }
   if(remaining<=2)duration=Math.max(5,Math.floor(duration/2));
+  if(profile?.quality&&type==='Rodaje suave'&&duration>=30&&Date.parse(d)-Date.parse(start)>=14*86400000&&remaining>7&&(!lastQuality||Date.parse(d)-Date.parse(lastQuality)>=7*86400000)&&![-1,1].some(n=>days.includes(weekday(add(d,n)))||occupied.has(add(d,n))||schedule.planned(add(d,n),settings)!==null)&&!effectiveRows(b,{replaces,start}).some(q=>isQuality(q)&&Math.abs(Date.parse(q.day)-Date.parse(d))<7*86400000)){type=profile.quality;lastQuality=d;}
   rows.push({day:d,minutes:duration,type});last=d;
  }
- check(rows.length>0,'No hay sesiones en esas fechas');
+ check(rows.length>0,'No hay sesiones en esas fechas');if(profile?.quality)check(rows.some(isQuality),'No hay espacio seguro para calidad con este calendario y volumen; elegí bloque suave o revisá días');
  return {goalId,start,end,days:[...days],weeklyMinutes,longestMinutes,rows,...(profile===undefined?{}:{profile:clone(profile)}),...(replaces===undefined?{}:{replaces})};
 }
 function activate(raw,proposal,planId,goals,settings,today,schedule){
@@ -96,5 +107,5 @@ function metrics(raw,today){check(day(today),'Fecha inválida');const from=add(t
  const byMode={};for(const mode of modes){const list=rows.filter(x=>x.mode===mode),distanceM=list.reduce((s,r)=>s+r.distanceM,0),seconds=list.reduce((s,r)=>s+r.seconds,0);byMode[mode]={sessions:list.length,distanceM,seconds,pace:distanceM?Math.round(seconds*1000/distanceM):null}}
  return {sessions:rows.length,distanceM:rows.reduce((s,r)=>s+r.distanceM,0),seconds:rows.reduce((s,r)=>s+r.seconds,0),longestM:Math.max(0,...rows.map(r=>r.distanceM)),byMode}
 }
-root.asiaRunning1174=Object.freeze({empty,validate,addTarget,addSession,pace,draft,activate,planned,effectiveRows,assertStrengthChange,validateHybrid,metrics,modes,types,levels});
+root.asiaRunning1174=Object.freeze({empty,validate,addTarget,addSession,pace,draft,activate,planned,effectiveRows,assertStrengthChange,validateHybrid,metrics,modes,types,levels,isQuality,qualityDetails,qualityTypes});
 })(globalThis);

@@ -53,3 +53,17 @@ const divergent=plain(R.activate(active,revised,'runplan-'+'2'.repeat(32),goals,
 assert.equal(merge(JSON.stringify({...diary,running1174:active}),JSON.stringify({...diary,running1174:replaced}),JSON.stringify({...diary,running1174:divergent})).value,undefined);
 assert.doesNotThrow(()=>R.addTarget(undefined,{goalId:id,distanceM:0,raceDate:'',targetSeconds:1800},goals));
 console.log('Running enhanced profile, future-only append-only replan, hybrid collision, time target and portable roundtrip PASS');
+
+// V11.96 quality is explicit, conservative and backward-compatible.
+const qInput={...input,start:'2026-11-30',end:'2027-01-06',days:[1,3,6],weeklyMinutes:120,longestMinutes:45,profile:{...profile,availableMinutes:45,progress:false,quality:'Intervalos'}};
+const quality=plain(R.draft(qInput,l,goals,settings,today,S)),qualityRows=quality.rows.filter(R.isQuality);
+assert.ok(qualityRows.length>0);assert.ok(qualityRows.every(r=>r.type==='Intervalos'&&r.day>='2026-12-14'&&r.day<'2026-12-31'));
+for(const r of qualityRows){const q=R.qualityDetails(r);assert.equal(q.warmup+q.work+q.recovery+q.cooldown,r.minutes);assert.ok(!quality.rows.some(x=>Math.abs(Date.parse(x.day)-Date.parse(r.day))===86400000));}
+assert.throws(()=>R.draft({...qInput,profile:{...qInput.profile,level:'Inicial'}},l,goals,settings,today,S));
+assert.throws(()=>R.draft({...qInput,profile:{...qInput.profile,progress:true}},l,goals,settings,today,S));
+assert.throws(()=>R.draft({...qInput,weeklyMinutes:60},l,goals,settings,today,S));
+const qbook=plain(R.activate(l,quality,'runplan-'+'3'.repeat(32),goals,settings,today,S));assert.deepEqual(qbook.sessions,l.sessions);
+assert.throws(()=>R.validateHybrid(qbook,{busy:new Date(Date.parse(qualityRows[0].day)-86400000).toISOString().slice(0,10)},stub));
+assert.doesNotThrow(()=>R.validate(next,goals));
+const tempo=R.draft({...qInput,profile:{...qInput.profile,quality:'Tempo'}},l,goals,settings,today,S);assert.ok(tempo.rows.some(r=>r.type==='Tempo'));
+console.log('Running quality: explicit opt-in, recovery, spacing, taper and legacy compatibility PASS');
