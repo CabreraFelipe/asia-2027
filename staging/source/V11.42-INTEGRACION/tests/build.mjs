@@ -126,6 +126,7 @@ replaceIdentity("  if(path==='/v11.11/auth/logout'&&request.method==='POST'&&!u.
 writeFileSync(identityFile,identityText);
 execFileSync(process.execPath,['--check',identityFile],{stdio:'inherit'});
 const worker=sroot+'/V11.42-INTEGRACION/src/worker.mjs';mkdirSync(dirname(worker),{recursive:true});cpSync(base+'/src/worker.mjs',worker);
+for(const n of ['account-key1150.mjs','managed-key1152.mjs'])cpSync(base+'/src/'+n,dirname(worker)+'/'+n);
 function walk(dir){return readdirSync(dir).flatMap(n=>{const p=join(dir,n);return statSync(p).isDirectory()?walk(p):[p]})}
 // Public entry carries a fingerprint of the complete private and public asset set.
 // Compute before adding the comment, so the build is reproducible and noncircular.
