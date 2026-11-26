@@ -83,8 +83,9 @@ try{
   check((await fetch('/v11.42/app.mjs')).status===401,'Asset anónimo');
   el('phrase').value=phrase;el('openAccount').click();await wait(()=>!el('openAccount').disabled,'Acceso anónimo no terminó');check(!el('shell1140'),'Shell anónimo');
   await fetch('/__ci/a');check((await fetch('/v11.11/auth/me')).ok,'Cookie sintética no disponible');
+  check(!el('advancedUnlock').checked,'Herramientas avanzadas activadas por defecto');
   el('phrase').value=phrase;el('openAccount').click();await wait(()=>!!el('open1140'),'Shell no inicializado: '+el('entryStatus').textContent);
-  el('open1140').click();await wait(()=>{if(el('message1140').textContent.startsWith('No se completó:'))throw Error(el('message1140').textContent);return document.querySelector('iframe')?.contentWindow?.asiaGym84Ready===true&&!el('close1140').disabled},'Diario empaquetado no inició');
+  await wait(()=>{if(el('message1140').textContent.startsWith('No se completó:'))throw Error(el('message1140').textContent);return document.querySelector('iframe')?.contentWindow?.asiaGym84Ready===true&&!el('close1140').disabled},'Diario empaquetado no inició');
   check(!document.querySelector('iframe').inert,'Interacción no habilitada tras verificar Gym');
   if(document.querySelector('iframe').contentDocument.querySelector('img[src*="12345678"]'))check(document.querySelector('iframe').contentDocument.readyState!=='complete','La prueba no ejercitó apertura con carga secundaria pendiente');
   const d=document.querySelector('iframe').contentDocument;
@@ -168,7 +169,7 @@ try{
   const el=id=>document.getElementById(id),wait=async(f,m)=>{for(let i=0;i<200;i++){if(f())return;await new Promise(r=>setTimeout(r,100))}throw Error(m+' | '+(el('message1140')?.textContent||'sin mensaje')+' | '+(el('status1140')?.textContent||'sin estado'))};
   el('phrase').value='frase sintética incorrecta';el('openAccount').click();await wait(()=>!el('openAccount').disabled,'Frase incorrecta no rechazó');if(el('shell1140'))throw Error('Frase incorrecta abrió la bóveda');
   el('phrase').value='frase sintética paquete completo';el('openAccount').click();await wait(()=>!!el('open1140'),'Frase correcta no abrió');
-  el('open1140').click();await wait(()=>document.querySelector('iframe')?.contentWindow?.asiaGym84Ready===true&&!el('close1140').disabled,'No reabrió diario');
+  await wait(()=>document.querySelector('iframe')?.contentWindow?.asiaGym84Ready===true&&!el('close1140').disabled,'No reabrió diario');
   if(document.querySelector('iframe').contentDocument.getElementById('height').value!=='1.86')throw Error('Registro perdido tras reinicio');
   if(document.querySelector('iframe').contentDocument.querySelector('header .brand h1').textContent!=='Usuario A')throw Error('Nombre perdido al reabrir');
   const diaryA=document.querySelector('iframe').contentDocument;
@@ -184,15 +185,38 @@ try{
   const el=id=>document.getElementById(id),wait=async(f,m)=>{for(let i=0;i<200;i++){if(f())return;await new Promise(r=>setTimeout(r,100))}throw Error(m+' | '+(el('message1140')?.textContent||'sin mensaje')+' | '+(el('status1140')?.textContent||'sin estado'))};
   if((await fetch('/v11.42/diary/index.html')).status!==401)throw Error('Logout no revocó acceso');
   await fetch('/__ci/b');el('phrase').value='frase sintética paquete completo';el('openAccount').click();await wait(()=>!!el('open1140'),'B no abrió shell');
-  el('open1140').click();await wait(()=>document.querySelector('iframe')?.contentWindow?.asiaGym84Ready===true&&!el('close1140').disabled,'B no abrió diario');
+  await wait(()=>document.querySelector('iframe')?.contentWindow?.asiaGym84Ready===true&&!el('close1140').disabled,'B no abrió diario');
   if(document.querySelector('iframe').contentDocument.getElementById('height').value==='1.86')throw Error('Datos cruzados');
   if(document.querySelector('iframe').contentDocument.querySelector('header .brand h1').textContent!=='Mi progreso')throw Error('Nombre cruzado entre cuentas');
   const diaryB=document.querySelector('iframe').contentDocument;
   if(diaryB.getElementById('reminderTime821_weight').value==='06:35'||[...diaryB.querySelectorAll('input[id^="reminderEnabled821_"],input[id^="reminderCloud95_"]')].some(x=>x.checked))throw Error('Horario o preferencias cruzadas entre cuentas');
 
   if((await (await fetch('/v11.38/sync')).json()).head!==0)throw Error('Nube cruzada');
+  // Freeze a real B pending branch through the existing repository API. This
+  // exercises the recovery gate, not a fabricated successful reconciliation.
+  el('close1140').click();await wait(()=>!document.querySelector('iframe')&&!el('reconcile1140').disabled,'B no cerró');
+  const {openOfflineRepository}=await import('/v11.42/staging/source/V11.37-INTEGRACION/src/offline-repository.mjs');
+  const repo=await openOfflineRepository();try{await repo.freeze('acct_'+'b'.repeat(32));}finally{repo.close()}
   return true;
  }.toString()+')()',true);assert.equal(isolation,true);
+ await cmd('Page.navigate',{url:home});await ready("document.readyState==='complete'&&typeof document.getElementById('openAccount')?.onclick==='function'&&!document.getElementById('shell1140')");
+ const recovery=await evalJS('('+async function(){
+  const el=id=>document.getElementById(id),wait=async(f,m)=>{for(let i=0;i<200;i++){if(f())return;await new Promise(r=>setTimeout(r,100))}throw Error(m+' | '+(el('message1140')?.textContent||'sin mensaje'))};
+  el('phrase').value='frase sintética paquete completo';el('openAccount').click();await wait(()=>el('unlock').hidden&&!!el('reconcile1140')&&!el('reconcile1140').disabled,'Recuperación no disponible');
+  if(document.querySelector('iframe')||!el('message1140').textContent.includes('Rama en conciliación'))throw Error('Rama congelada abrió o perdió diagnóstico');
+  const {openOfflineRepository}=await import('/v11.42/staging/source/V11.37-INTEGRACION/src/offline-repository.mjs');
+  const repo=await openOfflineRepository();try{if((await repo.inspect('acct_'+'b'.repeat(32)))?.phase!=='frozen')throw Error('Rama congelada perdida')}finally{repo.close()}
+  el('reconcile1140').click();await wait(()=>!el('open1140').disabled,'Conciliación explícita no terminó');
+  if(el('message1140').textContent.startsWith('No se completó:'))throw Error(el('message1140').textContent);
+  return true;
+ }.toString()+')()',true);assert.equal(recovery,true);
+ await cmd('Page.navigate',{url:home});await ready("document.readyState==='complete'&&typeof document.getElementById('openAccount')?.onclick==='function'&&!document.getElementById('shell1140')");
+ const advanced=await evalJS('('+async function(){
+  const el=id=>document.getElementById(id),wait=async(f,m)=>{for(let i=0;i<200;i++){if(f())return;await new Promise(r=>setTimeout(r,100))}throw Error(m)};
+  el('advancedUnlock').checked=true;el('phrase').value='frase sintética paquete completo';el('openAccount').click();await wait(()=>el('unlock').hidden&&!!el('open1140')&&!el('open1140').disabled,'Herramientas avanzadas no disponibles');
+  if(document.querySelector('iframe')||!el('maintenance1141')||!el('import1141')||!el('restore1141'))throw Error('Apertura avanzada no preservó recuperación');
+  el('open1140').click();await wait(()=>document.querySelector('iframe')?.contentWindow?.asiaGym84Ready===true&&!el('close1140').disabled,'Apertura manual no disponible');return true;
+ }.toString()+')()',true);assert.equal(advanced,true);
  await evalJS("fetch('/__ci/offline').then(r=>r.text())",true);await cmd('Page.navigate',{url:home});await ready("document.body?.textContent.includes('Volvé a conectarte para verificar tu cuenta')");
  console.log('Chrome paquete generado: autorización, diario, guardado, conciliación, Worker sync, logout, aislamiento, caché pública y fallback offline.');
 }finally{ws?.close();chrome?.kill();if(chrome&&chrome.exitCode===null)await Promise.race([once(chrome,'exit'),sleep(3000)]);server?.closeAllConnections();server?.close();db.close();await rm(dir,{recursive:true,force:true,maxRetries:3,retryDelay:100})}

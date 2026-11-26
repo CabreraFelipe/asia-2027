@@ -12,6 +12,9 @@ const env={STAGING_MODE:'asia-v1111-identity-private',STAGING_ORIGIN:origin,STAG
 const req=(p,auth=false,e=env)=>worker.fetch(new Request(origin+p,{headers:auth?{Cookie:'__Host-asia1111_session='+token}:{}}),e);
 const prefix='/v11.42/';
 assert.equal((await req(prefix+'index.html')).status,200);const m=await (await req(prefix+'manifest.json')).json();assert.equal(m.scope,prefix);assert.equal(m.start_url,prefix+'index.html');assert.equal(m.display,'standalone');assert.equal(m.icons.length,2);
+assert.match(await (await req(prefix+'index.html')).text(),/V11\.45/);
+assert.equal(m.id,prefix);
+assert.match(readFileSync(root+prefix+'index.html','utf8'),/id="advancedUnlock" type="checkbox" autocomplete="off"/);
 assert.equal((await req(prefix+'app.mjs')).status,401);assert.equal((await req(prefix+'diary/index.html')).status,401);assert.equal((await req(prefix+'diary/index.html',true)).headers.get('cache-control'),'no-store');assert.match((await req(prefix+'diary/index.html',true)).headers.get('content-security-policy'),/connect-src 'none'/);
 // Restore only the exact V10.6 public photo source, never broad network access.
 const diaryCsp=(await req(prefix+'diary/index.html',true)).headers.get('content-security-policy');

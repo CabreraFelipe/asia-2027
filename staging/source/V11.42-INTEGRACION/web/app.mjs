@@ -7,7 +7,7 @@ import {openOfflineRepository} from './staging/source/V11.37-INTEGRACION/src/off
 import {sessionReader,openSessionVault} from './staging/source/V11.26-INTEGRACION/src/session-vault.mjs';
 import {devicePolicy} from './staging/source/V11.30-INTEGRACION/src/device-session.mjs';
 import {openEncryptedModuleStore} from './staging/source/V11.28-INTEGRACION/src/encrypted-module-store.mjs';
-export async function start(passphrase){
+export async function start(passphrase,{maintenanceOnly=false}={}){
  const repository=await openUnifiedRepository(),pending=await openOfflineRepository();let shell,panel;
  const mount=async fixture=>{
   if(globalThis.__asiaCandidateFixture)throw Error('Diario ya abierto');globalThis.__asiaCandidateFixture=fixture;
@@ -45,5 +45,10 @@ export async function start(passphrase){
   const c=await createController({origin:location.origin,repository,pending,policy:globalThis.asiaAccounts106,passphrase,mount,onState:s=>{shell?.render();panel?.render();if(s==='closed'){repository.close();pending.close();location.replace('/v11.42/index.html')}}});
   shell=mountShell({doc:document,anchor:document.getElementById('shell'),controller:c,onRender:()=>panel?.render()});
   panel=mountMaintenance({doc:document,anchor:document.getElementById('shell'),controller:c,onChange:()=>shell.render()});
+  // Use the same guarded shell action as manual opening. Its error handling
+  // keeps recovery controls available if a frozen branch or mount blocks entry.
+  // Never reconcile, import, discard, or sync automatically in this step.
+  if(!maintenanceOnly)await document.getElementById('open1140').onclick();
+  return c.state;
  }catch(e){repository.close();pending.close();throw e}
 }
