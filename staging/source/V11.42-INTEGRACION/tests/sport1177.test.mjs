@@ -25,6 +25,17 @@ const blocked=plain(A.put(undefined,'profiles',{...prof,symptoms:'Sí / no estoy
 const row=p.rows[0],done=plain(A.put(active,'sessions',{id:sid,profileId:pid,planId:plan,day:row.day,minutes:35,rpe:5,notes:'Técnica',completed:[row.drills[0].exerciseId]},g,row.day));
 const m={id:mid,profileId:pid,day:today,kind:'Sprint 10 m',unit:'s',value:2.1,protocol:'Cronómetro manual, misma salida',surface:'Césped',side:'No aplica'};
 const measured=plain(A.put(active,'metrics',m,g,today));assert.throws(()=>A.put(active,'metrics',{...m,unit:'cm'},g,today));
+// V11.93: local PRO guard, conservative adjacency, malformed or active PRO fails closed.
+const proDay=p.rows[0].day,proRow=p.rows[0],proEmpty={revision:1,payload:{active:null,planned:[],sessions:[]}};
+assert.equal(A.proCalendarGuard(proEmpty,[proRow]),JSON.stringify([1,[]]));
+assert.notEqual(A.proCalendarGuard({...proEmpty,revision:2},[proRow]),A.proCalendarGuard(proEmpty,[proRow]));
+for(const key of ['planned','sessions'])assert.throws(()=>A.proCalendarGuard({revision:1,payload:{...proEmpty.payload,[key]:[{date:proDay}]}},[proRow]));
+assert.throws(()=>A.proCalendarGuard({revision:1,payload:{...proEmpty.payload,active:{}}},[proRow]));
+assert.throws(()=>A.proCalendarGuard({revision:1,payload:{...proEmpty.payload,planned:[{date:'invalid'}]}},[proRow]));
+assert.throws(()=>A.proCalendarGuard(null,[proRow]));
+const impact=A.catalog.find(e=>e.impact==='moderada'),low=A.catalog.find(e=>e.impact==='baja'),near={revision:1,payload:{...proEmpty.payload,planned:[{date:A.add(proDay,1)}]}};
+assert.throws(()=>A.proCalendarGuard(near,[{day:proDay,drills:[{exerciseId:impact.id}]}]));
+assert.doesNotThrow(()=>A.proCalendarGuard(near,[{day:proDay,drills:[{exerciseId:low.id}]}]));
 // V11.92: only future reductions, no new dates/drills/doses, exact re-review.
 const cut='2026-12-02',reduceId='sportplan-'+'9'.repeat(32),reduceInput={planId:plan,start:cut,days:[2],lowOnly:false};
 const beforeReduction=JSON.stringify(active),reduction=plain(A.draftReduction(reduceInput,active,g,settings,undefined,today,S,R));

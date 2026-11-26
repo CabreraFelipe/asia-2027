@@ -53,6 +53,22 @@ function assertCalendar(raw,settings,running,S,R){if(!raw)return;for(const r of 
 function draft(input,raw,g,settings,running,today,S,R,work={}){const b=validate(raw,g),p=b.profiles[input.profileId];check(exact(input,['profileId','start','end','days','replaces'])&&p&&g.items.some(x=>x.id===p.goalId&&x.status==='Activa')&&p.symptoms==='Sin síntomas preocupantes'&&p.safeSpace&&day(today)&&day(input.start)&&day(input.end)&&input.start>=today&&input.end>=input.start&&Date.parse(input.end)-Date.parse(input.start)<=27*86400000&&list(input.days,[0,1,2,3,4,5,6],1,3),'Completá el perfil, espacio seguro y fechas. Si hay síntomas preocupantes, no aumentes carga sin valoración.');if(input.replaces!==null){const old=b.plans[input.replaces];check(old&&b.profiles[old.profileId].goalId===p.goalId&&input.start>today&&input.start>old.start&&input.start<=old.end&&!Object.values(b.plans).some(x=>x.replaces===old.id)&&!Object.values(b.sessions).some(x=>x.day>=input.start&&x.day<=old.end),'No se puede reemplazar ese tramo deportivo.');}
  const occupied=new Set(effective(b,input).map(r=>r.day)),rows=[];for(let d=input.start;d<=input.end;d=add(d,1))if(input.days.includes(weekday(d))){check(!occupied.has(d)&&!eventsOn(b,d).length&&!R.planned(running,d)&&S.planned(d,settings)===null&&!Object.keys(work).some(k=>k.slice(0,10)===d),'Hay una sesión o evento previsto/registrado el '+d);const nearby=[-1,1].some(n=>eventsOn(b,add(d,n)).length||R.planned(running,add(d,n))||S.planned(add(d,n),settings)!==null||occupied.has(add(d,n))||rows.some(r=>r.day===add(d,n)));const moderate=!nearby&&!input.days.includes((weekday(d)+1)%7)&&!input.days.includes((weekday(d)+6)%7);rows.push({day:d,minutes:p.minutes,drills:choose(p,rows.length,moderate)});}check(rows.length,'No hay días en ese tramo');return {...clone(input),rows};}
 function activate(raw,proposal,key,g,settings,running,today,S,R,work){const {rows,...input}=proposal,actual=draft(input,raw,g,settings,running,today,S,R,work);check(JSON.stringify(actual)===JSON.stringify(proposal),'Cambió el borrador o el calendario');const b=clone(validate(raw,g));check(!Object.hasOwn(b.plans,key),'Plan deportivo ya existe');b.plans[key]={id:key,...actual};validate(b,g);assertCalendar(b,settings,running,S,R);return b;}
+// Local read-only PRO calendar guard for candidate sports rows, not a distributed transaction.
+function proCalendarGuard(gym,rows){
+ check(gym&&Number.isSafeInteger(gym.revision)&&gym.revision>=0&&Array.isArray(rows),'Gym PRO no disponible');
+ if(!gym.revision)return JSON.stringify([0,[]]);
+ const p=gym.payload;check(obj(p)&&Array.isArray(p.planned)&&Array.isArray(p.sessions)&&Object.hasOwn(p,'active'),'Agenda PRO inválida');
+ check(!p.active,'Finalizá la sesión PRO activa');
+ const dates=[...new Set([...p.planned,...p.sessions].map(r=>r?.date))].sort();
+ check(dates.every(day),'Fecha PRO inválida');
+ const occupied=new Set(dates);
+ for(const r of rows){
+  check(day(r.day)&&Array.isArray(r.drills)&&r.drills.every(d=>find(d.exerciseId)),'Sesión deportiva inválida');
+  check(!occupied.has(r.day),'Coincidencia con Gym PRO el '+r.day);
+  if(r.drills.some(d=>find(d.exerciseId).impact==='moderada'))check(![-1,1].some(n=>occupied.has(add(r.day,n))),'Gym PRO próximo a carga deportiva moderada el '+r.day);
+ }
+ return JSON.stringify([gym.revision,dates]);
+}
 // Only remove future prescribed work. Never generate new drills, doses or dates.
 function draftReduction(input,raw,g,settings,running,today,S,R,work={}){
  const b=validate(raw,g);
@@ -100,5 +116,5 @@ function metricComparisons(raw,g,profileId,asOf){
   return {kind,unit,protocol,surface,side,lower,count:rows.length,days:days.length,firstDay,lastDay,first,latest,best:bestOf(rows.map(m=>m.value)),improvement};
  });
 }
-root.asiaSport1177=Object.freeze({sports,capacities,equipment,locations,levels,surfaces,eventTypes,symptoms,catalog,metricKinds,metricComparisons,empty,validate,put,eligible,draft,activate,draftReduction,activateReduction,effective,planned,eventsOn,assertCalendar,add,find});
+root.asiaSport1177=Object.freeze({sports,capacities,equipment,locations,levels,surfaces,eventTypes,symptoms,catalog,metricKinds,metricComparisons,proCalendarGuard,empty,validate,put,eligible,draft,activate,draftReduction,activateReduction,effective,planned,eventsOn,assertCalendar,add,find});
 })(globalThis);

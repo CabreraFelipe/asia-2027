@@ -265,15 +265,15 @@ try{
   try{w.confirm=()=>true;diaryB.getElementById('sportSaveProfile1177').click()}finally{w.confirm=originalConfirm}
   await wait(()=>spStatus.textContent==='Perfil guardado.'&&el('status1140').textContent.includes('saved'),'Perfil deportivo no guardado: '+spStatus.textContent);
   sp('start').value=addDay(obEnd,10);sp('end').value=addDay(obEnd,23);sp('day2').checked=true;sp('day4').checked=true;
-  diaryB.getElementById('sportReview1177').click();if(!diaryB.getElementById('sportPreview1177').textContent.includes('Calentamiento'))throw Error('Bloque deportivo no generado: '+spStatus.textContent);
-  diaryB.getElementById('sportReject1177').click();diaryB.getElementById('sportReview1177').click();
+  diaryB.getElementById('sportReview1177').click();await wait(()=>diaryB.getElementById('sportPreview1177').textContent.includes('Calentamiento')&&sport.getAttribute('aria-busy')==='false','Bloque deportivo no generado: '+spStatus.textContent);
+  diaryB.getElementById('sportReject1177').click();diaryB.getElementById('sportReview1177').click();await wait(()=>diaryB.getElementById('sportPreview1177').textContent.includes('Calentamiento')&&sport.getAttribute('aria-busy')==='false','Bloque no revisado nuevamente');
   try{w.confirm=()=>true;diaryB.getElementById('sportApply1177').click()}finally{w.confirm=originalConfirm}
   await wait(()=>spStatus.textContent==='Bloque deportivo guardado.'&&el('status1140').textContent.includes('saved'),'Bloque deportivo no guardado: '+spStatus.textContent);
   const reductionSelect=sp('reducePlan');reductionSelect.value=[...reductionSelect.options].find(o=>o.value).value;reductionSelect.dispatchEvent(new w.Event('change'));
   sp('reduceStart').value=addDay(obEnd,11);sp('reduceDay4').checked=false;sp('reduceConfirm').checked=true;
-  diaryB.getElementById('sportReviewReduction1192').click();if(spStatus.textContent!=='Reducción revisada. Sin guardar.')throw Error('Reducción no revisada: '+spStatus.textContent);
+  diaryB.getElementById('sportReviewReduction1192').click();await wait(()=>spStatus.textContent==='Reducción revisada. Sin guardar.'&&sport.getAttribute('aria-busy')==='false','Reducción no revisada: '+spStatus.textContent);
   diaryB.getElementById('sportRejectReduction1192').click();if(!spStatus.textContent.includes('Sin cambios'))throw Error('Reducción no descartada');
-  diaryB.getElementById('sportReviewReduction1192').click();
+  diaryB.getElementById('sportReviewReduction1192').click();await wait(()=>spStatus.textContent==='Reducción revisada. Sin guardar.'&&sport.getAttribute('aria-busy')==='false','Reducción no revisada nuevamente');
   try{w.confirm=()=>true;diaryB.getElementById('sportApplyReduction1192').click()}finally{w.confirm=originalConfirm}
   await wait(()=>spStatus.textContent==='Reducción deportiva guardada.'&&el('status1140').textContent.includes('saved'),'Reducción no guardada: '+spStatus.textContent);
   const metricToday=sp('metricDay').value,comparison=diaryB.getElementById('sportComparisons1191');
