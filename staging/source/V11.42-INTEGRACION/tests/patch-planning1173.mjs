@@ -13,6 +13,7 @@ export function patchPlanning1173(web){
  ["p.start>=programmeStart","p.start>=minimum"],
  ["if(!day(d)||d<programmeStart)return null;","if(!day(d)||d<earliest(settings))return null;"],
  ["if(d>=programmeStart){const p=programmeAt(d,settings);","if(d>=programmeStart||personalAt(d,settings)){const p=programmeAt(d,settings);"],
+ ["return p?.days.find(x=>x.weekday===weekday(d))?.slot??null;","const slot=p?.days.find(x=>x.weekday===weekday(d))?.slot??null;return Object.hasOwn(settings??{},'coachRoutine1179')?root.asiaCoachActions1179.resolve(slot,d,settings,p?.id,root.asiaGym826,programmes(settings)):slot;"],
  ["check(active(from)&&active(to)&&day(today)","check(!root.asiaSport1177?.planned(data.sport1177,to),'Sesión deportiva prevista en el destino.');check(!root.asiaRunning1174?.planned(data.running1174,to),'Running previsto en el destino. Revisá el calendario híbrido.');check(!personalAt(from,data.settings)&&!personalAt(to,data.settings)&&active(from)&&active(to)&&day(today)"],
  ["const api={base,clean,planned,move,rolling,programmes,programmeAt,programmeStart,","const api={base,clean,planned,move,rolling,programmes,programmeAt,programmeStart,personalStart,personalAt,earliest,"]
  ]);

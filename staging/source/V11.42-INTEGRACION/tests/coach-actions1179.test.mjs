@@ -1,0 +1,24 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {createContext,runInContext} from 'node:vm';
+import {inspectLegacy88,makePortable88,readPortable88} from '../dist/assets/v11.42/migration88.mjs';
+import {reconcileDiary1164} from '../dist/assets/v11.42/staging/source/V11.42-INTEGRACION/src/recovery-apply1162.mjs';
+const dir=new URL('../dist/assets/v11.42/diary/',import.meta.url).pathname,ctx=createContext({module:{exports:{}}});
+for(const n of ['core105.js','extras830.js','gym826.js','schedule829.js','training102.js']){ctx.module.exports={};runInContext(readFileSync(dir+n,'utf8'),ctx,{filename:n});}
+const A=ctx.asiaCoachActions1179,api={Gym:ctx.asiaGym826,S:ctx.asiaSchedule829,T:ctx.asiaTraining102,R:ctx.asiaRunning1174,Sport:ctx.asiaSport1177};
+const plain=x=>JSON.parse(JSON.stringify(x)),today='2026-11-26',d='2026-12-01',pid='prog-'+'a'.repeat(32),id='coachchange-'+'b'.repeat(32),id2='coachchange-'+'c'.repeat(32);
+const routine={name:'Rutina previa',entries:[{exercise:'Press banca con barra',sets:3,min:8,max:10,rest:90}]};
+const data={body:{'2026-11-20':{weight:80}},diet:{'2026-11-20':{}},work:{'2026-11-24_4':{ex:{'Press banca con barra':[{kg:30,reps:8,done:true}]}}},journal96:{'2026-11-20':'Histórico'},settings:{goals101:{version:2,primary:'',items:[]},personalCalendar1173:today,routines826:[routine,{name:'Otra rutina',entries:[{exercise:'Sentadilla con barra',sets:3,min:8,max:10,rest:90}]}],programmes102:[{id:pid,name:'Mi programa',start:today,end:'2026-12-15',objective:'Fuerza',equipment:'Gimnasio completo',minutes:60,days:[{weekday:2,slot:4},{weekday:4,slot:5}],cancelled:false}]}};
+const raw={day:d,scope:'future',reason:'Agregar espalda',availableExercises:['Remo con pecho apoyado'],operations:[{type:'add',at:1,entry:{exercise:'Remo con pecho apoyado',sets:2,min:8,max:10,rest:90}}]};
+const before=JSON.stringify(data),p=plain(A.review(data,raw,id,today,api)),next=plain(A.apply(data,p,today,api));
+assert.equal(JSON.stringify(data),before);assert.deepEqual(next.work,data.work);assert.deepEqual(next.settings.routines826.slice(0,2),data.settings.routines826);assert.deepEqual(next.settings.programmes102,data.settings.programmes102);
+assert.deepEqual(p.view.dates,['2026-12-01','2026-12-08','2026-12-15']);assert.equal(api.S.planned(d,next.settings),6);assert.equal(api.S.planned('2026-12-08',next.settings),6);assert.equal(api.S.planned('2026-12-03',next.settings),5);
+assert.throws(()=>A.apply(next,p,today,api));assert.throws(()=>A.apply({...data,settings:{...data.settings,extra:1}},p,today,api));assert.throws(()=>A.review(data,{...raw,availableExercises:[]},id,today,api));assert.throws(()=>A.review({...data,work:{...data.work,[d+'_4']:{ex:{}}}},raw,id,today,api));assert.throws(()=>A.review(data,{...raw,operations:[{type:'unknown'}]},id,today,api));
+const once=plain(A.apply(data,A.review(data,{...raw,scope:'once'},id,today,api),today,api));assert.equal(api.S.planned(d,once.settings),6);assert.equal(api.S.planned('2026-12-08',once.settings),4);
+const revert={day:'2026-12-08',scope:'future',reason:'Volver a la rutina anterior',availableExercises:['Press banca con barra'],operations:[{type:'restore',changeId:id}]};
+const restored=plain(A.apply(next,A.review(next,revert,id2,today,api),today,api));assert.equal(api.S.planned(d,restored.settings),6);assert.equal(api.S.planned('2026-12-08',restored.settings),7);assert.deepEqual(restored.settings.routines826[3].entries,routine.entries);assert.equal(restored.settings.coachRoutine1179.length,2);
+const changed=plain(restored);changed.settings.coachRoutine1179[1].baseSlot=5;assert.throws(()=>inspectLegacy88(changed));const malformed=plain(restored);malformed.settings.coachRoutine1179[1].oldSlot=4;assert.throws(()=>inspectLegacy88(malformed));
+const short=plain(api.T.shorten(restored.settings,pid,'2026-12-10',today));assert.equal(api.S.planned('2026-12-15',short),null);inspectLegacy88({...restored,settings:short});
+inspectLegacy88(restored);const pair={preferences:{revision:0,payload:{}},gym:{revision:0,payload:{}}},phrase='frase sintetica cambios coach';assert.deepEqual((await readPortable88(await makePortable88(restored,pair,phrase),phrase)).legacy,restored);
+assert.ok(reconcileDiary1164(JSON.stringify(data),JSON.stringify(next),JSON.stringify(restored)).conflicts.some(x=>x.key==='settings'));
+console.log('Coach native actions: actual calendar, once/future, reversal append-only, original slots and work, invalid refs, stale, backup and conflicts PASS');
