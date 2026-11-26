@@ -87,7 +87,7 @@ export async function start(passphrase,{maintenanceOnly=false,expectedIdentity=n
    }catch(e){throw Error('No se completó la recuperación automática. No se enviaron ni descartaron registros. '+e.message)}
    finally{plan?.cancel()}
   };
-  const c=await createController({origin:location.origin,repository,pending,policy:globalThis.asiaAccounts106,passphrase,mount,beforeOpen,expectedIdentity:identity,onState:s=>{shell?.render();panel?.render();if(s==='closed'){repository.close();pending.close();location.replace('/v11.42/index.html')}}});
+  const c=await createController({origin:location.origin,repository,pending,policy:globalThis.asiaAccounts106,passphrase,mount,beforeOpen,expectedIdentity:identity,managedWrite:managedRecovery,onState:s=>{shell?.render();panel?.render();if(s==='closed'){repository.close();pending.close();location.replace('/v11.42/index.html')}}});
   shell=mountShell({doc:document,anchor:document.getElementById('shell'),controller:c,onRender:()=>panel?.render()});
   panel=mountMaintenance({doc:document,anchor:document.getElementById('shell'),controller:c,onChange:()=>shell.render()});
   // Use the same guarded shell action as manual opening. Its error handling

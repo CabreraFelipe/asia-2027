@@ -22,8 +22,9 @@ export async function handleManagedKey(request,env,{authenticate,now=Date.now}){
   const current=async()=>{const s=await authenticate();return valid(s)&&s.accountId===accountId&&s.csrf===session.csrf};
   const live='EXISTS(SELECT 1 FROM auth_oidc_sessions_v1111 WHERE token_digest=? AND account_id=? AND csrf=? AND expires_at>?)';
   const liveArgs=()=>[tokenDigest,accountId,session.csrf,now()];
-  const read=()=>db.prepare('SELECT envelope FROM managed_account_keys_v1152 WHERE account_id=? AND '+live).bind(accountId,...liveArgs()).first();
+  const read=()=>db.prepare('SELECT envelope,migration_lock FROM managed_account_keys_v1152 WHERE account_id=? AND '+live).bind(accountId,...liveArgs()).first();
   let row=await read();if(!row)return fail(409,'ALTA_NO_HABILITADA');
+  if(row.migration_lock!==null)return fail(409,'MIGRACION_EN_CURSO');
   // This initial route supports only a single configured KEK version. An
   // unknown version must fail closed; it never replaces the stored key.
   const kekId=env.STAGING_MANAGED_KEK_ID_1152,key=await importWrappingKey(env.STAGING_MANAGED_KEK_1152);
@@ -33,13 +34,17 @@ export async function handleManagedKey(request,env,{authenticate,now=Date.now}){
    // data, no write after revocation. Concurrent initializers reuse winner.
    const empty=['sync_v1138_objects','synthetic_journal_v115','encrypted_snapshots_v11'].map(t=>'NOT EXISTS(SELECT 1 FROM '+t+' WHERE account_id=?)').join(' AND ');
    if(!await current())return fail(401,'NO_AUTORIZADO');
-   await db.prepare('UPDATE managed_account_keys_v1152 SET envelope=? WHERE account_id=? AND envelope IS NULL AND '+live+' AND '+empty+' RETURNING account_id').bind(JSON.stringify(envelope),accountId,...liveArgs(),accountId,accountId,accountId).first();
+   await db.prepare('UPDATE managed_account_keys_v1152 SET envelope=? WHERE account_id=? AND envelope IS NULL AND migration_lock IS NULL AND '+live+' AND '+empty+' RETURNING account_id').bind(JSON.stringify(envelope),accountId,...liveArgs(),accountId,accountId,accountId).first();
    row=await read();
    if(!row)return fail(401,'NO_AUTORIZADO');
+   if(row.migration_lock!==null)return fail(409,'MIGRACION_EN_CURSO');
    if(row.envelope===null)return fail(409,'MIGRACION_REQUERIDA');
   }
   const envelope=JSON.parse(row.envelope),secret=await unwrapAccountSecret({accountId,kekId,key,envelope});
-  if(!await current()||!await read())return fail(401,'NO_AUTORIZADO');
+  if(!await current())return fail(401,'NO_AUTORIZADO');
+  const last=await read();if(!last)return fail(401,'NO_AUTORIZADO');
+  if(last.migration_lock!==null)return fail(409,'MIGRACION_EN_CURSO');
+  if(last.envelope!==row.envelope)return fail(409,'CLAVE_CAMBIO');
   // Only in memory and authenticated HTTPS response; never logged or cached.
   return json({ok:true,syntheticOnly:true,accountId,secret});
  }catch{return fail(503,'CLAVE_NO_DISPONIBLE')}

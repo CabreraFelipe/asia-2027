@@ -19,7 +19,7 @@ async function bounded(request){
 const headers={'Cache-Control':'no-store','Content-Type':'application/json; charset=utf-8','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Cross-Origin-Resource-Policy':'same-origin'};
 const json=(x,status=200)=>new Response(JSON.stringify(x),{status,headers});
 const err=(status,error)=>json({ok:false,error},status);
-export async function handleLargeSync(request,{db,bucket,session,validWrite,enabled=false,now=Date.now}){
+export async function handleLargeSync(request,{db,bucket,session,validWrite,enabled=false,fenceEnabled=false,now=Date.now}){
  if(!enabled||!bucket||typeof bucket.put!=='function')return err(403,'DESACTIVADO');
  if(!session||!/^acct_[a-f0-9]{32}$/.test(session.id)||!session.digest)return err(401,'NO_AUTORIZADO');
  const u=new URL(request.url),match=/^\/v11\.38\/sync(?:\/([1-9]\d{0,2}))?$/.exec(u.pathname);
@@ -43,13 +43,25 @@ export async function handleLargeSync(request,{db,bucket,session,validWrite,enab
    return json({ok:true,revision,envelope,created_at:row.created_at});
   }
   if(!validWrite(request))return err(403,'CSRF_INVALIDO');
+  // This protocol marker prevents accidental writes by older clients. It is
+  // not a proof of knowledge of the encryption key or a separate auth factor.
+  const epoch=request.headers.get('X-Asia-Key-Epoch');
+  if(epoch!==null&&epoch!=='managed-v1')return err(400,'EPOCA_INVALIDA');
+  if(epoch!==null&&!fenceEnabled)return err(409,'CUSTODIA_DESACTIVADA');
+  // D1 publication must check the fence atomically with remote CAS. No read
+  // before an R2 put can be used as the final authorization for a write.
+  const fenceSQL=!fenceEnabled?'1=1':epoch==='managed-v1'
+   ?'EXISTS(SELECT 1 FROM managed_account_keys_v1152 WHERE account_id=? AND envelope IS NOT NULL AND migration_lock IS NULL)'
+   :'NOT EXISTS(SELECT 1 FROM managed_account_keys_v1152 WHERE account_id=? AND (envelope IS NOT NULL OR migration_lock IS NOT NULL))';
+  const fenceArgs=fenceEnabled?[session.id]:[];
+  if(!await db.prepare('SELECT 1 AS yes WHERE '+fenceSQL).bind(...fenceArgs).first())return err(409,'ESCRITURA_BLOQUEADA');
   let input;try{input=await bounded(request)}catch{return err(400,'CUERPO_INVALIDO')}
   if(!exact(input,['expectedRevision','envelope'])||!Number.isSafeInteger(input.expectedRevision)||input.expectedRevision<0||input.expectedRevision>=200||!validLargeEnvelope(input.envelope))return err(400,'SOBRE_INVALIDO_O_CUOTA');
   if(!await live())return err(401,'NO_AUTORIZADO');
   const raw=bytes(JSON.stringify(input.envelope)),sha=await hashBytes(raw),key='synthetic-sync-v1138/'+session.id+'/'+crypto.randomUUID();
   // Unique object; never replace an earlier revision. No delete on ambiguous D1 outcome.
   await bucket.put(key,raw);
-  const stamp=now(),row=await db.prepare('INSERT INTO sync_v1138_objects(account_id,revision,object_key,bytes,sha256,created_at) SELECT ?,?,?,?,?,? WHERE '+liveSQL+' AND COALESCE((SELECT MAX(revision) FROM sync_v1138_objects WHERE account_id=?),0)=? RETURNING revision').bind(session.id,input.expectedRevision+1,key,raw.length,sha,new Date(stamp).toISOString(),...args(),session.id,input.expectedRevision).first();
+  const stamp=now(),row=await db.prepare('INSERT INTO sync_v1138_objects(account_id,revision,object_key,bytes,sha256,created_at) SELECT ?,?,?,?,?,? WHERE '+liveSQL+' AND '+fenceSQL+' AND COALESCE((SELECT MAX(revision) FROM sync_v1138_objects WHERE account_id=?),0)=? RETURNING revision').bind(session.id,input.expectedRevision+1,key,raw.length,sha,new Date(stamp).toISOString(),...args(),...fenceArgs,session.id,input.expectedRevision).first();
   if(!row){try{await bucket.delete(key)}catch{}return err(409,'CONFLICTO_O_REVOCADA')}
   return json({ok:true,revision:row.revision},201);
  }catch{return err(503,'ALMACENAMIENTO_NO_DISPONIBLE')}

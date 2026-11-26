@@ -8,7 +8,7 @@ import {createAccountServices} from '../../V11.39-INTEGRACION/src/service-client
 const check=(x,m)=>{if(!x)throw Error(m)};
 const same=(a,b)=>a.accountId===b.accountId&&a.csrf===b.csrf;
 function transient(){const m=new Map();return Object.freeze({getItem:k=>m.get(k)??null,setItem:(k,v)=>m.set(k,String(v)),removeItem:k=>m.delete(k),key:i=>[...m.keys()][i]??null,get length(){return m.size}})}
-export async function createController({origin,fetcher=fetch,repository,pending,policy,passphrase,mount,beforeOpen=async()=>{},expectedIdentity=null,onState=()=>{},now=Date.now}){
+export async function createController({origin,fetcher=fetch,repository,pending,policy,passphrase,mount,beforeOpen=async()=>{},expectedIdentity=null,managedWrite=false,onState=()=>{},now=Date.now}){
  check(/^https:\/\/asia-v1111-identity-staging\.[a-z0-9-]+\.workers\.dev$/.test(origin)&&typeof mount==='function'&&typeof beforeOpen==='function','Origen o montaje inválido');
  const read=sessionReader({origin,fetcher}),identity=await read();
  check(!expectedIdentity||same(identity,expectedIdentity),'La sesión cambió');
@@ -16,7 +16,7 @@ export async function createController({origin,fetcher=fetch,repository,pending,
  const publish=next=>{state=next;try{onState(next)}catch{}};
  async function verify(){check(!locked&&state!=='closed','Sesión bloqueada');let s;try{s=await read()}catch(e){if(e.revoked===true){locked=true;services?.close();view?.hide?.();publish('locked')}throw e}
   if(!same(s,identity)){locked=true;services?.close();view?.hide?.();publish('locked');throw Error('La sesión cambió')}return s}
- const options={readSession:verify,origin,fetcher,repository,pending,policy,passphrase,now};
+ const options={readSession:verify,origin,fetcher,repository,pending,policy,passphrase,now,managedWrite};
  const maintenance=()=>check(state==='maintenance'&&!busy&&!plan,'Cerrá el diario y la operación pendiente');
  async function operation(fn){check(!busy,'Operación en curso');busy=true;try{return await fn()}finally{busy=false}}
  async function prepare(fn){maintenance();return operation(async()=>{

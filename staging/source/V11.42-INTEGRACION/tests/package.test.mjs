@@ -14,8 +14,8 @@ const req=(p,auth=false,e=env)=>worker.fetch(new Request(origin+p,{headers:auth?
 const prefix='/v11.42/';
 assert.equal((await req(prefix+'index.html')).status,200);const m=await (await req(prefix+'manifest.json')).json();assert.equal(m.scope,prefix);assert.equal(m.start_url,prefix+'index.html');assert.equal(m.display,'standalone');assert.equal(m.icons.length,2);
 const publicIndex=await (await req(prefix+'index.html')).text();
-assert.ok(publicIndex.includes('<title>Asia 2027 · V11.55.1</title>'),'Versión exacta del título');
-assert.ok(publicIndex.includes('<p>V11.55.1 · Pruebas privadas. Solo datos sintéticos.</p>'),'Versión visible exacta');
+assert.ok(publicIndex.includes('<title>Asia 2027 · V11.56</title>'),'Versión exacta del título');
+assert.ok(publicIndex.includes('<p>V11.56 · Pruebas privadas. Solo datos sintéticos.</p>'),'Versión visible exacta');
 assert.equal(m.id,prefix);
 assert.match(readFileSync(root+prefix+'index.html','utf8'),/id="advancedUnlock" type="checkbox" autocomplete="off"/);
 // The pre-auth entry imports exactly this public, data-free helper.
@@ -121,3 +121,5 @@ await import('./account-key1150.test.mjs');
 await import('./managed-key1152.test.mjs');
 
 await import('./rekey1153.test.mjs');
+
+await import('./write-fence1156.test.mjs');
