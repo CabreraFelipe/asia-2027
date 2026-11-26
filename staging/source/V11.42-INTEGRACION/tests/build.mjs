@@ -35,7 +35,7 @@ replaceExtras("check(ids.has('asia-2027')&&(raw.primary===''||items.some(g=>g.id
 replaceExtras('return {version:1,primary:raw.primary,items};','return {version:raw.version,primary:raw.primary,items};');
 replaceExtras('profile100,goals101,goalDay101','profile100,goals101,emptyGoals1148,goalDay101');
 replaceExtras("['Peso corporal','Fuerza','Hábitos','Bienestar','Otro']","['Peso corporal','Fuerza','Hábitos','Bienestar','Otro','Running']");
-replaceExtras('function diary(d){','function diary(d){globalThis.asiaRunning1174.validate(d.running1174,goals101(d.settings?.goals101));');
+replaceExtras('function diary(d){','function diary(d){globalThis.asiaRunning1174.validate(d.running1174,goals101(d.settings?.goals101));if(d.running1174)globalThis.asiaRunning1174.validateHybrid(d.running1174,d.settings,globalThis.asiaSchedule829);');
 extras1148=readFileSync(base+'/src/running1174.js','utf8')+'\n'+extras1148;
 writeFileSync(web+'/diary/extras830.js',extras1148);
 execFileSync(process.execPath,['--check',web+'/diary/extras830.js'],{stdio:'inherit'});
