@@ -331,3 +331,6 @@ Reconstruido V11.99.3 sobre 634336d70eb42a3f40b228a236be505de48b4b7c; original 0
 
 ## V11.99.3 — corrección de integración metas en shell
 CI paralela original b8466167a66f5dffaba03029bd33f12452dd2b65: fuentes/runtime OK, package y Chrome fallaron en tests/coach-commit1184.test.mjs (TypeError validate de G indefinido). Causa: extracción goals101 conservaba retorno temprano CommonJS antes de asignar globalThis.asiaGoals101. Se elimina exclusivamente dicho retorno en copia pura empaquetada, con ancla única y aserciones explícitas; no modifica goals101.js original ni navegador. Revalidar candidato corregido antes de promover. Sin credenciales, despliegues ni producción.
+
+## Consolidación bloque Coach — conexión de interfaces preparada
+Base 46fa582b0e8a1fcde9d29a5b46589537bd7a2fc9. Las tres interfaces seleccionan un transporte autorizado exclusivamente desde una capacidad explícita del shell; el piloto no recibe esa capacidad y conserva recorrido sintético separado. Factory real no montada crea tres transportes, fija identidad/CSRF, impide consultas simultáneas y bloquea cambio de cuenta; no se concede acceso por texto/URL. No hay llamadas reales ni credenciales. La autorización real, montaje del servidor, configuración y aceptación siguen pendientes. No promover sobre CI fallida.
