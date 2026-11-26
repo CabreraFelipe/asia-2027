@@ -26,7 +26,15 @@ export async function openOfflineRepository(factory=globalThis.indexedDB){
     check(!r||r.phase==='editing','Rama en conciliación');
     if(!r)r={base:copy(base),working:copy(base),phase:'editing'};
     r.lease=lease;s.put(r,id);
-   });return Object.freeze({local:adapter(id,'local',lease),modules:adapter(id,'modules',lease)});
+   });return Object.freeze({local:adapter(id,'local',lease),modules:adapter(id,'modules',lease),
+    // Candidate-only paired fence: no plaintext; existing working record and lease.
+    readCoachPair:()=>tx(id,false,r=>{check(r&&r.lease===lease&&r.phase==='editing','Rama bloqueada');return copy({local:r.working.local,modules:r.working.modules})}),
+    commitCoachLocal(expected,next){
+     check(expected&&Object.keys(expected).length===2&&['local','modules'].every(k=>Object.hasOwn(expected,k)&&(expected[k]===null||validRecord(expected[k])))&&validRecord(next)&&next.revision===rev(expected.local)+1,'Revisión Coach inválida');
+     const prior=copy(expected),target=copy(next);
+     return tx(id,true,(r,s)=>{check(r&&r.lease===lease&&r.phase==='editing','Rama bloqueada');check(JSON.stringify(r.working.local)===JSON.stringify(prior.local)&&JSON.stringify(r.working.modules)===JSON.stringify(prior.modules),'Conflicto de revisión diario/PRO');r.working.local=target;s.put(r,id);return {accountId:id,revision:target.revision,proRevision:rev(r.working.modules)};});
+    }
+   });
   },
   inspect:id=>tx(id,false,r=>r?{phase:r.phase,base:r.base,working:r.working}:null),
   // Freeze only the exact inspected branch; no stale review may freeze a

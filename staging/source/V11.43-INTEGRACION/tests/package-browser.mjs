@@ -293,6 +293,27 @@ try{
   diaryB.getElementById('bundleReview1180').click();await wait(()=>bs.textContent==='Conjunto revisado. Sin cambios guardados.','No repitió revisión conjunta');
   try{w.confirm=()=>true;diaryB.getElementById('bundleApply1180').click()}finally{w.confirm=originalConfirm}
   await wait(()=>bs.textContent==='Conjunto guardado.'&&el('status1140').textContent.includes('saved'),'Conjunto no guardado: '+bs.textContent);
+  // Independent synthetic account exercises actual IndexedDB paired CAS.
+  const {openOfflineRepository:openCoachFence}=await import('/v11.42/staging/source/V11.37-INTEGRACION/src/offline-repository.mjs');
+  const {encrypt84:encryptCoachFence}=await import('/v11.42/model84.mjs');
+  const fence=await openCoachFence(),fid='acct_'+'f'.repeat(32),phraseFence='frase sintética fence coach';
+  const localRow=async(revision,tag)=>({revision,envelope:await encryptCoachFence({format:'asia-v1126-local-vault-v1',accountId:fid,revision,entries:[['asia2027-v1',JSON.stringify({body:{},diet:{},work:{},settings:{tag}})]]},phraseFence)});
+  const moduleRow=async(revision)=>({revision,envelope:await encryptCoachFence({format:'asia-v1128-modules-v1',accountId:fid,revision,modules:{}},phraseFence)});
+  const expectReject=async fn=>{let rejected=false;try{await fn()}catch{rejected=true}if(!rejected)throw Error('Fence Coach aceptó conflicto')};
+  try{
+   const base={local:await localRow(1,'original'),modules:await moduleRow(1),baseline:{remote:0,local:1,modules:1,namespace:'objects-v1138'}};
+   const a=await fence.begin(fid,base,'fence-lease-test-0001'),old=await a.readCoachPair(),newLocal=await localRow(2,'ajuste'),newModule=await moduleRow(2);
+   await a.modules.compareAndSwap(fid,1,newModule);
+   await expectReject(()=>a.commitCoachLocal(old,newLocal));
+   const current=await a.readCoachPair();if(JSON.stringify(current.local)!==JSON.stringify(base.local)||JSON.stringify(current.modules)!==JSON.stringify(newModule))throw Error('Conflicto alteró bóvedas');
+   const ack=await a.commitCoachLocal(current,newLocal);if(ack.accountId!==fid||ack.revision!==2||ack.proRevision!==2)throw Error('Recibo Coach inválido');
+   await expectReject(()=>a.commitCoachLocal(current,newLocal));
+   const current2=await a.readCoachPair(),newer=await localRow(3,'otro');
+   const b=await fence.begin(fid,base,'fence-lease-test-0002');await expectReject(()=>a.commitCoachLocal(current2,newer));
+   const frozen=await fence.freeze(fid);await expectReject(()=>b.commitCoachLocal(current2,newer));
+   if(JSON.stringify(frozen.base)!==JSON.stringify(base)||JSON.stringify(frozen.working.local)!==JSON.stringify(newLocal)||JSON.stringify(frozen.working.modules)!==JSON.stringify(newModule))throw Error('Fence perdió datos');
+   await fence.finish(fid,frozen);
+  }finally{fence.close()}
   // Freeze a real B pending branch through the existing repository API. This
   // exercises the recovery gate, not a fabricated successful reconciliation.
   el('close1140').click();await wait(()=>!document.querySelector('iframe')&&!el('reconcile1140').disabled,'B no cerró');
