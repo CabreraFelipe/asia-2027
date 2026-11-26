@@ -25,9 +25,31 @@ export async function run(){
   await rejects(open,/red/);await rejects(reconcile,/red/);
   offline=false;main=await local();check(main.storage.getItem(theme)==='dark','Escritura llegó a confirmado sin red');await main.close();
   s=await open();check(s.storage.getItem(theme)==='light:ocean'&&(await s.moduleStore.read('gym')).revision===1,'Rama no sobrevivió a reapertura');await s.close();
+  // Exercise real encryption, pair-CAS and ordinary cached edits after Coach commit.
+  s=await open();const snapshot=await s.coachSnapshot(),prior=JSON.parse(snapshot.diary),newDiary=JSON.stringify({...prior,settings:{...prior.settings,coachTest:true}});
+  const conflict=await s.coachSnapshot();await s.moduleStore.write('gym',1,seedGym());await rejects(()=>s.commitCoachDiary(conflict,newDiary),/modular/);
+  check(s.storage.getItem(diary)===snapshot.diary,'Conflicto modificó la caché');
+  const review=await s.coachSnapshot();const ack=await s.commitCoachDiary(review,newDiary);check(ack.revision===review.revision+1&&ack.proRevision===review.proRevision&&s.storage.getItem(diary)===newDiary,'Recibo o caché incorrectos');
+  s.storage.setItem(theme,'light:ocean');s.storage.setItem(timer,'{"start":123,"elapsed":0,"rest":0,"coachTest":true}');await s.flush();await s.close();
+  s=await open();check(s.storage.getItem(diary)===newDiary&&s.storage.getItem(timer).includes('coachTest')&&(await s.moduleStore.read('gym')).revision===2,'Guardado ordinario pisó cambio Coach');await s.close();
+  // Fault injection AFTER a real IndexedDB commit: no false acknowledgement, no ordinary overwrite.
+  const lostPending={...pending,async begin(...args){const a=await pending.begin(...args);return {...a,async commitCoachLocal(...params){await a.commitCoachLocal(...params);throw Error('Recibo perdido simulado')}}}};
+  s=await openOfflineEditing({...options,pending:lostPending});const beforeLoss=await s.coachSnapshot(),lossDiary=JSON.stringify({...JSON.parse(beforeLoss.diary),settings:{...JSON.parse(beforeLoss.diary).settings,recoveryTest:true}});
+  await rejects(()=>s.commitCoachDiary(beforeLoss,lossDiary),/Recibo perdido/);
+  check(s.status.phase==='locked','Guardado incierto no bloqueó sesión');
+  await rejects(()=>Promise.resolve(s.storage.getItem(diary)),/pendiente/);
+  await rejects(()=>Promise.resolve(s.storage.setItem(theme,'dark')),/pendiente/);
+  await rejects(()=>s.moduleStore.write('gym',2,seedGym()),/pendiente/);
+  await rejects(()=>s.flush(),/pendiente/);
+  await rejects(()=>s.close(),/pendiente/);
+  await rejects(()=>Promise.resolve(s.closeForCoachRecovery(false)),/recuperable/);
+  s.closeForCoachRecovery(true);
+  s=await open();const recovered=await s.coachSnapshot();check(recovered.diary===lossDiary&&recovered.revision===beforeLoss.revision+1&&recovered.proRevision===beforeLoss.proRevision,'Recuperación no identificó commit real');
+  await rejects(()=>s.commitCoachDiary(beforeLoss,lossDiary),/vigente/);
+  await s.close();
   check((await reconcile()).result==='applied'&&await pending.inspect(A)===null,'No concilió');
-  main=await local();check(main.storage.getItem(theme)==='light:ocean'&&main.storage.getItem(timer).includes('123'),'Cambios locales perdidos');await main.close();
-  const m=await openEncryptedModuleStore({readSession,repository:repository.modules,passphrase});check((await m.read('gym')).revision===1,'Gym no aplicado');m.close();
+  main=await local();check(main.storage.getItem(theme)==='light:ocean'&&main.storage.getItem(timer).includes('123')&&JSON.parse(main.storage.getItem(diary)).settings.recoveryTest===true,'Cambios locales perdidos');await main.close();
+  const m=await openEncryptedModuleStore({readSession,repository:repository.modules,passphrase});check((await m.read('gym')).revision===2,'Gym no aplicado');m.close();
   s=await open();s.storage.setItem(theme,'dark:forest');await s.close();
   main=await local();main.storage.setItem(theme,'light:graphite');await main.close();
   await rejects(reconcile,/Conflicto/);check((await pending.inspect(A)).phase==='frozen','Conflicto perdido');

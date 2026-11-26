@@ -8,7 +8,7 @@ const same=(a,b)=>valid(a)&&valid(b)&&a.accountId===b.accountId&&a.csrf===b.csrf
 const MAX_LEASE=15*60*1000;
 export async function openOfflineEditing({readSession,repository,pending,policy,passphrase,onStatus,now=Date.now}){
  const identity=await readSession();check(valid(identity),'Sesión inválida');
- const start=now(),deadline=start+MAX_LEASE;let active=true,closing=false;
+ const start=now(),deadline=start+MAX_LEASE;let active=true,closing=false,coachBusy=false,coachUncertain=false,moduleCalls=0;
  // Local-only capability: not used for any HTTP or confirmed-repository operation.
  const localIdentity=async()=>{check(active&&now()>=start&&now()<deadline,'Permiso local vencido');return identity};
  const lease=crypto.randomUUID(),base=await repository.readSync(identity.accountId);
@@ -17,15 +17,24 @@ export async function openOfflineEditing({readSession,repository,pending,policy,
  const confirmedModules=await openEncryptedModuleStore({readSession,repository:repository.modules,passphrase});confirmedModules.close();
  check(same(identity,await readSession()),'La sesión cambió');
  const adapters=await pending.begin(identity.accountId,base,lease);
- const local=await openDeviceSession({readSession:localIdentity,repository:adapters.local,passphrase,policy,onStatus});
+ const verifyCoach=async()=>{check(active&&!closing&&!coachUncertain&&now()>=start&&now()<deadline,'Permiso Coach vencido o bloqueado');check(same(identity,await readSession()),'La sesión cambió');check(active&&!closing&&!coachUncertain&&now()>=start&&now()<deadline,'Permiso Coach vencido o bloqueado')};
+ const coachPair=Object.freeze({async readCoachPair(){await verifyCoach();const x=await adapters.readCoachPair();await verifyCoach();return x},async commitCoachLocal(...a){await verifyCoach();const x=await adapters.commitCoachLocal(...a);await verifyCoach();return x}});
+ const local=await openDeviceSession({readSession:localIdentity,repository:adapters.local,passphrase,policy,onStatus,coachPair});
  const modules=await openEncryptedModuleStore({readSession:localIdentity,repository:adapters.modules,passphrase});
  // Do not expose identity or passphrase. Gate synchronous storage reads too.
- const guard=()=>check(active&&!closing&&now()>=start&&now()<deadline,'Permiso local vencido o cerrado');
- const storage=Object.freeze({getItem(k){guard();return local.storage.getItem(k)},setItem(k,v){guard();local.storage.setItem(k,v)},removeItem(k){guard();local.storage.removeItem(k)},key(i){guard();return local.storage.key(i)},get length(){guard();return local.storage.length}});
- const moduleStore=Object.freeze({read(n){guard();return modules.read(n)},readPair(){guard();return modules.readPair()},write(...a){guard();return modules.write(...a)},replacePair(...a){guard();return modules.replacePair(...a)}});
+ const guard=()=>check(active&&!closing&&!coachUncertain&&now()>=start&&now()<deadline,'Permiso local vencido, cerrado o guardado Coach pendiente de verificar');
+ const writable=()=>{guard();check(!coachBusy,'Operación Coach en curso')};
+ async function modular(fn){writable();moduleCalls++;try{return await fn()}finally{moduleCalls--}}
+ const storage=Object.freeze({getItem(k){guard();return local.storage.getItem(k)},setItem(k,v){writable();local.storage.setItem(k,v)},removeItem(k){writable();local.storage.removeItem(k)},key(i){guard();return local.storage.key(i)},get length(){guard();return local.storage.length}});
+ const moduleStore=Object.freeze({read(n){return modular(()=>modules.read(n))},readPair(){return modular(()=>modules.readPair())},write(...a){return modular(()=>modules.write(...a))},replacePair(...a){return modular(()=>modules.replacePair(...a))}});
+ async function coachOperation(fn){writable();check(moduleCalls===0,'Operaciones modulares en curso');coachBusy=true;try{await verifyCoach();return await fn()}catch(e){if(local.status.phase==='locked')coachUncertain=true;throw e}finally{coachBusy=false}}
  return Object.freeze({storage,moduleStore,deadline,get status(){return local.status},
-  flush(){guard();return local.flush()},
-  async close(){guard();closing=true;try{modules.close();await local.close();active=false}finally{closing=false}}
+  // Candidate internal capability only; not passed into mounted diary/controller yet.
+  coachSnapshot(){return coachOperation(()=>local.coachSnapshot())},
+  commitCoachDiary(expected,nextDiary){return coachOperation(()=>local.commitCoachDiary(expected,nextDiary))},
+  flush(){writable();return local.flush()},
+  closeForCoachRecovery(confirmed){check(confirmed===true&&active&&!closing&&!coachBusy&&coachUncertain&&moduleCalls===0,'No hay guardado incierto recuperable');local.closeForCoachRecovery(true);modules.close();active=false;},
+  async close(){writable();check(moduleCalls===0,'Operaciones modulares en curso');closing=true;try{modules.close();await local.close();active=false}finally{closing=false}}
  });
 }
 // Maintenance mode: do not mount an editable diary during reconciliation.

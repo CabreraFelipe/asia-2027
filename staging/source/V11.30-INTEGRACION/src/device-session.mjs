@@ -16,16 +16,16 @@ export function openDeviceRepository(factory=globalThis.indexedDB){
   return factory.open('asia-v1130-encrypted-device-staging',1);
  }});
 }
-export async function openDeviceSession({readSession,repository,passphrase,policy,onStatus=()=>{}}){
+export async function openDeviceSession({readSession,repository,passphrase,policy,onStatus=()=>{},coachPair=null}){
  const effective=devicePolicy(policy),vault=await openSessionVault({readSession,repository,passphrase,policy:effective});
  const coordinator=createSaveCoordinator(vault);
- let phase='saved',lastError=null,scheduled=false,closing=false,closed=false,flight=null;
+ let phase='saved',lastError=null,scheduled=false,closing=false,closed=false,flight=null,coachBusy=false;
  function publish(next,error=null){
   phase=next;lastError=error;
   // Status listeners cannot break a write or make it appear uncommitted.
   try{onStatus(Object.freeze({phase,error}))}catch{}
  }
- function flush(){
+ function flushInner(){
   check(!closed,'Sesión cerrada');
   if(flight)return flight;
   publish('saving');
@@ -38,25 +38,30 @@ export async function openDeviceSession({readSession,repository,passphrase,polic
   })();
   return flight;
  }
+ function flush(){check(!coachBusy&&!vault.coachBlocked,'Guardado Coach en curso o incierto');return flushInner()}
  function changed(){
   publish('pending');
   if(scheduled||closing||closed)return;
   scheduled=true;
-  queueMicrotask(()=>{scheduled=false;if(!closed&&!closing)flush().catch(()=>{})});
+  queueMicrotask(()=>{scheduled=false;if(!closed&&!closing&&!coachBusy)flush().catch(()=>{})});
  }
  const bridge=createLegacyBridge({vault,policy:effective,onDirty:changed});
- const writable=()=>check(!closing&&!closed&&phase!=='locked','Escrituras bloqueadas');
+ const writable=()=>check(!closing&&!closed&&!coachBusy&&!vault.coachBlocked&&phase!=='locked','Escrituras bloqueadas');
  const storage=Object.freeze({
   getItem:k=>bridge.storage.getItem(k),
   setItem(k,v){writable();bridge.storage.setItem(k,v)},
   removeItem(k){writable();bridge.storage.removeItem(k)},
   key:i=>bridge.storage.key(i),get length(){return bridge.storage.length}
  });
+ async function coachOperation(fn){check(coachPair&&!closing&&!closed&&!coachBusy&&!vault.coachBlocked,'Coach local no disponible');coachBusy=true;try{await flushInner();return await fn()}catch(e){if(vault.coachBlocked)publish('locked','Guardado Coach incierto; reabrí y verificá la rama antes de editar.');throw e}finally{coachBusy=false}}
+ function coachSnapshot(){return coachOperation(()=>vault.coachSnapshot(coachPair))}
+ function commitCoachDiary(expected,nextDiary){return coachOperation(async()=>{publish('saving');try{const receipt=await vault.commitCoachDiary(coachPair,expected,nextDiary);publish('saved');return receipt}catch(e){publish(vault.coachBlocked?'locked':'error','Guardado Coach no confirmado');throw e}})}
  async function close(){
-  check(!closed&&!closing,'Cierre ya iniciado');closing=true;
+  check(!closed&&!closing&&!coachBusy&&!vault.coachBlocked,'Cierre o recuperación pendiente');closing=true;
   try{await flush();vault.close();bridge.close();closed=true;publish('closed')}
   finally{closing=false}
  }
+ function closeForCoachRecovery(confirmed){check(confirmed===true&&!closed&&!closing&&!coachBusy&&!flight,'No se puede cerrar para recuperar');vault.closeForCoachRecovery(true);bridge.close();closed=true;publish('closed');}
  // Opportunistic only: browsers may suspend/kill before async encryption/commit ends.
  function attachLifecycle(doc,win){
   const hidden=()=>{if(doc.visibilityState==='hidden'&&!closed&&!closing&&phase!=='locked')flush().catch(()=>{})};
@@ -65,5 +70,5 @@ export async function openDeviceSession({readSession,repository,passphrase,polic
   return ()=>{doc.removeEventListener('visibilitychange',hidden);win.removeEventListener('pagehide',pagehide)};
  }
  publish('saved');
- return Object.freeze({storage,flush,close,attachLifecycle,get status(){return Object.freeze({phase,error:lastError})}});
+ return Object.freeze({storage,flush,close,attachLifecycle,coachSnapshot,commitCoachDiary,closeForCoachRecovery,get status(){return Object.freeze({phase,error:lastError})}});
 }
