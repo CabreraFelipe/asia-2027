@@ -5,6 +5,9 @@ const dir=new URL('../dist/assets/v11.42/diary/',import.meta.url).pathname;
 assert.equal(readFileSync(dir+'schedule829.js','utf8'),readFileSync(dir+'../schedule829.js','utf8'));
 assert.equal(readFileSync(dir+'schedule829.js','utf8'),readFileSync(new URL('../dist/server/schedule829.js',import.meta.url),'utf8'));
 const ctx=createContext({module:{exports:{}}});
+// The original planner's CommonJS branch imports its already loaded schedule.
+// Permit only this exact dependency; never execute an unpatched root module.
+ctx.require=specifier=>{assert.equal(specifier,'./schedule829.js');return ctx.asiaSchedule829};
 for(const n of ['core105.js','gym826.js','schedule829.js','training102.js','planner820.js']){ctx.module.exports={};runInContext(readFileSync(dir+n,'utf8'),ctx,{filename:n})}
 const s=ctx.asiaSchedule829,t=ctx.asiaTraining102,p=ctx.module.exports;
 const today='2026-11-26',prior='2026-11-23',future='2026-11-30',legacy={};
