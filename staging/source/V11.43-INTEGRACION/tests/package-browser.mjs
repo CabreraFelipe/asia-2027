@@ -269,13 +269,42 @@ try{
   const d=document.querySelector('iframe').contentDocument;if(d.getElementById('height').value==='1.86'||d.getElementById('goalBrand101').textContent.includes('Mi meta B'))throw Error('Datos cruzados C');
   d.getElementById('pilotName1146').click();const name=d.getElementById('profile100-displayName');name.value='Usuario C';name.dispatchEvent(new Event('input',{bubbles:true}));d.getElementById('profileForm100').requestSubmit();
   await wait(()=>d.querySelector('header .brand h1').textContent==='Usuario C'&&el('status1140').textContent.includes('saved'),'C no guardó nombre');
-  el('close1140').click();await wait(()=>!document.querySelector('iframe')&&!el('reconcile1140').disabled,'C no cerró');el('reconcile1140').click();await wait(()=>!el('logout1140').disabled,'C no concilió');return true;
+  el('close1140').click();await wait(()=>!document.querySelector('iframe')&&!el('reconcile1140').disabled,'C no cerró');el('reconcile1140').click();await wait(()=>!el('logout1140').disabled,'C no concilió');el('sync1140').click();await wait(()=>!el('apply1140').disabled,'C no preparó copia');el('apply1140').click();await wait(()=>el('message1140').textContent.includes('confirmada'),'C no confirmó copia');return true;
  }.toString()+')()',true);assert.equal(managed,true);
  const managedRow=db.prepare('SELECT envelope FROM managed_account_keys_v1152 WHERE account_id=?').get(C).envelope;assert.ok(managedRow);
  await cmd('Page.navigate',{url:home});await ready("document.querySelector('iframe')?.contentWindow?.asiaGym84Ready===true&&!document.getElementById('close1140').disabled");
  assert.equal(await evalJS("document.querySelector('iframe').contentDocument.querySelector('header .brand h1').textContent"),'Usuario C');
  assert.equal(await evalJS("document.getElementById('unlock').hidden&&document.getElementById('phrase').value===''"),true);
  assert.equal(db.prepare('SELECT envelope FROM managed_account_keys_v1152 WHERE account_id=?').get(C).envelope,managedRow);
+ const remoteC=db.prepare('SELECT * FROM sync_v1138_objects WHERE account_id=?').all(C);assert.equal(remoteC.length,1);
+ const cloudC=Buffer.from(objects.get(remoteC[0].object_key));
+ const newManagedDevice=await evalJS('('+async function(){
+  const el=id=>document.getElementById(id),wait=async(f,m)=>{for(let i=0;i<200;i++){if(f())return;await new Promise(r=>setTimeout(r,100))}throw Error(m)};
+  el('close1140').click();await wait(()=>!document.querySelector('iframe')&&!el('reconcile1140').disabled,'C no cerró');el('reconcile1140').click();await wait(()=>!el('logout1140').disabled,'C no concilió');
+  // Only disposable test IndexedDB. Never remove local records in application code.
+  const fixtureDb=await new Promise((ok,fail)=>{const q=indexedDB.open('asia-v1134-unified-synthetic-staging',1);q.onsuccess=()=>ok(q.result);q.onerror=()=>fail(q.error)});
+  try{await new Promise((ok,fail)=>{const t=fixtureDb.transaction('accounts','readwrite');t.objectStore('accounts').delete('acct_'+'c'.repeat(32));t.oncomplete=ok;t.onabort=()=>fail(t.error)})}finally{fixtureDb.close()}
+  await fetch('/__ci/head-fail');return true;
+ }.toString()+')()',true);assert.equal(newManagedDevice,true);
+ await cmd('Page.navigate',{url:home});await ready("document.getElementById('message1140')?.textContent.includes('No se pudo verificar')&&!document.getElementById('open1140').disabled");
+ const recoveredManaged=await evalJS('('+async function(){
+  const el=id=>document.getElementById(id),wait=async(f,m)=>{for(let i=0;i<200;i++){if(f())return;await new Promise(r=>setTimeout(r,100))}throw Error(m+' | '+el('message1140')?.textContent)};
+  const id='acct_'+'c'.repeat(32);
+  const {openUnifiedRepository}=await import('/v11.42/staging/source/V11.34-INTEGRACION/src/unified-repository.mjs');
+  const {openOfflineRepository}=await import('/v11.42/staging/source/V11.37-INTEGRACION/src/offline-repository.mjs');
+  const repo=await openUnifiedRepository(),pending=await openOfflineRepository();
+  try{
+   if(document.querySelector('iframe')||!el('unlock').hidden||!await repo.empty(id)||await pending.inspect(id))throw Error('Fallo remoto inicializó datos C');
+   await fetch('/__ci/head-resume');el('open1140').click();
+   await wait(()=>document.querySelector('iframe')?.contentWindow?.asiaGym84Ready===true&&!el('close1140').disabled,'Recuperación gestionada no abrió');
+   const d=document.querySelector('iframe').contentDocument,row=await repo.readSync(id);
+   if(d.querySelector('header .brand h1').textContent!=='Usuario C'||!d.getElementById('pilotGoals1149').hidden||!el('unlock').hidden||!row.local||!row.modules||row.baseline?.remote!==1)throw Error('C no recuperó la copia confirmada');
+   if((await (await fetch('/v11.38/sync')).json()).head!==1)throw Error('Recuperación hizo escritura remota');
+   return true;
+  }finally{repo.close();pending.close()}
+ }.toString()+')()',true);assert.equal(recoveredManaged,true);
+ assert.deepEqual(db.prepare('SELECT * FROM sync_v1138_objects WHERE account_id=?').all(C),remoteC);
+ assert.deepEqual(Buffer.from(objects.get(remoteC[0].object_key)),cloudC);
  await evalJS("fetch('/__ci/offline').then(r=>r.text())",true);await cmd('Page.navigate',{url:home});await ready("document.body?.textContent.includes('Volvé a conectarte para verificar tu cuenta')");
  console.log('Chrome paquete generado: autorización, diario, guardado, conciliación, Worker sync, logout, aislamiento, caché pública y fallback offline.');
 }finally{ws?.close();chrome?.kill();if(chrome&&chrome.exitCode===null)await Promise.race([once(chrome,'exit'),sleep(3000)]);server?.closeAllConnections();server?.close();db.close();await rm(dir,{recursive:true,force:true,maxRetries:3,retryDelay:100})}

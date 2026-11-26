@@ -5,7 +5,7 @@ let busy=false;
 const controls=disabled=>{$('openAccount').disabled=$('advancedUnlock').disabled=$('retryAccess1153').disabled=disabled};
 async function open(access,phrase,maintenanceOnly){
  await renewAccess1153(access.identity);
- const {start}=await import('./app.mjs');const state=await start(phrase,{maintenanceOnly,expectedIdentity:access.identity});
+ const {start}=await import('./app.mjs');const state=await start(phrase,{maintenanceOnly,expectedIdentity:access.identity,managedRecovery:access.mode==='managed'});
  $('unlock').hidden=true;$('retryAccess1153').hidden=true;$('googleLogin').hidden=true;
  status(state==='editing'?'Cuenta verificada. Diario abierto.':state==='locked'?'Sesión bloqueada. Volvé a iniciar sesión.':maintenanceOnly?'Cuenta verificada. Herramientas avanzadas.':'Cuenta verificada. No se abrió el diario; revisá el mensaje y las herramientas avanzadas.');
 }
