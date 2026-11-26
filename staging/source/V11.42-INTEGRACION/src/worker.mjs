@@ -1,7 +1,7 @@
 // Isolated synthetic pilot only. The asset binding MUST run behind this Worker.
 import {createServiceWorker} from '../../V11.39-INTEGRACION/src/service-worker.mjs';
 import {handleManagedKey} from './managed-key1152.mjs';
-const scope='/v11.42/',home=scope+'index.html',pub=new Set(['index.html','manifest.json','shell.css','entry.js','sw.js','offline.html','asia-icon-v4-192.png','asia-icon-v4-512.png','asia-icon-v4-180.png'].map(p=>scope+p));
+const scope='/v11.42/',home=scope+'index.html',pub=new Set(['index.html','manifest.json','shell.css','entry.js','managed-entry1153.mjs','sw.js','offline.html','asia-icon-v4-192.png','asia-icon-v4-512.png','asia-icon-v4-180.png'].map(p=>scope+p));
 const originPattern=/^https:\/\/asia-v1142-candidate-staging\.[a-z0-9-]+\.workers\.dev$/;
 const common={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Cross-Origin-Resource-Policy':'same-origin'};
 const csp=diary=>"default-src 'self'; script-src 'self'"+(diary?" 'unsafe-inline'":"")+"; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:"+(diary?" https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/":"")+"; media-src 'self' data: blob:; connect-src "+(diary?"'none'":"'self'")+"; worker-src "+(diary?"'none'":"'self'")+"; object-src 'none'; frame-src "+(diary?"'none'":"'self'")+"; frame-ancestors "+(diary?"'self'":"'none'")+"; form-action 'none'; base-uri 'none'";

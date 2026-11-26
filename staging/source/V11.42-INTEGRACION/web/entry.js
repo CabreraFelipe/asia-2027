@@ -14,7 +14,7 @@ async function attempt({manual=false}={}){
  busy=true;controls(true);let phrase=manual?$('phrase').value:'';const advanced=manual&&$('advancedUnlock').checked;$('phrase').value='';$('retryAccess1153').hidden=true;status('Verificando tu cuenta…');
  try{
   const access=await discoverAccess1153();
-  if(access.mode==='anonymous'){$('unlock').hidden=false;status('Iniciá sesión con Google.');return}
+  if(access.mode==='anonymous'){$('unlock').hidden=true;status('Iniciá sesión con Google.');return}
   if(access.mode==='legacy'){
    $('unlock').hidden=false;
    if(!manual){status('Cuenta verificada. Ingresá la frase anterior mientras se completa la migración.');return}
