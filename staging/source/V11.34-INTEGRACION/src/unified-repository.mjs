@@ -61,6 +61,25 @@ export async function openUnifiedRepository(factory=globalThis.indexedDB){
     return 'applied';
    });
   },
+  // A conservative recovery is a separate operation, never replaces rekeyBackup.
+  // Preserve the precise encrypted source in the same local transaction.
+  readRecovery:id=>tx(id,false,row=>row?.recoveryBackup1162??null),
+  commitRecovery(id,expected,target,proof){
+   const rev=r=>r?.revision??0,eq=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
+   check(expected&&(expected.local||expected.modules)&&proof?.format==='asia-v1162-additive-recovery-v1'&&/^[a-f0-9]{64}$/.test(proof.archiveSha||'')&&/^[a-f0-9]{64}$/.test(proof.remoteSha||'')&&Number.isSafeInteger(proof.remoteRevision)&&proof.remoteRevision>=1&&proof.remoteRevision<=200,'Recibo de recuperación inválido');
+   for(const k of ['local','modules'])check(validRecord(target[k])&&target[k].revision===rev(expected[k])+1,'Revisión de recuperación inválida');
+   check(target.baseline?.namespace==='objects-v1138'&&target.baseline.remote===proof.remoteRevision&&target.baseline.local===rev(target.local)&&target.baseline.modules===rev(target.modules),'Marcador de recuperación inválido');
+   return tx(id,true,(row,s)=>{
+    const current={local:row?.local??null,modules:row?.modules??null,baseline:row?.baseline??null};
+    if(row?.recoveryBackup1162){
+     check(eq(row.recoveryBackup1162.source,expected)&&eq(row.recoveryBackup1162.proof,proof)&&eq(current,target),'Ya hay respaldo de recuperación; no se reemplaza');
+     return 'already-applied';
+    }
+    check(!row?.rekeyBackup&&eq(current,expected),'Conflicto de revisión local o respaldo previo');
+    s.put({...row,local:target.local,modules:target.modules,baseline:target.baseline,recoveryBackup1162:{source:structuredClone(expected),proof:structuredClone(proof)}},id);
+    return 'applied';
+   });
+  },
   initialize(id,local,modules){
    check(validRecord(local)&&validRecord(modules)&&local.revision===1&&modules.revision===1,'Importación inválida');
    return tx(id,true,(row,s)=>{check(row===null,'La cuenta ya contiene datos');s.add({local,modules},id);return true});

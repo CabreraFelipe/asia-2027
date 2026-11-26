@@ -95,12 +95,13 @@ function dependencies(file){
 function checkPath(p){if(!p.startsWith(assetRoot+'/'))throw Error('Dependencia fuera del paquete');}
 dependencies(web+'/app.mjs');
 // Private, internal migration primitives; no public route or UI.
-for(const n of ['prepare-rekey1153.mjs','local-rekey1158.mjs','rekey-client1159.mjs','recovery-review1161.mjs']){
+for(const n of ['prepare-rekey1153.mjs','local-rekey1158.mjs','rekey-client1159.mjs','recovery-review1161.mjs','recovery-apply1162.mjs']){
  const path=web+'/staging/source/V11.42-INTEGRACION/src/'+n;
  mkdirSync(dirname(path),{recursive:true});cpSync(base+'/src/'+n,path);
 }
 dependencies(web+'/staging/source/V11.42-INTEGRACION/src/rekey-client1159.mjs');
 dependencies(web+'/staging/source/V11.42-INTEGRACION/src/recovery-review1161.mjs');
+dependencies(web+'/staging/source/V11.42-INTEGRACION/src/recovery-apply1162.mjs');
 const shellExtras=web+'/extras830.js';if(readFileSync(shellExtras,'utf8')!==extrasSource)throw Error('Validador de shell inesperado');writeFileSync(shellExtras,extras1148);
 console.log('Shell static dependency graph:',visited.size,'modules; original pure JS dependencies included');
 // Server modules isolated from static asset binding. Preserve relative paths for imports.

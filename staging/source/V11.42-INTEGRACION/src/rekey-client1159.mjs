@@ -30,7 +30,8 @@ export async function createRekeyClient1159({origin,readSession,fetcher=fetch}){
  }
  const request=createLargeTransport({origin,readSession:verify,fetcher});
  const seedRequest=createLargeTransport({origin,readSession:verify,fetcher,legacySeed:true});
- return Object.freeze({accountId:identity.accountId,verify,request,seed:envelope=>seedRequest('POST',{expectedRevision:0,envelope}),discover:()=>post({action:'discover'}),inspect:operationId=>post({action:'inspect',operationId}),
+ const managedRequest=createLargeTransport({origin,readSession:verify,fetcher,managedWrite:true});
+ return Object.freeze({accountId:identity.accountId,verify,request,writeManaged:({expectedRevision,envelope})=>managedRequest('POST',{expectedRevision,envelope}),seed:envelope=>seedRequest('POST',{expectedRevision:0,envelope}),discover:()=>post({action:'discover'}),inspect:operationId=>post({action:'inspect',operationId}),
   begin:({operationId,expectedRevision,expectedSha,confirmed})=>post({action:'begin',operationId,expectedRevision,expectedSha,confirmed}),
   cancel:({operationId,confirmed})=>post({action:'cancel',operationId,confirmed}),
   commit:({operationId,oldPhrase,confirmed,consent})=>post({action:'commit',operationId,oldPhrase,confirmed,consent}),

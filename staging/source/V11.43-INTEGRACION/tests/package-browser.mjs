@@ -348,6 +348,37 @@ try{
    return true;
   }finally{repo.close();pending.close()}
  }.toString()+')()',true);assert.equal(localRekey,true);
+ // Real IndexedDB recovery CAS and immutable backup, no production network.
+ const recoveryCAS=await evalJS('('+async function(){
+  const {openUnifiedRepository}=await import('/v11.42/staging/source/V11.34-INTEGRACION/src/unified-repository.mjs');
+  const {encrypt84,decrypt84}=await import('/v11.42/model84.mjs');
+  const repo=await openUnifiedRepository(),phrase='frase sintética recuperación CAS';
+  const check=(ok,m)=>{if(!ok)throw Error(m)},eq=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
+  const rejects=async f=>{try{await f()}catch{return true}return false};
+  try{
+   for(const [letter,stale] of [['3',false],['4',true]]){
+    const id='acct_'+letter.repeat(32),localPlain={format:'asia-v1126-local-vault-v1',accountId:id,revision:1,entries:[]},modulesPlain={format:'asia-v1128-modules-v1',accountId:id,revision:1,modules:{}};
+    await repo.initialize(id,{revision:1,envelope:await encrypt84(localPlain,phrase)},{revision:1,envelope:await encrypt84(modulesPlain,phrase)});
+    const source=await repo.readSync(id),target={local:{revision:2,envelope:await encrypt84({...localPlain,revision:2},phrase)},modules:{revision:2,envelope:await encrypt84({...modulesPlain,revision:2},phrase)},baseline:{remote:3,local:2,modules:2,namespace:'objects-v1138'}};
+    const proof={format:'asia-v1162-additive-recovery-v1',archiveSha:'a'.repeat(64),remoteSha:'b'.repeat(64),remoteRevision:3};
+    if(stale){
+     await repo.local.compareAndSwap(id,1,target.local);const changed=await repo.readSync(id);
+     check(await rejects(()=>repo.commitRecovery(id,source,target,proof))&&eq(await repo.readSync(id),changed)&&!await repo.readRecovery(id),'CAS de recuperación ignorado');
+     continue;
+    }
+    check(await repo.commitRecovery(id,source,target,proof)==='applied','No confirmó recuperación');
+    const backup=await repo.readRecovery(id);
+    check(eq(backup,{source,proof})&&eq(await repo.readSync(id),target),'Respaldo o transacción incorrecta');
+    check(await repo.commitRecovery(id,source,target,proof)==='already-applied','Repetición local no idempotente');
+    check(await rejects(()=>repo.local.compareAndSwap(id,1,target.local)),'Escritor viejo no rechazado');
+    check(await rejects(()=>repo.commitRecovery(id,source,target,{...proof,archiveSha:'c'.repeat(64)})),'Reemplazó respaldo');
+    check(eq(await repo.readRecovery(id),backup),'Respaldo alterado');
+    check(eq(await decrypt84((await repo.readSync(id)).local.envelope,phrase),{...localPlain,revision:2}),'Bóveda inválida');
+   }
+   return true;
+  }finally{repo.close()}
+ }.toString()+')()',true);assert.equal(recoveryCAS,true);
+
  await evalJS("fetch('/__ci/offline').then(r=>r.text())",true);await cmd('Page.navigate',{url:home});await ready("document.body?.textContent.includes('Volvé a conectarte para verificar tu cuenta')");
  console.log('Chrome paquete generado: autorización, diario, guardado, conciliación, Worker sync, logout, aislamiento, caché pública y fallback offline.');
 }finally{ws?.close();chrome?.kill();if(chrome&&chrome.exitCode===null)await Promise.race([once(chrome,'exit'),sleep(3000)]);server?.closeAllConnections();server?.close();db.close();await rm(dir,{recursive:true,force:true,maxRetries:3,retryDelay:100})}
