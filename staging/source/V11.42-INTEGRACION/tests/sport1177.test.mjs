@@ -25,6 +25,24 @@ const blocked=plain(A.put(undefined,'profiles',{...prof,symptoms:'Sí / no estoy
 const row=p.rows[0],done=plain(A.put(active,'sessions',{id:sid,profileId:pid,planId:plan,day:row.day,minutes:35,rpe:5,notes:'Técnica',completed:[row.drills[0].exerciseId]},g,row.day));
 const m={id:mid,profileId:pid,day:today,kind:'Sprint 10 m',unit:'s',value:2.1,protocol:'Cronómetro manual, misma salida',surface:'Césped',side:'No aplica'};
 const measured=plain(A.put(active,'metrics',m,g,today));assert.throws(()=>A.put(active,'metrics',{...m,unit:'cm'},g,today));
+// V11.92: only future reductions, no new dates/drills/doses, exact re-review.
+const cut='2026-12-02',reduceId='sportplan-'+'9'.repeat(32),reduceInput={planId:plan,start:cut,days:[2],lowOnly:false};
+const beforeReduction=JSON.stringify(active),reduction=plain(A.draftReduction(reduceInput,active,g,settings,undefined,today,S,R));
+assert.ok(reduction.plan.rows.length<reduction.before.length);
+assert.equal(JSON.stringify(active),beforeReduction);
+const reduced=plain(A.activateReduction(active,reduction,reduceId,g,settings,undefined,today,S,R));
+assert.deepEqual(reduced.plans[plan],active.plans[plan]);
+assert.deepEqual(plain(A.effective(reduced).filter(x=>x.day<cut)),plain(A.effective(active).filter(x=>x.day<cut)));
+for(const r of reduction.plan.rows)assert.deepEqual(r,reduction.before.find(x=>x.day===r.day));
+assert.throws(()=>A.activateReduction(reduced,reduction,reduceId,g,settings,undefined,today,S,R));
+assert.throws(()=>A.activateReduction(active,{...reduction,plan:{...reduction.plan,rows:[]}},reduceId,g,settings,undefined,today,S,R));
+assert.throws(()=>A.draftReduction({...reduceInput,start:today},active,g,settings,undefined,today,S,R));
+assert.throws(()=>A.draftReduction({...reduceInput,days:[0]},active,g,settings,undefined,today,S,R));
+assert.throws(()=>A.draftReduction({...reduceInput,days:[2,4]},active,g,settings,undefined,today,S,R));
+assert.throws(()=>A.draftReduction(reduceInput,active,g,settings,undefined,today,S,R,{[reduction.before[0].day+'-record']:true}));
+const moderateReduction=plain(A.draftReduction({...reduceInput,lowOnly:true},active,g,settings,undefined,today,S,R));
+assert.ok(moderateReduction.plan.rows.flatMap(x=>x.drills).every(d=>A.find(d.exerciseId).impact==='baja'));
+assert.ok(moderateReduction.plan.rows.every(r=>r.drills.every(d=>moderateReduction.before.find(x=>x.day===r.day).drills.some(o=>JSON.stringify(o)===JSON.stringify(d)))));
 // V11.91: comparisons are derived, profile-isolated, and preserve stored records.
 const metricId=i=>'sportmetric-'+i.toString(16).padStart(32,'0');
 const otherPid='sportprofile-'+'1'.repeat(32);

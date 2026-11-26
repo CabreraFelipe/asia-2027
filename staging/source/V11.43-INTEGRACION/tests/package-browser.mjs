@@ -269,6 +269,13 @@ try{
   diaryB.getElementById('sportReject1177').click();diaryB.getElementById('sportReview1177').click();
   try{w.confirm=()=>true;diaryB.getElementById('sportApply1177').click()}finally{w.confirm=originalConfirm}
   await wait(()=>spStatus.textContent==='Bloque deportivo guardado.'&&el('status1140').textContent.includes('saved'),'Bloque deportivo no guardado: '+spStatus.textContent);
+  const reductionSelect=sp('reducePlan');reductionSelect.value=[...reductionSelect.options].find(o=>o.value).value;reductionSelect.dispatchEvent(new w.Event('change'));
+  sp('reduceStart').value=addDay(obEnd,11);sp('reduceDay4').checked=false;sp('reduceConfirm').checked=true;
+  diaryB.getElementById('sportReviewReduction1192').click();if(spStatus.textContent!=='Reducción revisada. Sin guardar.')throw Error('Reducción no revisada: '+spStatus.textContent);
+  diaryB.getElementById('sportRejectReduction1192').click();if(!spStatus.textContent.includes('Sin cambios'))throw Error('Reducción no descartada');
+  diaryB.getElementById('sportReviewReduction1192').click();
+  try{w.confirm=()=>true;diaryB.getElementById('sportApplyReduction1192').click()}finally{w.confirm=originalConfirm}
+  await wait(()=>spStatus.textContent==='Reducción deportiva guardada.'&&el('status1140').textContent.includes('saved'),'Reducción no guardada: '+spStatus.textContent);
   const metricToday=sp('metricDay').value,comparison=diaryB.getElementById('sportComparisons1191');
   for(const [k,v] of Object.entries({metric:'Sprint 10 m',metricDay:addDay(metricToday,-1),metricValue:'2.5',protocol:'Cronómetro sintético B',metricSurface:'Césped',side:'No aplica'}))sp(k).value=v;
   diaryB.getElementById('sportSaveMetric1177').click();await wait(()=>spStatus.textContent==='Medición deportiva guardada.'&&el('status1140').textContent.includes('saved'),'Medición B no guardada: '+spStatus.textContent);

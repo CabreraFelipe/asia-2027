@@ -53,6 +53,33 @@ function assertCalendar(raw,settings,running,S,R){if(!raw)return;for(const r of 
 function draft(input,raw,g,settings,running,today,S,R,work={}){const b=validate(raw,g),p=b.profiles[input.profileId];check(exact(input,['profileId','start','end','days','replaces'])&&p&&g.items.some(x=>x.id===p.goalId&&x.status==='Activa')&&p.symptoms==='Sin síntomas preocupantes'&&p.safeSpace&&day(today)&&day(input.start)&&day(input.end)&&input.start>=today&&input.end>=input.start&&Date.parse(input.end)-Date.parse(input.start)<=27*86400000&&list(input.days,[0,1,2,3,4,5,6],1,3),'Completá el perfil, espacio seguro y fechas. Si hay síntomas preocupantes, no aumentes carga sin valoración.');if(input.replaces!==null){const old=b.plans[input.replaces];check(old&&b.profiles[old.profileId].goalId===p.goalId&&input.start>today&&input.start>old.start&&input.start<=old.end&&!Object.values(b.plans).some(x=>x.replaces===old.id)&&!Object.values(b.sessions).some(x=>x.day>=input.start&&x.day<=old.end),'No se puede reemplazar ese tramo deportivo.');}
  const occupied=new Set(effective(b,input).map(r=>r.day)),rows=[];for(let d=input.start;d<=input.end;d=add(d,1))if(input.days.includes(weekday(d))){check(!occupied.has(d)&&!eventsOn(b,d).length&&!R.planned(running,d)&&S.planned(d,settings)===null&&!Object.keys(work).some(k=>k.slice(0,10)===d),'Hay una sesión o evento previsto/registrado el '+d);const nearby=[-1,1].some(n=>eventsOn(b,add(d,n)).length||R.planned(running,add(d,n))||S.planned(add(d,n),settings)!==null||occupied.has(add(d,n))||rows.some(r=>r.day===add(d,n)));const moderate=!nearby&&!input.days.includes((weekday(d)+1)%7)&&!input.days.includes((weekday(d)+6)%7);rows.push({day:d,minutes:p.minutes,drills:choose(p,rows.length,moderate)});}check(rows.length,'No hay días en ese tramo');return {...clone(input),rows};}
 function activate(raw,proposal,key,g,settings,running,today,S,R,work){const {rows,...input}=proposal,actual=draft(input,raw,g,settings,running,today,S,R,work);check(JSON.stringify(actual)===JSON.stringify(proposal),'Cambió el borrador o el calendario');const b=clone(validate(raw,g));check(!Object.hasOwn(b.plans,key),'Plan deportivo ya existe');b.plans[key]={id:key,...actual};validate(b,g);assertCalendar(b,settings,running,S,R);return b;}
+// Only remove future prescribed work. Never generate new drills, doses or dates.
+function draftReduction(input,raw,g,settings,running,today,S,R,work={}){
+ const b=validate(raw,g);
+ check(exact(input,['planId','start','days','lowOnly'])&&day(today)&&day(input.start)&&input.start>today&&list(input.days,[0,1,2,3,4,5,6],1,3)&&typeof input.lowOnly==='boolean','Elegí fechas futuras y días a conservar');
+ const old=b.plans[input.planId],p=old&&b.profiles[old.profileId];
+ check(old&&p&&input.start>old.start&&input.start<=old.end&&!Object.values(b.plans).some(x=>x.replaces===old.id)&&g.items.some(x=>x.id===p.goalId&&x.status==='Activa'),'Bloque no disponible para reducir');
+ check(p.safeSpace&&p.symptoms==='Sin síntomas preocupantes','Revisá el perfil y los síntomas antes de planificar');
+ check(!Object.values(b.sessions).some(x=>x.day>=input.start&&x.day<=old.end),'Hay sesiones registradas en el tramo');
+ const before=old.rows.filter(r=>r.day>=input.start);
+ check(before.length&&input.days.every(d=>old.days.includes(d)),'Elegí únicamente días del bloque original');
+ check(!before.some(r=>Object.keys(work).some(k=>k.slice(0,10)===r.day)),'Hay trabajo registrado en el tramo');
+ const rows=before.filter(r=>input.days.includes(weekday(r.day))).map(r=>({...r,drills:r.drills.filter(d=>!input.lowOnly||find(d.exerciseId).impact==='baja')})).filter(r=>r.drills.length);
+ check(rows.length,'La reducción deja el bloque vacío; no se aplicó ningún cambio');
+ check(rows.length<before.length||rows.some(r=>r.drills.length<before.find(x=>x.day===r.day).drills.length),'No hay reducción efectiva');
+ const plan={profileId:old.profileId,start:input.start,end:old.end,days:clone(input.days),rows:clone(rows),replaces:old.id};
+ // Validate the real candidate using the same shared schema and calendar, without a write.
+ const probe=clone(b);let i=0,key;
+ do{key='sportplan-'+(i++).toString(16).padStart(32,'0')}while(Object.hasOwn(probe.plans,key));
+ probe.plans[key]={id:key,...plan};validate(probe,g);assertCalendar(probe,settings,running,S,R);
+ return {input:clone(input),before:clone(before),plan};
+}
+function activateReduction(raw,proposal,key,g,settings,running,today,S,R,work){
+ const actual=draftReduction(proposal.input,raw,g,settings,running,today,S,R,work);
+ check(JSON.stringify(actual)===JSON.stringify(proposal),'Cambió la reducción revisada');
+ const b=clone(validate(raw,g));check(!Object.hasOwn(b.plans,key),'Plan deportivo ya existe');
+ b.plans[key]={id:key,...actual.plan};validate(b,g);assertCalendar(b,settings,running,S,R);return b;
+}
 // Derived read-only comparisons; never infer equivalence or mutate training prescriptions.
 function metricComparisons(raw,g,profileId,asOf){
  const b=validate(raw,g);check(day(asOf),'Fecha de comparación inválida');if(!Object.hasOwn(b.profiles,profileId))return [];
@@ -73,5 +100,5 @@ function metricComparisons(raw,g,profileId,asOf){
   return {kind,unit,protocol,surface,side,lower,count:rows.length,days:days.length,firstDay,lastDay,first,latest,best:bestOf(rows.map(m=>m.value)),improvement};
  });
 }
-root.asiaSport1177=Object.freeze({sports,capacities,equipment,locations,levels,surfaces,eventTypes,symptoms,catalog,metricKinds,metricComparisons,empty,validate,put,eligible,draft,activate,effective,planned,eventsOn,assertCalendar,add,find});
+root.asiaSport1177=Object.freeze({sports,capacities,equipment,locations,levels,surfaces,eventTypes,symptoms,catalog,metricKinds,metricComparisons,empty,validate,put,eligible,draft,activate,draftReduction,activateReduction,effective,planned,eventsOn,assertCalendar,add,find});
 })(globalThis);
