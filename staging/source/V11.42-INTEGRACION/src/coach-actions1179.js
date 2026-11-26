@@ -2,7 +2,7 @@
 // Only already registered exercises; future personal programmes; no network/provider.
 (function(root){'use strict';
 const check=(ok,msg)=>{if(!ok)throw Error(msg)},clone=x=>JSON.parse(JSON.stringify(x)),eq=(a,b)=>JSON.stringify(a)===JSON.stringify(b),int=(x,a,b)=>Number.isInteger(x)&&x>=a&&x<=b,exact=(x,ks)=>x&&typeof x==='object'&&!Array.isArray(x)&&Object.keys(x).length===ks.length&&ks.every(k=>Object.hasOwn(x,k)),day=x=>typeof x==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(x)&&x>='1900-01-01'&&x<='2199-12-31'&&Number.isFinite(Date.parse(x))&&new Date(x).toISOString().slice(0,10)===x,add=(d,n)=>new Date(Date.parse(d)+n*86400000).toISOString().slice(0,10),weekday=d=>new Date(d+'T00:00:00Z').getUTCDay(),id=x=>typeof x==='string'&&/^coachchange-[a-f0-9]{32}$/.test(x);
-const rows=s=>s?.coachRoutine1179??[];
+const rows=s=>Object.hasOwn(s??{},'coachRoutine1179')?s.coachRoutine1179:[];
 // Validation intentionally independent of schedule.planned wrapper: base routine stays identifiable.
 function validate(settings,gym,programmes){
  const all=rows(settings);if(!Object.hasOwn(settings??{},'coachRoutine1179'))return [];const slots=gym.templates(settings),used=new Set(),newSlots=new Set(),baseSlots=new Set(programmes.flatMap(p=>p.days.map(d=>d.slot)));

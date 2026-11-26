@@ -268,3 +268,12 @@ Base V11.88 d6bf8e4ecaca5600faf49823d10f172ce1109961; gates PWA/Chrome aún en e
 Ensayo de dominio V11.89 aislado PASS: 105 combinaciones, 3 compatibles, 102 rechazadas, sin mutación; prueba Chrome preparada. V11.88 fuentes/runtime SUCCESS; PWA y jobs chrome (normal)/(slow) aún en ejecución. Borrador no promovido.
 
 V11.88 completamente validada: fuentes 45901073233, runtime 45901073249, PWA 45901073195 y Chrome 45901073192 SUCCESS. Chrome paralelo 263 s frente a 379 s de V11.87; gate final verde. Se promueve V11.89 a desarrollo, no a producción; CI propia pendiente.
+
+## V11.90 — borrador independiente: referencias de rutina y diario de cambios
+Preparado sobre V11.89 677d8234664d99fa972e5212a1356019a22a374e, gates pendientes. Extiende compatibleSettings de Gym en paquete candidato (diario/shell/servidor) para proteger slots de programas y todos los slots históricos de cambios Coach incluso sin sesiones registradas; journal append-only. Verifica antes de persistencia normal si cambian settings, sobre before-image guardado; no sustituye mecanismo de recuperación completa. Permite cancelar programa y crear versión nueva; rechaza journal null explícito. Prueba dominio preparada, pendiente ejecución; no promover hasta gates V11.89. Origen intacto.
+
+Ensayo aislado V11.90 ejecutado con fuente original y parche generado: PASS; protege identidad incluso sin historial, impide alterar/truncar cambios, permite cancelar programa y editar rutina no referenciada, preserva protección histórica y comparte código exacto diario/shell. Marcador persistencia probado en fuente original, falta build real y regresión integral. No promover aún.
+
+V11.90 adicional: barrera en la bóveda ante estado Gym clásico pendiente (ausente o texto null son los únicos estados inactivos admitidos), tanto snapshot como commit; guardado de ciclo de vida/microtarea no se inicia durante operación Coach ni estado bloqueado. Regresión browser offline real preparada: activar estado, snapshot y commit rechazados, diario y sesión intactos, limpiar estado y continuar commit legítimo. No se altera formato de bóveda. CI pendiente.
+
+V11.89 677d8234664d99fa972e5212a1356019a22a374e validada: fuentes 45901892839, D1/R2 45901892806, PWA 45901892860 y Chrome 45901892879 SUCCESS. Se promueve V11.90 a desarrollo; gates propios aún pendientes, sin despliegue.

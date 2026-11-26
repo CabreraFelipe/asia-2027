@@ -5,6 +5,7 @@ import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {runInNewContext} from 'node:vm';
 import {patchPlanning1173} from './patch-planning1173.mjs';
+import {patchRoutine1190} from './patch-routine1190.mjs';
 const base='staging/source/V11.42-INTEGRACION',out=base+'/dist',web=out+'/assets/v11.42',candidate='staging/source/V11.29-INTEGRACION/tests/candidate';
 if(existsSync(out))throw Error('Build debe ser nuevo');
 mkdirSync(web,{recursive:true});cpSync(base+'/web',web,{recursive:true});
@@ -107,6 +108,7 @@ dependencies(web+'/staging/source/V11.42-INTEGRACION/src/rekey-client1159.mjs');
 dependencies(web+'/staging/source/V11.42-INTEGRACION/src/recovery-review1161.mjs');
 dependencies(web+'/staging/source/V11.42-INTEGRACION/src/recovery-apply1162.mjs');
 const schedule1173=patchPlanning1173(web);
+patchRoutine1190(web);
 // Catalog discovery generated from pinned metadata and immutable original/sports IDs.
 const legacyCatalog=runInNewContext(readFileSync('gym84_catalog.mjs','utf8').replace('export const catalog','const catalog')+'\n;catalog;');
 const sportContext={};runInNewContext(readFileSync(base+'/src/sport1177.js','utf8'),sportContext);

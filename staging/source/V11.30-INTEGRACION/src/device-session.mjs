@@ -43,7 +43,7 @@ export async function openDeviceSession({readSession,repository,passphrase,polic
   publish('pending');
   if(scheduled||closing||closed)return;
   scheduled=true;
-  queueMicrotask(()=>{scheduled=false;if(!closed&&!closing&&!coachBusy)flush().catch(()=>{})});
+  queueMicrotask(()=>{scheduled=false;if(!closed&&!closing&&!coachBusy&&!vault.coachBlocked&&phase!=='locked')flush().catch(()=>{})});
  }
  const bridge=createLegacyBridge({vault,policy:effective,onDirty:changed});
  const writable=()=>check(!closing&&!closed&&!coachBusy&&!vault.coachBlocked&&phase!=='locked','Escrituras bloqueadas');
@@ -64,8 +64,8 @@ export async function openDeviceSession({readSession,repository,passphrase,polic
  function closeForCoachRecovery(confirmed){check(confirmed===true&&!closed&&!closing&&!coachBusy&&!flight,'No se puede cerrar para recuperar');vault.closeForCoachRecovery(true);bridge.close();closed=true;publish('closed');}
  // Opportunistic only: browsers may suspend/kill before async encryption/commit ends.
  function attachLifecycle(doc,win){
-  const hidden=()=>{if(doc.visibilityState==='hidden'&&!closed&&!closing&&phase!=='locked')flush().catch(()=>{})};
-  const pagehide=()=>{if(!closed&&!closing&&phase!=='locked')flush().catch(()=>{})};
+  const hidden=()=>{if(doc.visibilityState==='hidden'&&!closed&&!closing&&!coachBusy&&!vault.coachBlocked&&phase!=='locked')flush().catch(()=>{})};
+  const pagehide=()=>{if(!closed&&!closing&&!coachBusy&&!vault.coachBlocked&&phase!=='locked')flush().catch(()=>{})};
   doc.addEventListener('visibilitychange',hidden);win.addEventListener('pagehide',pagehide);
   return ()=>{doc.removeEventListener('visibilitychange',hidden);win.removeEventListener('pagehide',pagehide)};
  }

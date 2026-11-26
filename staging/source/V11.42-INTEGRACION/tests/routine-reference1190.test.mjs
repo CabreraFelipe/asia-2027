@@ -1,0 +1,22 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {createContext,runInContext} from 'node:vm';
+const dir=new URL('../dist/assets/v11.42/diary/',import.meta.url).pathname,ctx=createContext({module:{exports:{}}});
+for(const n of ['core105.js','extras830.js','gym826.js','schedule829.js','goals101.js','training102.js']){ctx.module.exports={};runInContext(readFileSync(dir+n,'utf8'),ctx,{filename:n});}
+const copy=x=>JSON.parse(JSON.stringify(x)),Gym=ctx.asiaGym826,S=ctx.asiaSchedule829,A=ctx.asiaCoachActions1179,T=ctx.asiaTraining102,R=ctx.asiaRunning1174,Sport=ctx.asiaSport1177;
+const today='2026-11-26',pid='prog-'+'a'.repeat(32),id='coachchange-'+'b'.repeat(32);
+const before={goals101:{version:2,primary:'',items:[]},personalCalendar1173:today,routines826:[{name:'Fuerza A',entries:[{exercise:'Press banca con barra',sets:3,min:8,max:10,rest:90},{exercise:'Remo con pecho apoyado',sets:2,min:8,max:10,rest:90}]},{name:'Fuerza B',entries:[{exercise:'Sentadilla con barra',sets:3,min:8,max:10,rest:90}]}],programmes102:[{id:pid,name:'Programa propio',start:today,end:'2026-12-20',objective:'Fuerza',equipment:'Gimnasio completo',minutes:60,days:[{weekday:2,slot:4},{weekday:4,slot:5}],cancelled:false}]};
+const data={body:{},diet:{},work:{},photos:{},settings:before},api={Gym,S,T,R,Sport};
+const changed=copy(before);changed.routines826[0].entries[0].sets=4;assert.throws(()=>Gym.compatibleSettings(before,changed,{}),/referenciada/);
+const dropped=copy(before);dropped.routines826.pop();assert.throws(()=>Gym.compatibleSettings(before,dropped,{}),/referenciada/);
+assert.equal(Gym.compatibleSettings(before,{...before,theme:'dark'},{}),true);
+const p=A.review(data,{day:'2026-12-01',scope:'future',reason:'Prueba',availableExercises:[],operations:[{type:'remove',at:1}]},id,today,api),next=copy(A.apply(data,p,today,api));
+assert.equal(next.settings.routines826.length,3);assert.equal(Gym.compatibleSettings(before,next.settings,{}),true);
+const override=copy(next.settings);override.routines826[2].entries[0].sets=5;assert.throws(()=>Gym.compatibleSettings(next.settings,override,{}),/referenciada/);
+const erased=copy(next.settings);delete erased.coachRoutine1179;assert.throws(()=>Gym.compatibleSettings(next.settings,erased,{}),/acumulativo/);
+const tamper=copy(next.settings);tamper.coachRoutine1179[0].reason='Otro motivo';assert.throws(()=>Gym.compatibleSettings(next.settings,tamper,{}),/acumulativo/);
+assert.throws(()=>A.validate({...before,coachRoutine1179:null},Gym,S.programmes(before)),/inválido/);
+const cancelled=copy(next.settings);cancelled.programmes102[0].cancelled=true;assert.equal(Gym.compatibleSettings(next.settings,cancelled,{}),true);
+const loose={routines826:copy(before.routines826)};const edited=copy(loose);edited.routines826[0].entries[0].sets=4;assert.equal(Gym.compatibleSettings(loose,edited,{}),true);assert.throws(()=>Gym.compatibleSettings(loose,edited,{'2026-11-24_4':{ex:{}}}),/historial/);
+const root=new URL('../dist/assets/v11.42/',import.meta.url).pathname;assert.equal(readFileSync(root+'gym826.js','utf8'),readFileSync(dir+'gym826.js','utf8'));assert.ok(readFileSync(dir+'index.html','utf8').includes('compatibleSettings(previous.settings,data.settings,previous.work)'));
+console.log('Routine references: existing history, future programmes, append-only Coach journal, legitimate cancellation and unreferenced editing PASS');

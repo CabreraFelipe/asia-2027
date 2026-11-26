@@ -27,7 +27,9 @@ export async function run(){
   s=await open();check(s.storage.getItem(theme)==='light:ocean'&&(await s.moduleStore.read('gym')).revision===1,'Rama no sobrevivió a reapertura');await s.close();
   // Exercise real encryption, pair-CAS and ordinary cached edits after Coach commit.
   s=await open();const snapshot=await s.coachSnapshot(),prior=JSON.parse(snapshot.diary),newDiary=JSON.stringify({...prior,settings:{...prior.settings,coachTest:true}});
-  const conflict=await s.coachSnapshot();await s.moduleStore.write('gym',1,seedGym());await rejects(()=>s.commitCoachDiary(conflict,newDiary),/modular/);
+  const activeKey='asia-gym-active53',activeValue=JSON.stringify({key:'2026-11-26_0',start:1000,index:0,end:0,paused:null,baseline:null});
+  s.storage.setItem(activeKey,activeValue);await s.flush();await rejects(()=>s.coachSnapshot(),/Sesión Gym clásica/);await rejects(()=>s.commitCoachDiary(snapshot,newDiary),/Sesión Gym clásica/);check(s.storage.getItem(activeKey)===activeValue&&s.storage.getItem(diary)===snapshot.diary,'Coach modificó sesión activa');
+  s.storage.setItem(activeKey,'null');await s.flush();const conflict=await s.coachSnapshot();await s.moduleStore.write('gym',1,seedGym());await rejects(()=>s.commitCoachDiary(conflict,newDiary),/modular/);
   check(s.storage.getItem(diary)===snapshot.diary,'Conflicto modificó la caché');
   const review=await s.coachSnapshot();const ack=await s.commitCoachDiary(review,newDiary);check(ack.revision===review.revision+1&&ack.proRevision===review.proRevision&&s.storage.getItem(diary)===newDiary,'Recibo o caché incorrectos');
   s.storage.setItem(theme,'light:ocean');s.storage.setItem(timer,'{"start":123,"elapsed":0,"rest":0,"coachTest":true}');await s.flush();await s.close();

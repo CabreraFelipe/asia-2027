@@ -103,9 +103,10 @@ export async function openSessionVault({readSession,repository,passphrase,policy
   else assert(revision===0&&map.size===0,'Caché inicial incompatible');
   return current;
  }
- async function coachSnapshot(pair){guard();writable();assert(!busy,'Guardado en curso');coachBusy=true;try{const snapshot=await checkPair(pair);return {accountId:id,revision,proRevision:snapshot.modules?.revision??0,diary:map.get('asia2027-v1')??null};}finally{coachBusy=false}}
+ function noActiveCoach(){const active=map.get('asia-gym-active53');assert(active===undefined||active==='null','Sesión Gym clásica activa o pendiente de verificar');}
+ async function coachSnapshot(pair){guard();writable();noActiveCoach();assert(!busy,'Guardado en curso');coachBusy=true;try{const snapshot=await checkPair(pair);return {accountId:id,revision,proRevision:snapshot.modules?.revision??0,diary:map.get('asia2027-v1')??null};}finally{coachBusy=false}}
  async function commitCoachDiary(pair,expected,nextDiary){
-  guard();writable();assert(!busy&&generation===saved&&expected&&expected.accountId===id&&expected.revision===revision&&typeof expected.diary==='string'&&expected.diary===map.get('asia2027-v1')&&typeof nextDiary==='string'&&nextDiary!==expected.diary&&nextDiary.length<=50000000&&permitted.has('asia2027-v1'),'Diario o revisión no vigente');
+  guard();writable();noActiveCoach();assert(!busy&&generation===saved&&expected&&expected.accountId===id&&expected.revision===revision&&typeof expected.diary==='string'&&expected.diary===map.get('asia2027-v1')&&typeof nextDiary==='string'&&nextDiary!==expected.diary&&nextDiary.length<=50000000&&permitted.has('asia2027-v1'),'Diario o revisión no vigente');
   coachBusy=true;let attempted=false;
   try{
    const current=await checkPair(pair);assert((current.modules?.revision??0)===expected.proRevision,'Cambió la bóveda modular');
