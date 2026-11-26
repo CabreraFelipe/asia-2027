@@ -132,7 +132,10 @@ let nut1184=readFileSync(web+'/diary/nutrition103.js','utf8');const nutMarker118
 cpSync(base+'/src/coach-bundle1180.js',web+'/coach-bundle1184.js');
 const goalShell11993=readFileSync(web+'/diary/goals101.js','utf8'),goalMarker11993="const el=id=>document.getElementById(id),make=";
 if(goalShell11993.split(goalMarker11993).length!==2)throw Error('Marcador goals shell');
-const goalPure11993=goalShell11993.slice(0,goalShell11993.indexOf(goalMarker11993));
+const goalHead11993=goalShell11993.slice(0,goalShell11993.indexOf(goalMarker11993));
+const goalCjs11993="if(typeof module!=='undefined'&&module.exports){module.exports=api;return;}";
+if(goalHead11993.split(goalCjs11993).length!==2)throw Error('Marcador CommonJS metas shell');
+const goalPure11993=goalHead11993.replace(goalCjs11993,'');
 writeFileSync(web+'/goals11993.js',goalPure11993+'globalThis.asiaGoals101=Object.freeze(api);})();\n');
 cpSync(base+'/src/onboard1176.js',web+'/onboard11993.js');
 for(const n of ['goals11993.js','onboard11993.js'])execFileSync(process.execPath,['--check',web+'/'+n],{stdio:'inherit'});

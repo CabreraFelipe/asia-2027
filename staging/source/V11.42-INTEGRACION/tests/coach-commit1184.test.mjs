@@ -50,6 +50,9 @@ await c.review('bundle',bundle,snap.diary);const saved=await c.apply('bundle',bu
  console.log('Inverse sports PRO planning guard and local write fence PASS');
 
  // V11.99.3 onboarding uses the same reviewed encrypted write boundary.
+ assert.equal(typeof globalThis.asiaGoals101?.validate,'function','El módulo puro de metas debe exponer su API incluso en CommonJS');
+ assert.equal(typeof globalThis.asiaGoals101?.upsert,'function');
+ assert.equal(typeof globalThis.asiaGoals101?.select,'function');
  const onboardApi={G:globalThis.asiaGoals101,S:api.S,T:api.T,R:api.R,N:api.N,gym:api.Gym},O=globalThis.asiaOnboard1176;
  const obData=JSON.parse(snap.diary),obIds={goal:'goal-'+'5'.repeat(32),program:'prog-'+'6'.repeat(32),running:'runplan-'+'7'.repeat(32),nutrition:'nut-'+'8'.repeat(32)};
  const obRaw={goal:{title:'Carrera de prueba',kind:'Running',target:'10K',motivation:'',start:'2027-02-01',deadline:'2027-03-01'},primary:false,personalStart:null,strength:{config:{name:'Fuerza febrero',objective:'Bienestar general',equipment:'Mancuernas y banco',minutes:45,start:'2027-02-01',end:'2027-02-21',days:[1,4]},templates:null},running:{distanceM:10000,targetSeconds:null,raceDate:'2027-03-01',start:'2027-02-01',end:'2027-02-21',days:[3,6],weeklyMinutes:90,longestMinutes:40,profile:{level:'Habitual',surface:'Cinta',availableMinutes:40,progress:false,symptoms:'Sin síntomas preocupantes'}},nutrition:null};
