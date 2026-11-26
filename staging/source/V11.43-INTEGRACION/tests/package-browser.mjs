@@ -227,6 +227,14 @@ try{
   await wait(()=>setup.hidden&&diaryB.getElementById('goalBrand101').textContent==='Sin meta principal'&&el('status1140').textContent.includes('saved'),'Libro vacío no guardado');
   for(const [k,v] of Object.entries({title:'Mi meta B',kind:'Fuerza',target:'5 dominadas',motivation:'Constancia',deadline:'2027-08-01'}))diaryB.getElementById('goal101-'+k).value=v;
   diaryB.getElementById('goalForm101').requestSubmit();await wait(()=>diaryB.getElementById('goalBrand101').textContent==='Meta principal · Mi meta B'&&el('status1140').textContent.includes('saved'),'Primera meta propia no guardada');
+  const training=diaryB.getElementById('training102');training.open=true;diaryB.getElementById('goalPlanning1173').click();await wait(()=>!diaryB.getElementById('personalPlanning1173').hidden,'Calendario personal no disponible');
+  const personal=diaryB.getElementById('activatePersonal1173'),dateInput=diaryB.getElementById('personalStart1173');const originalConfirm=w.confirm;
+  try{w.confirm=()=>false;personal.click();if(personal.hidden)throw Error('Cancelación activó calendario');w.confirm=()=>true;personal.click()}finally{w.confirm=originalConfirm}
+  await wait(()=>personal.hidden&&el('status1140').textContent.includes('saved'),'Calendario personal no guardado');
+  if(diaryB.getElementById('programStart102').value!==dateInput.value)throw Error('Inicio propio no aplicado');
+  diaryB.getElementById('programGenerate102').click();if(!diaryB.getElementById('programActivate102'))throw Error('Borrador no disponible');
+  try{w.confirm=()=>true;diaryB.getElementById('programActivate102').click()}finally{w.confirm=originalConfirm}
+  await wait(()=>diaryB.getElementById('programList102').textContent.includes('Mi próximo programa')&&el('status1140').textContent.includes('saved'),'Programa personal no guardado');
   // Freeze a real B pending branch through the existing repository API. This
   // exercises the recovery gate, not a fabricated successful reconciliation.
   el('close1140').click();await wait(()=>!document.querySelector('iframe')&&!el('reconcile1140').disabled,'B no cerró');
@@ -254,7 +262,7 @@ try{
   if(document.querySelector('iframe')||!el('maintenance1141')||!el('import1141')||!el('restore1141')||!el('review1167')||el('review1167').disabled||!el('reviewFile1167').disabled||!el('recover1169')||el('recover1169').disabled||!el('reload1169').hidden)throw Error('Apertura avanzada no preservó recuperación');
   el('open1140').click();await wait(()=>document.querySelector('iframe')?.contentWindow?.asiaGym84Ready===true&&!el('close1140').disabled,'Apertura manual no disponible');
   const d=document.querySelector('iframe').contentDocument;d.getElementById('goals101').open=true;await wait(()=>d.getElementById('goalActive101').textContent.includes('Constancia'),'Motivación no persistió');
-  if(!d.getElementById('pilotGoals1149').hidden||d.getElementById('goalBrand101').textContent!=='Meta principal · Mi meta B'||d.getElementById('goalActive101').textContent.includes('Asia 2027'))throw Error('Meta v2 perdida o heredada');return true;
+  if(!d.getElementById('pilotGoals1149').hidden||d.getElementById('goalBrand101').textContent!=='Meta principal · Mi meta B'||d.getElementById('goalActive101').textContent.includes('Asia 2027'))throw Error('Meta v2 perdida o heredada');d.getElementById('training102').open=true;await wait(()=>d.getElementById('programList102').textContent.includes('Mi próximo programa')&&d.getElementById('activatePersonal1173').hidden,'Calendario propio no persistió');return true;
  }.toString()+')()',true);assert.equal(advanced,true);
  const finishB=await evalJS('('+async function(){
   const el=id=>document.getElementById(id),wait=async(f,m)=>{for(let i=0;i<200;i++){if(f())return;await new Promise(r=>setTimeout(r,100))}throw Error(m)};
