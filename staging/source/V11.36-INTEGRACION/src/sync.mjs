@@ -14,7 +14,7 @@ const check=(x,m)=>{if(!x)throw Error(m)},rev=r=>r?.revision??0;
 const exact=(x,keys)=>x&&typeof x==='object'&&!Array.isArray(x)&&Object.keys(x).length===keys.length&&keys.every(k=>Object.hasOwn(x,k));
 const valid=s=>typeof s?.accountId==='string'&&/^acct_[a-f0-9]{32}$/.test(s.accountId)&&typeof s.csrf==='string'&&s.csrf.length>0;
 const format='asia-v1136-sync-v1';
-function validatePayload(payload,policy){
+export function validatePayload(payload,policy){
  check(exact(payload,['entries','modules'])&&Array.isArray(payload.entries)&&payload.modules&&typeof payload.modules==='object'&&!Array.isArray(payload.modules),'Contenido inválido');
  const seen=new Set(),entries=[];
  for(const e of payload.entries){
