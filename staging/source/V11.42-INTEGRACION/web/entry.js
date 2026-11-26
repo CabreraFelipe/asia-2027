@@ -23,8 +23,8 @@ async function attempt({manual=false}={}){
   }
   $('unlock').hidden=true;
   await open(access,access.secret,advanced);
- }catch{
-  status('No se pudo verificar el acceso o abrir los registros. No se reemplazó la clave. Reintentá o verificá tu cuenta.');
+ }catch(e){
+  status(e?.code==='WRITER_BUSY'?'La cuenta está abierta en otra pestaña. Cerrala y reintentá.':e?.code==='WRITER_UNAVAILABLE'?'Este navegador no permite coordinar la edición segura. Usá un navegador compatible.':'No se pudo verificar el acceso o abrir los registros. No se reemplazó la clave. Reintentá o verificá tu cuenta.');
   $('retryAccess1153').hidden=false;
  }finally{phrase='';busy=false;controls(false)}
 }

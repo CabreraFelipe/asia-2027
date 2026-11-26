@@ -1,0 +1,31 @@
+name: Asia 2027 - runtime D1 y R2 local V11.71
+on:
+  push:
+    branches: ['development/multiuser']
+    paths: ['staging/source/V11.42-INTEGRACION/**','staging/source/V11.38-INTEGRACION/**','.github/workflows/asia-v1171-runtime.yml']
+permissions:
+  contents: read
+jobs:
+  local-runtime:
+    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/development/multiuser'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22.16.0'
+      - run: node staging/source/V11.29-INTEGRACION/tests/build-candidate.mjs
+      - run: node staging/source/V11.39-INTEGRACION/tests/patch-candidate.mjs
+      - run: node staging/source/V11.40-INTEGRACION/tests/patch-candidate.mjs
+      - run: node staging/source/V11.42-INTEGRACION/tests/build.mjs
+      - name: Instalar runtime local fijado, sin secretos
+        run: npm install --prefix "$RUNNER_TEMP/asia-local-runtime" --no-audit --no-fund --save-exact wrangler@4.164.0
+      - name: Validar migraciones y concurrencia contra D1 y R2 desechables
+        shell: bash
+        run: |
+          export ASIA_WRANGLER_ROOT="$RUNNER_TEMP/asia-local-runtime"
+          node staging/source/V11.42-INTEGRACION/tests/local-runtime1171.test.mjs

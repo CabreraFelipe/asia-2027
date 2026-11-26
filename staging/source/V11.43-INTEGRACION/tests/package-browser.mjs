@@ -266,6 +266,13 @@ try{
  const managed=await evalJS('('+async function(){
   const el=id=>document.getElementById(id),wait=async(f,m)=>{for(let i=0;i<200;i++){if(f())return;await new Promise(r=>setTimeout(r,100))}throw Error(m)};
   if(!el('unlock').hidden||el('phrase').value)throw Error('C solicitó frase');
+  const {acquireAccountWriter1171}=await import('/v11.42/staging/source/V11.40-INTEGRACION/src/account-writer1171.mjs');
+  let refused=false;try{const unexpected=await acquireAccountWriter1171('acct_'+'c'.repeat(32));await unexpected.release()}catch(e){refused=e.code==='WRITER_BUSY'}
+  if(!refused)throw Error('Otra pestaña podría escribir la misma cuenta');
+  const other=await acquireAccountWriter1171('acct_'+'d'.repeat(32));await other.release();
+  const reopened=await acquireAccountWriter1171('acct_'+'d'.repeat(32));await reopened.release();
+  let unsupported=false;try{await acquireAccountWriter1171('acct_'+'d'.repeat(32),{})}catch(e){unsupported=e.code==='WRITER_UNAVAILABLE'}
+  if(!unsupported)throw Error('No se bloqueó navegador sin coordinación');
   const d=document.querySelector('iframe').contentDocument;if(d.getElementById('height').value==='1.86'||d.getElementById('goalBrand101').textContent.includes('Mi meta B'))throw Error('Datos cruzados C');
   d.getElementById('pilotName1146').click();const name=d.getElementById('profile100-displayName');name.value='Usuario C';name.dispatchEvent(new Event('input',{bubbles:true}));d.getElementById('profileForm100').requestSubmit();
   await wait(()=>d.querySelector('header .brand h1').textContent==='Usuario C'&&el('status1140').textContent.includes('saved'),'C no guardó nombre');
