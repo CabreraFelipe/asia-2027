@@ -5,6 +5,7 @@ import {prepareLargeSync} from '../../V11.38-INTEGRACION/src/large-sync-client.m
 import {prepareFullImport} from '../../V11.35-INTEGRACION/src/full-archive.mjs';
 import {prepareSelectiveRestore} from '../../V11.32-INTEGRACION/src/selective-restore.mjs';
 import {createAccountServices} from '../../V11.39-INTEGRACION/src/service-client.mjs';
+import {syncManaged1170} from './managed-sync1170.mjs';
 const check=(x,m)=>{if(!x)throw Error(m)};
 const same=(a,b)=>a.accountId===b.accountId&&a.csrf===b.csrf;
 function transient(){const m=new Map();return Object.freeze({getItem:k=>m.get(k)??null,setItem:(k,v)=>m.set(k,String(v)),removeItem:k=>m.delete(k),key:i=>[...m.keys()][i]??null,get length(){return m.size}})}
@@ -12,7 +13,7 @@ export async function createController({origin,fetcher=fetch,repository,pending,
  check(/^https:\/\/asia-v1111-identity-staging\.[a-z0-9-]+\.workers\.dev$/.test(origin)&&typeof mount==='function'&&typeof beforeOpen==='function','Origen o montaje inválido');
  const read=sessionReader({origin,fetcher}),identity=await read();
  check(!expectedIdentity||same(identity,expectedIdentity),'La sesión cambió');
- let state='maintenance',busy=false,plan=null,editing=null,services=null,view=null,closing=false,locked=false,restricted=recoveryOnly===true;
+ let state='maintenance',busy=false,plan=null,editing=null,services=null,view=null,closing=false,locked=false,restricted=recoveryOnly===true,syncState=null;
  const publish=next=>{state=next;try{onState(next)}catch{}};
  async function verify(){check(!locked&&state!=='closed','Sesión bloqueada');let s;try{s=await read()}catch(e){if(e.revoked===true){locked=true;services?.close();view?.hide?.();publish('locked')}throw e}
   if(!same(s,identity)){locked=true;services?.close();view?.hide?.();publish('locked');throw Error('La sesión cambió')}return s}
@@ -27,9 +28,16 @@ export async function createController({origin,fetcher=fetch,repository,pending,
    async apply(confirm){check(active&&plan===p&&state==='maintenance','Plan cerrado');return operation(async()=>{try{await verify();const result=await (p.commit??p.apply)(confirm);active=false;plan=null;return result}catch(e){p.cancel();active=false;plan=null;throw e}})}
   });
  })}
+ async function closeEditing(){
+  closing=true;try{check(view.pending()===0,'Hay operaciones en curso');await editing.flush();await editing.close();services.close();view.remove();view=null;editing=null;services=null;publish('maintenance')}finally{closing=false}
+ }
+ async function syncNow(reconcileBranch){
+  try{syncState=await syncManaged1170(options,{reconcileBranch});return syncState}
+  catch(e){syncState={kind:'retry-required'};throw e}
+ }
  publish('maintenance');
  return Object.freeze({
-  get state(){return state},get recoveryOnly(){return restricted},get hasPlan(){return plan!==null},get busy(){return busy},get status(){return editing?.status??null},
+  get state(){return state},get recoveryOnly(){return restricted},get canManagedSync(){return managedWrite&&!restricted},get syncState(){return syncState},get canRetrySync(){return managedWrite&&!restricted&&state==='maintenance'&&!busy&&!plan&&syncState?.kind==='retry-required'},get hasPlan(){return plan!==null},get busy(){return busy},get status(){return editing?.status??null},
   async openDiary(){normal();return operation(async()=>{
    await verify();const initialSetup=(await beforeOpen())===true;await verify();editing=await openOfflineEditing({...options,onStatus:()=>{try{onState(state)}catch{}}});
    try{
@@ -43,8 +51,10 @@ export async function createController({origin,fetcher=fetch,repository,pending,
    }catch(e){services?.close();view?.remove?.();view=null;try{await editing.close()}catch{}editing=null;throw e}
   })},
   async closeDiary(){check(state==='editing'&&!busy&&!closing,'Diario no disponible');return operation(async()=>{
-   closing=true;try{check(view.pending()===0,'Hay operaciones en curso');await editing.flush();await editing.close();services.close();view.remove();view=null;editing=null;services=null;publish('maintenance')}finally{closing=false}
+   await closeEditing();
   })},
+  async saveAndSync(){check(managedWrite&&!restricted&&!busy&&!plan&&!closing&&['editing','maintenance'].includes(state),'Sincronización no disponible');return operation(async()=>{if(state==='editing')await closeEditing();return syncNow(true)})},
+  async retryManagedSync(){check(managedWrite&&!restricted&&syncState?.kind==='retry-required','No hay reintento solicitado');maintenance();return operation(()=>syncNow(false))},
   async reconcile(confirmation){normal();return operation(async()=>{await verify();return reconcileOffline({...options,maintenanceConfirmed:true,confirmed:confirmation===true})})},
   async inspectPending(){maintenance();return operation(async()=>{await verify();const p=await pending.inspect(identity.accountId);return p?{phase:p.phase}:null})},
   async exportConflict(backupPhrase){normal();return operation(()=>exportOfflineConflict({...options,backupPhrase}))},

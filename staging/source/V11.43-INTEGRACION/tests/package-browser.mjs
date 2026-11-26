@@ -269,7 +269,7 @@ try{
   const d=document.querySelector('iframe').contentDocument;if(d.getElementById('height').value==='1.86'||d.getElementById('goalBrand101').textContent.includes('Mi meta B'))throw Error('Datos cruzados C');
   d.getElementById('pilotName1146').click();const name=d.getElementById('profile100-displayName');name.value='Usuario C';name.dispatchEvent(new Event('input',{bubbles:true}));d.getElementById('profileForm100').requestSubmit();
   await wait(()=>d.querySelector('header .brand h1').textContent==='Usuario C'&&el('status1140').textContent.includes('saved'),'C no guardó nombre');
-  el('close1140').click();await wait(()=>!document.querySelector('iframe')&&!el('reconcile1140').disabled,'C no cerró');el('reconcile1140').click();await wait(()=>!el('logout1140').disabled,'C no concilió');el('sync1140').click();await wait(()=>!el('apply1140').disabled,'C no preparó copia');el('apply1140').click();await wait(()=>el('message1140').textContent.includes('confirmada'),'C no confirmó copia');return true;
+  if(el('saveSync1170').hidden||el('saveSync1170').disabled)throw Error('Guardado gestionado no disponible');el('saveSync1170').click();await wait(()=>!document.querySelector('iframe')&&el('message1140').textContent.includes('confirmada'),'C no confirmó guardado y sincronización');if(!el('syncStatus1170').textContent.includes('revisión 1'))throw Error('Revisión no confirmada');return true;
  }.toString()+')()',true);assert.equal(managed,true);
  const managedRow=db.prepare('SELECT envelope FROM managed_account_keys_v1152 WHERE account_id=?').get(C).envelope;assert.ok(managedRow);
  await cmd('Page.navigate',{url:home});await ready("document.querySelector('iframe')?.contentWindow?.asiaGym84Ready===true&&!document.getElementById('close1140').disabled");

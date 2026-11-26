@@ -30,11 +30,12 @@ export async function openOfflineEditing({readSession,repository,pending,policy,
 }
 // Maintenance mode: do not mount an editable diary during reconciliation.
 // Frozen pending branch is durable until CAS succeeds; lost response is idempotent.
-export async function reconcileOffline({readSession,repository,pending,passphrase,maintenanceConfirmed,confirmed}){
+export async function reconcileOffline({readSession,repository,pending,passphrase,maintenanceConfirmed,confirmed,expectedBranch=null}){
  check(maintenanceConfirmed===true&&confirmed===true,'Confirmá el modo mantenimiento');
  const identity=await readSession();check(valid(identity),'Sesión inválida');
  const id=identity.accountId,verify=async()=>check(same(identity,await readSession()),'La sesión cambió');
- const snapshot=await pending.freeze(id);
+ const reviewed=expectedBranch?await pending.freezeReviewed(id,expectedBranch):null;
+ const snapshot=reviewed?{base:reviewed.base,working:reviewed.working}:await pending.freeze(id);
  // Verify account/revision and phrase on all encrypted records before applying.
  for(const row of [snapshot.base,snapshot.working])for(const k of ['local','modules']){
   if(row[k]===null)continue;
