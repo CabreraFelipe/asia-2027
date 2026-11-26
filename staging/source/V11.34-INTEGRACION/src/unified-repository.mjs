@@ -41,6 +41,26 @@ export async function openUnifiedRepository(factory=globalThis.indexedDB){
     s.put({...row,...(local?{local,modules}:{}),baseline},id);return true;
    });
   },
+  // Retain the exact encrypted source and receipt in the same transaction as
+  // both new vaults. Increasing outer revisions fences previously opened CAS
+  // handles. Never discard a backup, including after subsequent normal writes.
+  readRekey:id=>tx(id,false,row=>row?.rekeyBackup??null),
+  commitRekey(id,expected,target,receipt){
+   const rev=r=>r?.revision??0;
+   check(expected&&(expected.local||expected.modules)&&receipt?.phase==='committed'&&/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(receipt.operationId||'')&&Number.isSafeInteger(receipt.sourceRevision)&&receipt.sourceRevision>=1&&receipt.revision===receipt.sourceRevision+1&&receipt.revision<=200&&/^[a-f0-9]{64}$/.test(receipt.sourceSha||'')&&/^[a-f0-9]{64}$/.test(receipt.targetSha||''),'Recibo inválido');
+   for(const k of ['local','modules'])check(expected[k]===null?target[k]===null:validRecord(target[k])&&target[k].revision===rev(expected[k])+1,'Revisión de recifrado inválida');
+   check(target.baseline?.namespace==='objects-v1138'&&target.baseline.remote===receipt.revision&&target.baseline.local===rev(target.local)&&target.baseline.modules===rev(target.modules),'Marcador de recifrado inválido');
+   return tx(id,true,(row,s)=>{
+    const current={local:row?.local??null,modules:row?.modules??null,baseline:row?.baseline??null};
+    if(row?.rekeyBackup){
+     check(JSON.stringify(row.rekeyBackup.receipt)===JSON.stringify(receipt)&&JSON.stringify(row.rekeyBackup.source)===JSON.stringify(expected)&&JSON.stringify(current)===JSON.stringify(target),'Ya existe un respaldo de recifrado; no se reemplaza');
+     return 'already-applied';
+    }
+    check(JSON.stringify(current)===JSON.stringify(expected),'Conflicto de revisión local');
+    s.put({...row,...target,rekeyBackup:{receipt:structuredClone(receipt),source:structuredClone(expected)}},id);
+    return 'applied';
+   });
+  },
   initialize(id,local,modules){
    check(validRecord(local)&&validRecord(modules)&&local.revision===1&&modules.revision===1,'Importación inválida');
    return tx(id,true,(row,s)=>{check(row===null,'La cuenta ya contiene datos');s.add({local,modules},id);return true});

@@ -34,7 +34,7 @@ export function validatePayload(payload,policy){
  return {entries:entries.sort((a,b)=>a[0].localeCompare(b[0])),modules:Object.fromEntries(MODULES.filter(k=>Object.hasOwn(modules,k)).map(k=>[k,modules[k]]))};
 }
 const readOnly=record=>({read:async()=>record,compareAndSwap(){throw Error('Solo lectura')}});
-async function localPayload({row,readSession,passphrase,policy}){
+export async function localPayload({row,readSession,passphrase,policy}){
  const vault=await openSessionVault({readSession,repository:readOnly(row.local),passphrase,policy:devicePolicy(policy)});
  let store;
  try{

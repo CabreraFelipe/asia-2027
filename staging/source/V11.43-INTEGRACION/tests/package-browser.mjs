@@ -305,6 +305,49 @@ try{
  }.toString()+')()',true);assert.equal(recoveredManaged,true);
  assert.deepEqual(db.prepare('SELECT * FROM sync_v1138_objects WHERE account_id=?').all(C),remoteC);
  assert.deepEqual(Buffer.from(objects.get(remoteC[0].object_key)),cloudC);
+ // Internal client migration test on isolated fixture accounts in real
+ // Chromium IndexedDB. No production endpoint or real account is created.
+ const localRekey=await evalJS('('+async function(){
+  const {prepareLocalCommit1158}=await import('/v11.42/staging/source/V11.42-INTEGRACION/src/local-rekey1158.mjs');
+  const {openUnifiedRepository}=await import('/v11.42/staging/source/V11.34-INTEGRACION/src/unified-repository.mjs');
+  const {openOfflineRepository}=await import('/v11.42/staging/source/V11.37-INTEGRACION/src/offline-repository.mjs');
+  const {encrypt84,decrypt84,checksum84}=await import('/v11.42/model84.mjs');
+  const {hashBytes}=await import('/v11.42/staging/source/V11.38-INTEGRACION/src/large-sync.mjs');
+  const repo=await openUnifiedRepository(),pending=await openOfflineRepository(),oldPhrase='frase anterior sintética browser',newSecret='X'.repeat(43);
+  const eq=(a,b)=>JSON.stringify(a)===JSON.stringify(b),check=(x,m)=>{if(!x)throw Error(m)};
+  const rejects=async(fn,m)=>{let failed=false;try{await fn()}catch{failed=true}check(failed,m)};
+  try{
+   for(const [letter,scenario] of [['d','success'],['e','dirty'],['f','pending'],['1','stale'],['2','remote-change']]){
+    const id='acct_'+letter.repeat(32),identity={accountId:id,csrf:'z'.repeat(43)},readSession=async()=>identity;
+    const diary={body:{'2026-11-26':{weight:81}},diet:{},work:{},settings:{},photos:{}};
+    const entries=[['asia2027-v1',JSON.stringify(diary)]],modules={coach:{history:['preservar']},visual:{photos:['referencia']}};
+    const localPlain={format:'asia-v1126-local-vault-v1',accountId:id,revision:1,entries:[...entries,['asia-timers-v4','null']]};
+    const modulesPlain={format:'asia-v1128-modules-v1',accountId:id,revision:1,modules:Object.fromEntries(Object.entries(modules).map(([name,payload])=>[name,{name,revision:1,payload}]))};
+    await repo.initialize(id,{revision:1,envelope:await encrypt84(localPlain,oldPhrase)},{revision:1,envelope:await encrypt84(modulesPlain,oldPhrase)});
+    const source=await repo.readSync(id);
+    const plain={format:'asia-v1136-sync-v1',accountId:id,payload:{entries,modules:scenario==='dirty'?{...modules,coach:{history:['otra rama']}}:modules}};
+    const old=await encrypt84(plain,oldPhrase),next=await encrypt84(plain,newSecret);
+    const sha=x=>hashBytes(new TextEncoder().encode(JSON.stringify(x)));
+    const receipt={operationId:crypto.randomUUID(),phase:'committed',sourceRevision:1,sourceSha:await sha(old),revision:2,targetSha:await sha(next)};
+    let head=2;const request=async(method,body,revision)=>{check(method==='GET','Escritura remota no permitida');return revision?{ok:true,revision,envelope:revision===1?old:next}:{ok:true,head,versions:[{revision:head,bytes:100,created_at:new Date().toISOString()}]}};
+    const options={readSession,repository:repo,pending,policy:globalThis.asiaAccounts106,oldPhrase,newSecret,operationId:receipt.operationId,readReceipt:async()=>receipt,request,maintenanceConfirmed:true};
+    if(scenario==='pending'){await pending.begin(id,source,crypto.randomUUID());await rejects(()=>prepareLocalCommit1158(options),'Rama pendiente no bloqueó');check(eq(await repo.readSync(id),source)&&await pending.inspect(id),'Rama perdida');continue}
+    const plan=await prepareLocalCommit1158(options);
+    if(scenario==='dirty'){check(plan.kind==='conflict'&&eq(await repo.readSync(id),source)&&!await repo.readRekey(id),'Divergencia reemplazada');continue}
+    check(plan.kind==='ready','Plan no disponible');
+    if(scenario==='stale'){await repo.local.compareAndSwap(id,1,{revision:2,envelope:await encrypt84({...localPlain,revision:2},oldPhrase)});const changed=await repo.readSync(id);await rejects(()=>plan.apply({confirmed:true}),'CAS local no bloqueó');check(eq(await repo.readSync(id),changed)&&!await repo.readRekey(id),'Cambios concurrentes perdidos');continue}
+    if(scenario==='remote-change'){head=3;await rejects(()=>plan.apply({confirmed:true}),'CAS remoto no bloqueó');check(eq(await repo.readSync(id),source)&&!await repo.readRekey(id),'Cambio remoto ignorado');continue}
+    check((await plan.apply({confirmed:true})).kind==='applied','No confirmó local');
+    const row=await repo.readSync(id),backup=await repo.readRekey(id);
+    check(row.local.revision===2&&row.modules.revision===2&&row.baseline.remote===2&&eq(backup.source,source)&&eq(backup.receipt,receipt),'Transacción o respaldo incorrecto');
+    check(await checksum84(await decrypt84(row.local.envelope,newSecret))===await checksum84({...localPlain,revision:2})&&await checksum84(await decrypt84(row.modules.envelope,newSecret))===await checksum84({...modulesPlain,revision:2}),'Contenido local cambiado');
+    await rejects(()=>repo.local.compareAndSwap(id,1,{revision:2,envelope:source.local.envelope}),'Escritor antiguo no bloqueado');
+    check((await prepareLocalCommit1158(options)).kind==='already-applied','No recuperó comprobante local');
+    check(eq(await repo.readRekey(id),backup),'Respaldo sobrescrito');
+   }
+   return true;
+  }finally{repo.close();pending.close()}
+ }.toString()+')()',true);assert.equal(localRekey,true);
  await evalJS("fetch('/__ci/offline').then(r=>r.text())",true);await cmd('Page.navigate',{url:home});await ready("document.body?.textContent.includes('Volvé a conectarte para verificar tu cuenta')");
  console.log('Chrome paquete generado: autorización, diario, guardado, conciliación, Worker sync, logout, aislamiento, caché pública y fallback offline.');
 }finally{ws?.close();chrome?.kill();if(chrome&&chrome.exitCode===null)await Promise.race([once(chrome,'exit'),sleep(3000)]);server?.closeAllConnections();server?.close();db.close();await rm(dir,{recursive:true,force:true,maxRetries:3,retryDelay:100})}
