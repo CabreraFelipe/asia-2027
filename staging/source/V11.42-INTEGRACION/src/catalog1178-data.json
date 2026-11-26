@@ -1,0 +1,6155 @@
+{
+  "version": 1,
+  "source": {
+    "repository": "yuhonas/free-exercise-db",
+    "revision": "f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5",
+    "license": "Unlicense (repository; no media rights inferred)",
+    "scope": "Exercise names, factual classifications and English aliases; Spanish names curated. No instructions or images copied."
+  },
+  "entries": [
+    {
+      "id": "fed-Ab-Crunch-Machine",
+      "name": "Crunch en máquina",
+      "aliases": [
+        "Ab Crunch Machine"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [],
+      "equipment": "Máquina",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Ab_Crunch_Machine",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Ab-Roller",
+      "name": "Rueda abdominal",
+      "aliases": [
+        "Ab Roller"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [
+        "Hombros"
+      ],
+      "equipment": "Otro",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Ab_Roller",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Alternate-Heel-Touchers",
+      "name": "Toques alternos de talón",
+      "aliases": [
+        "Alternate Heel Touchers"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [],
+      "equipment": "Peso corporal",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Alternate_Heel_Touchers",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Barbell-Ab-Rollout",
+      "name": "Rueda abdominal con barra",
+      "aliases": [
+        "Barbell Ab Rollout"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [
+        "Zona lumbar",
+        "Hombros"
+      ],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Barbell_Ab_Rollout",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Barbell-Side-Bend",
+      "name": "Flexión lateral de tronco con barra",
+      "aliases": [
+        "Barbell Side Bend"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [
+        "Zona lumbar"
+      ],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Barbell_Side_Bend",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Bent-Knee-Hip-Raise",
+      "name": "Elevación de cadera con rodillas flexionadas",
+      "aliases": [
+        "Bent-Knee Hip Raise"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [],
+      "equipment": "Peso corporal",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Bent-Knee_Hip_Raise",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Cable-Reverse-Crunch",
+      "name": "Crunch inverso en polea",
+      "aliases": [
+        "Cable Reverse Crunch"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Cable_Reverse_Crunch",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Cable-Russian-Twists",
+      "name": "Giros de tronco en polea",
+      "aliases": [
+        "Cable Russian Twists"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Cable_Russian_Twists",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Cable-Seated-Crunch",
+      "name": "Crunch sentado en polea",
+      "aliases": [
+        "Cable Seated Crunch"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Cable_Seated_Crunch",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Cross-Body-Crunch",
+      "name": "Crunch cruzado",
+      "aliases": [
+        "Cross-Body Crunch"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [],
+      "equipment": "Peso corporal",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Cross-Body_Crunch",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Crunch-Hands-Overhead",
+      "name": "Crunch con brazos extendidos",
+      "aliases": [
+        "Crunch - Hands Overhead"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [],
+      "equipment": "Peso corporal",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Crunch_-_Hands_Overhead",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Crunch-Legs-On-Exercise-Ball",
+      "name": "Crunch con piernas sobre pelota suiza",
+      "aliases": [
+        "Crunch - Legs On Exercise Ball"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [],
+      "equipment": "Peso corporal",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Crunch_-_Legs_On_Exercise_Ball",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Crunches",
+      "name": "Crunch abdominal",
+      "aliases": [
+        "Crunches"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [],
+      "equipment": "Peso corporal",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Crunches",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Dead-Bug",
+      "name": "Dead bug alterno",
+      "aliases": [
+        "Dead Bug"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [],
+      "equipment": "Peso corporal",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Dead_Bug",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Decline-Crunch",
+      "name": "Crunch en banco declinado",
+      "aliases": [
+        "Decline Crunch"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [],
+      "equipment": "Peso corporal",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Decline_Crunch",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Decline-Oblique-Crunch",
+      "name": "Crunch oblicuo declinado",
+      "aliases": [
+        "Decline Oblique Crunch"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [],
+      "equipment": "Peso corporal",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Decline_Oblique_Crunch",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Decline-Reverse-Crunch",
+      "name": "Crunch inverso declinado",
+      "aliases": [
+        "Decline Reverse Crunch"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [],
+      "equipment": "Peso corporal",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Decline_Reverse_Crunch",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Dumbbell-Side-Bend",
+      "name": "Flexión lateral con mancuerna",
+      "aliases": [
+        "Dumbbell Side Bend"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Dumbbell_Side_Bend",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Exercise-Ball-Crunch",
+      "name": "Crunch sobre pelota suiza",
+      "aliases": [
+        "Exercise Ball Crunch"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [],
+      "equipment": "Pelota suiza",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Exercise_Ball_Crunch",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Exercise-Ball-Pull-In",
+      "name": "Encogimiento de rodillas sobre pelota suiza",
+      "aliases": [
+        "Exercise Ball Pull-In"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [],
+      "equipment": "Pelota suiza",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Exercise_Ball_Pull-In",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Flat-Bench-Leg-Pull-In",
+      "name": "Encogimiento de piernas en banco plano",
+      "aliases": [
+        "Flat Bench Leg Pull-In"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [],
+      "equipment": "Peso corporal",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Flat_Bench_Leg_Pull-In",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Flat-Bench-Lying-Leg-Raise",
+      "name": "Elevación de piernas tumbado en banco",
+      "aliases": [
+        "Flat Bench Lying Leg Raise"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [],
+      "equipment": "Peso corporal",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Flat_Bench_Lying_Leg_Raise",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Kettlebell-Windmill",
+      "name": "Molino con kettlebell",
+      "aliases": [
+        "Kettlebell Windmill"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [
+        "Glúteos",
+        "Isquiotibiales",
+        "Hombros",
+        "Tríceps"
+      ],
+      "equipment": "Kettlebell",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Kettlebell_Windmill",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Knee-Hip-Raise-On-Parallel-Bars",
+      "name": "Elevación de rodillas en paralelas",
+      "aliases": [
+        "Knee/Hip Raise On Parallel Bars"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [],
+      "equipment": "Otro",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Knee_Hip_Raise_On_Parallel_Bars",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Pallof-Press",
+      "name": "Press Pallof en polea",
+      "aliases": [
+        "Pallof Press"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [
+        "Pecho",
+        "Hombros",
+        "Tríceps"
+      ],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Pallof_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Pallof-Press-With-Rotation",
+      "name": "Press Pallof con rotación",
+      "aliases": [
+        "Pallof Press With Rotation"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [
+        "Pecho",
+        "Hombros",
+        "Tríceps"
+      ],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Pallof_Press_With_Rotation",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Plank",
+      "name": "Plancha frontal",
+      "aliases": [
+        "Plank"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [],
+      "equipment": "Peso corporal",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Plank",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Reverse-Crunch",
+      "name": "Crunch inverso",
+      "aliases": [
+        "Reverse Crunch"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [],
+      "equipment": "Peso corporal",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Reverse_Crunch",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Russian-Twist",
+      "name": "Giros rusos",
+      "aliases": [
+        "Russian Twist"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [
+        "Zona lumbar"
+      ],
+      "equipment": "Peso corporal",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Russian_Twist",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Scissor-Kick",
+      "name": "Tijeras abdominales",
+      "aliases": [
+        "Scissor Kick"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [],
+      "equipment": "Peso corporal",
+      "category": "Movilidad",
+      "level": "Inicial",
+      "sourceId": "Scissor_Kick",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Seated-Leg-Tucks",
+      "name": "Encogimiento sentado de piernas",
+      "aliases": [
+        "Seated Leg Tucks"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [],
+      "equipment": "Peso corporal",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Seated_Leg_Tucks",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Side-Bridge",
+      "name": "Plancha lateral",
+      "aliases": [
+        "Side Bridge"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [
+        "Hombros"
+      ],
+      "equipment": "Peso corporal",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Side_Bridge",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Standing-Cable-Wood-Chop",
+      "name": "Corte diagonal en polea",
+      "aliases": [
+        "Standing Cable Wood Chop"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [
+        "Hombros"
+      ],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Standing_Cable_Wood_Chop",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Toe-Touchers",
+      "name": "Toques de punta de pie tumbado",
+      "aliases": [
+        "Toe Touchers"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [],
+      "equipment": "Peso corporal",
+      "category": "Movilidad",
+      "level": "Inicial",
+      "sourceId": "Toe_Touchers",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Tuck-Crunch",
+      "name": "Crunch agrupado",
+      "aliases": [
+        "Tuck Crunch"
+      ],
+      "primary": [
+        "Abdomen"
+      ],
+      "secondary": [],
+      "equipment": "Peso corporal",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Tuck_Crunch",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-90-90-Hamstring",
+      "name": "Movilidad de isquiotibiales 90/90",
+      "aliases": [
+        "90/90 Hamstring"
+      ],
+      "primary": [
+        "Isquiotibiales"
+      ],
+      "secondary": [
+        "Gemelos"
+      ],
+      "equipment": "Peso corporal",
+      "category": "Movilidad",
+      "level": "Inicial",
+      "sourceId": "90_90_Hamstring",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Ball-Leg-Curl",
+      "name": "Curl femoral sobre pelota suiza",
+      "aliases": [
+        "Ball Leg Curl"
+      ],
+      "primary": [
+        "Isquiotibiales"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Glúteos"
+      ],
+      "equipment": "Pelota suiza",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Ball_Leg_Curl",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Chair-Leg-Extended-Stretch",
+      "name": "Estiramiento de isquiotibiales sentado",
+      "aliases": [
+        "Chair Leg Extended Stretch"
+      ],
+      "primary": [
+        "Isquiotibiales"
+      ],
+      "secondary": [
+        "Aductores"
+      ],
+      "equipment": "Otro",
+      "category": "Movilidad",
+      "level": "Inicial",
+      "sourceId": "Chair_Leg_Extended_Stretch",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Front-Leg-Raises",
+      "name": "Elevación frontal de pierna",
+      "aliases": [
+        "Front Leg Raises"
+      ],
+      "primary": [
+        "Isquiotibiales"
+      ],
+      "secondary": [],
+      "equipment": "Peso corporal",
+      "category": "Movilidad",
+      "level": "Inicial",
+      "sourceId": "Front_Leg_Raises",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Hamstring-SMR",
+      "name": "Automasaje de isquiotibiales con rodillo",
+      "aliases": [
+        "Hamstring-SMR"
+      ],
+      "primary": [
+        "Isquiotibiales"
+      ],
+      "secondary": [],
+      "equipment": "Rodillo de espuma",
+      "category": "Movilidad",
+      "level": "Inicial",
+      "sourceId": "Hamstring-SMR",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Inchworm",
+      "name": "Caminata de manos",
+      "aliases": [
+        "Inchworm"
+      ],
+      "primary": [
+        "Isquiotibiales"
+      ],
+      "secondary": [],
+      "equipment": "Peso corporal",
+      "category": "Movilidad",
+      "level": "Inicial",
+      "sourceId": "Inchworm",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Kettlebell-One-Legged-Deadlift",
+      "name": "Peso muerto unilateral con kettlebell",
+      "aliases": [
+        "Kettlebell One-Legged Deadlift"
+      ],
+      "primary": [
+        "Isquiotibiales"
+      ],
+      "secondary": [
+        "Glúteos",
+        "Zona lumbar"
+      ],
+      "equipment": "Kettlebell",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Kettlebell_One-Legged_Deadlift",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Natural-Glute-Ham-Raise",
+      "name": "Flexión nórdica de isquiotibiales",
+      "aliases": [
+        "Natural Glute Ham Raise"
+      ],
+      "primary": [
+        "Isquiotibiales"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Glúteos",
+        "Zona lumbar"
+      ],
+      "equipment": "Peso corporal",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Natural_Glute_Ham_Raise",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Platform-Hamstring-Slides",
+      "name": "Deslizamiento de talones para isquiotibiales",
+      "aliases": [
+        "Platform Hamstring Slides"
+      ],
+      "primary": [
+        "Isquiotibiales"
+      ],
+      "secondary": [
+        "Glúteos"
+      ],
+      "equipment": "Otro",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Platform_Hamstring_Slides",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Reverse-Hyperextension",
+      "name": "Hiperextensión inversa de cadera",
+      "aliases": [
+        "Reverse Hyperextension"
+      ],
+      "primary": [
+        "Isquiotibiales"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Glúteos"
+      ],
+      "equipment": "Máquina",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Reverse_Hyperextension",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Seated-Band-Hamstring-Curl",
+      "name": "Curl femoral sentado con banda",
+      "aliases": [
+        "Seated Band Hamstring Curl"
+      ],
+      "primary": [
+        "Isquiotibiales"
+      ],
+      "secondary": [],
+      "equipment": "Otro",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Seated_Band_Hamstring_Curl",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Seated-Hamstring-and-Calf-Stretch",
+      "name": "Estiramiento sentado de isquiotibiales y gemelos",
+      "aliases": [
+        "Seated Hamstring and Calf Stretch"
+      ],
+      "primary": [
+        "Isquiotibiales"
+      ],
+      "secondary": [
+        "Gemelos"
+      ],
+      "equipment": "Otro",
+      "category": "Movilidad",
+      "level": "Intermedio",
+      "sourceId": "Seated_Hamstring_and_Calf_Stretch",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Standing-Hamstring-and-Calf-Stretch",
+      "name": "Estiramiento de isquiotibiales y gemelos de pie",
+      "aliases": [
+        "Standing Hamstring and Calf Stretch"
+      ],
+      "primary": [
+        "Isquiotibiales"
+      ],
+      "secondary": [],
+      "equipment": "Otro",
+      "category": "Movilidad",
+      "level": "Inicial",
+      "sourceId": "Standing_Hamstring_and_Calf_Stretch",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Standing-Leg-Curl",
+      "name": "Curl femoral de pie",
+      "aliases": [
+        "Standing Leg Curl"
+      ],
+      "primary": [
+        "Isquiotibiales"
+      ],
+      "secondary": [],
+      "equipment": "Máquina",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Standing_Leg_Curl",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Stiff-Legged-Barbell-Deadlift",
+      "name": "Peso muerto de piernas semirrígidas con barra",
+      "aliases": [
+        "Stiff-Legged Barbell Deadlift"
+      ],
+      "primary": [
+        "Isquiotibiales"
+      ],
+      "secondary": [
+        "Glúteos",
+        "Zona lumbar"
+      ],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Stiff-Legged_Barbell_Deadlift",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Stiff-Legged-Dumbbell-Deadlift",
+      "name": "Peso muerto de piernas semirrígidas con mancuernas",
+      "aliases": [
+        "Stiff-Legged Dumbbell Deadlift"
+      ],
+      "primary": [
+        "Isquiotibiales"
+      ],
+      "secondary": [
+        "Glúteos",
+        "Zona lumbar"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Stiff-Legged_Dumbbell_Deadlift",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Adductor",
+      "name": "Estiramiento de aductores",
+      "aliases": [
+        "Adductor"
+      ],
+      "primary": [
+        "Aductores"
+      ],
+      "secondary": [],
+      "equipment": "Rodillo de espuma",
+      "category": "Movilidad",
+      "level": "Intermedio",
+      "sourceId": "Adductor",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Band-Hip-Adductions",
+      "name": "Aducción de cadera con banda",
+      "aliases": [
+        "Band Hip Adductions"
+      ],
+      "primary": [
+        "Aductores"
+      ],
+      "secondary": [],
+      "equipment": "Bandas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Band_Hip_Adductions",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Groiners",
+      "name": "Movilidad de cadera en zancada",
+      "aliases": [
+        "Groiners"
+      ],
+      "primary": [
+        "Aductores"
+      ],
+      "secondary": [],
+      "equipment": "Peso corporal",
+      "category": "Movilidad",
+      "level": "Intermedio",
+      "sourceId": "Groiners",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Side-Leg-Raises",
+      "name": "Elevación lateral de pierna tumbado",
+      "aliases": [
+        "Side Leg Raises"
+      ],
+      "primary": [
+        "Aductores"
+      ],
+      "secondary": [],
+      "equipment": "Peso corporal",
+      "category": "Movilidad",
+      "level": "Inicial",
+      "sourceId": "Side_Leg_Raises",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Thigh-Adductor",
+      "name": "Aducción de cadera en máquina",
+      "aliases": [
+        "Thigh Adductor"
+      ],
+      "primary": [
+        "Aductores"
+      ],
+      "secondary": [
+        "Glúteos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Máquina",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Thigh_Adductor",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-All-Fours-Quad-Stretch",
+      "name": "Estiramiento de cuádriceps en cuadrupedia",
+      "aliases": [
+        "All Fours Quad Stretch"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Cuádriceps"
+      ],
+      "equipment": "Peso corporal",
+      "category": "Movilidad",
+      "level": "Intermedio",
+      "sourceId": "All_Fours_Quad_Stretch",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Barbell-Hack-Squat",
+      "name": "Sentadilla hack con barra libre",
+      "aliases": [
+        "Barbell Hack Squat"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Antebrazos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Barbell_Hack_Squat",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Barbell-Lunge",
+      "name": "Zancada con barra",
+      "aliases": [
+        "Barbell Lunge"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Barbell_Lunge",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Barbell-Side-Split-Squat",
+      "name": "Zancada lateral con barra",
+      "aliases": [
+        "Barbell Side Split Squat"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Isquiotibiales",
+        "Zona lumbar"
+      ],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Barbell_Side_Split_Squat",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Barbell-Step-Ups",
+      "name": "Subida a banco con barra",
+      "aliases": [
+        "Barbell Step Ups"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales",
+        "Cuádriceps"
+      ],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Barbell_Step_Ups",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Barbell-Walking-Lunge",
+      "name": "Zancadas caminando con barra",
+      "aliases": [
+        "Barbell Walking Lunge"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Barbell_Walking_Lunge",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Bicycling",
+      "name": "Bicicleta exterior",
+      "aliases": [
+        "Bicycling"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Otro",
+      "category": "Resistencia",
+      "level": "Inicial",
+      "sourceId": "Bicycling",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Bicycling-Stationary",
+      "name": "Bicicleta estática",
+      "aliases": [
+        "Bicycling, Stationary"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Máquina",
+      "category": "Resistencia",
+      "level": "Inicial",
+      "sourceId": "Bicycling_Stationary",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Bodyweight-Squat",
+      "name": "Sentadilla con peso corporal",
+      "aliases": [
+        "Bodyweight Squat"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Glúteos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Peso corporal",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Bodyweight_Squat",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Cable-Deadlifts",
+      "name": "Peso muerto en polea",
+      "aliases": [
+        "Cable Deadlifts"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Antebrazos",
+        "Glúteos",
+        "Isquiotibiales",
+        "Zona lumbar"
+      ],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Cable_Deadlifts",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Cable-Hip-Adduction",
+      "name": "Aducción de cadera en polea",
+      "aliases": [
+        "Cable Hip Adduction"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Cable_Hip_Adduction",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Chair-Squat",
+      "name": "Sentadilla a silla",
+      "aliases": [
+        "Chair Squat"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Máquina",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Chair_Squat",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Dumbbell-Lunges",
+      "name": "Zancada con mancuernas",
+      "aliases": [
+        "Dumbbell Lunges"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Dumbbell_Lunges",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Dumbbell-Rear-Lunge",
+      "name": "Zancada hacia atrás con mancuernas",
+      "aliases": [
+        "Dumbbell Rear Lunge"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Dumbbell_Rear_Lunge",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Dumbbell-Squat",
+      "name": "Sentadilla con mancuernas",
+      "aliases": [
+        "Dumbbell Squat"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales",
+        "Zona lumbar"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Dumbbell_Squat",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Dumbbell-Squat-To-A-Bench",
+      "name": "Sentadilla a banco con mancuernas",
+      "aliases": [
+        "Dumbbell Squat To A Bench"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales",
+        "Zona lumbar"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Dumbbell_Squat_To_A_Bench",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Dumbbell-Step-Ups",
+      "name": "Subida a banco con mancuernas",
+      "aliases": [
+        "Dumbbell Step Ups"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Dumbbell_Step_Ups",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Elevated-Back-Lunge",
+      "name": "Zancada trasera desde plataforma",
+      "aliases": [
+        "Elevated Back Lunge"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Glúteos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Elevated_Back_Lunge",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Elliptical-Trainer",
+      "name": "Elíptica",
+      "aliases": [
+        "Elliptical Trainer"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Máquina",
+      "category": "Resistencia",
+      "level": "Intermedio",
+      "sourceId": "Elliptical_Trainer",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Front-Squat-Clean-Grip",
+      "name": "Sentadilla frontal con barra",
+      "aliases": [
+        "Front Squat (Clean Grip)"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Abdomen",
+        "Glúteos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Front_Squat_Clean_Grip",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Front-Squats-With-Two-Kettlebells",
+      "name": "Sentadilla frontal con dos kettlebells",
+      "aliases": [
+        "Front Squats With Two Kettlebells"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Glúteos"
+      ],
+      "equipment": "Kettlebell",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Front_Squats_With_Two_Kettlebells",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Hip-Flexion-with-Band",
+      "name": "Flexión de cadera con banda",
+      "aliases": [
+        "Hip Flexion with Band"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [],
+      "equipment": "Bandas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Hip_Flexion_with_Band",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Intermediate-Hip-Flexor-and-Quad-Stretch",
+      "name": "Estiramiento de flexores de cadera y cuádriceps",
+      "aliases": [
+        "Intermediate Hip Flexor and Quad Stretch"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [],
+      "equipment": "Otro",
+      "category": "Movilidad",
+      "level": "Intermedio",
+      "sourceId": "Intermediate_Hip_Flexor_and_Quad_Stretch",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Jefferson-Squats",
+      "name": "Sentadilla Jefferson",
+      "aliases": [
+        "Jefferson Squats"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales",
+        "Zona lumbar",
+        "Trapecios"
+      ],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Jefferson_Squats",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Jogging-Treadmill",
+      "name": "Trote suave en cinta",
+      "aliases": [
+        "Jogging, Treadmill"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Glúteos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Máquina",
+      "category": "Resistencia",
+      "level": "Inicial",
+      "sourceId": "Jogging_Treadmill",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Narrow-Stance-Hack-Squats",
+      "name": "Sentadilla hack con pies juntos",
+      "aliases": [
+        "Narrow Stance Hack Squats"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Máquina",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Narrow_Stance_Hack_Squats",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Narrow-Stance-Leg-Press",
+      "name": "Prensa con pies juntos",
+      "aliases": [
+        "Narrow Stance Leg Press"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Máquina",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Narrow_Stance_Leg_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Narrow-Stance-Squats",
+      "name": "Sentadilla con barra y pies juntos",
+      "aliases": [
+        "Narrow Stance Squats"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales",
+        "Zona lumbar"
+      ],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Narrow_Stance_Squats",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-On-Your-Back-Quad-Stretch",
+      "name": "Estiramiento de cuádriceps tumbado",
+      "aliases": [
+        "On-Your-Back Quad Stretch"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [],
+      "equipment": "Otro",
+      "category": "Movilidad",
+      "level": "Inicial",
+      "sourceId": "On-Your-Back_Quad_Stretch",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Plie-Dumbbell-Squat",
+      "name": "Sentadilla plié con mancuerna",
+      "aliases": [
+        "Plie Dumbbell Squat"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Abdomen",
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Plie_Dumbbell_Squat",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Quad-Stretch",
+      "name": "Estiramiento de cuádriceps de pie",
+      "aliases": [
+        "Quad Stretch"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [],
+      "equipment": "Otro",
+      "category": "Movilidad",
+      "level": "Intermedio",
+      "sourceId": "Quad_Stretch",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Quadriceps-SMR",
+      "name": "Automasaje de cuádriceps con rodillo",
+      "aliases": [
+        "Quadriceps-SMR"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [],
+      "equipment": "Rodillo de espuma",
+      "category": "Movilidad",
+      "level": "Intermedio",
+      "sourceId": "Quadriceps-SMR",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Recumbent-Bike",
+      "name": "Bicicleta reclinada",
+      "aliases": [
+        "Recumbent Bike"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Máquina",
+      "category": "Resistencia",
+      "level": "Inicial",
+      "sourceId": "Recumbent_Bike",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Rope-Jumping",
+      "name": "Salto de cuerda",
+      "aliases": [
+        "Rope Jumping"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Otro",
+      "category": "Resistencia",
+      "level": "Intermedio",
+      "sourceId": "Rope_Jumping",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Rowing-Stationary",
+      "name": "Remo ergómetro",
+      "aliases": [
+        "Rowing, Stationary"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Bíceps",
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales",
+        "Zona lumbar",
+        "Espalda media"
+      ],
+      "equipment": "Máquina",
+      "category": "Resistencia",
+      "level": "Intermedio",
+      "sourceId": "Rowing_Stationary",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Running-Treadmill",
+      "name": "Carrera en cinta",
+      "aliases": [
+        "Running, Treadmill"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Máquina",
+      "category": "Resistencia",
+      "level": "Inicial",
+      "sourceId": "Running_Treadmill",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Single-Leg-High-Box-Squat",
+      "name": "Sentadilla unilateral a cajón alto",
+      "aliases": [
+        "Single-Leg High Box Squat"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Glúteos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Otro",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Single-Leg_High_Box_Squat",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Single-Leg-Leg-Extension",
+      "name": "Extensión unilateral de cuádriceps",
+      "aliases": [
+        "Single-Leg Leg Extension"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [],
+      "equipment": "Máquina",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Single-Leg_Leg_Extension",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Smith-Machine-Pistol-Squat",
+      "name": "Sentadilla unilateral en multipower",
+      "aliases": [
+        "Smith Machine Pistol Squat"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Máquina",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Smith_Machine_Pistol_Squat",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Smith-Machine-Squat",
+      "name": "Sentadilla en multipower",
+      "aliases": [
+        "Smith Machine Squat"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales",
+        "Zona lumbar"
+      ],
+      "equipment": "Máquina",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Smith_Machine_Squat",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Smith-Single-Leg-Split-Squat",
+      "name": "Sentadilla dividida en multipower",
+      "aliases": [
+        "Smith Single-Leg Split Squat"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Máquina",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Smith_Single-Leg_Split_Squat",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Split-Squat-with-Dumbbells",
+      "name": "Sentadilla dividida con mancuernas",
+      "aliases": [
+        "Split Squat with Dumbbells"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Glúteos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Split_Squat_with_Dumbbells",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Squats-With-Bands",
+      "name": "Sentadilla con banda",
+      "aliases": [
+        "Squats - With Bands"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales",
+        "Zona lumbar"
+      ],
+      "equipment": "Bandas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Squats_-_With_Bands",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Stairmaster",
+      "name": "Escaladora",
+      "aliases": [
+        "Stairmaster"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Máquina",
+      "category": "Resistencia",
+      "level": "Intermedio",
+      "sourceId": "Stairmaster",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Suspended-Split-Squat",
+      "name": "Sentadilla dividida en suspensión",
+      "aliases": [
+        "Suspended Split Squat"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Abductores",
+        "Aductores",
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Otro",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Suspended_Split_Squat",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Trap-Bar-Deadlift",
+      "name": "Peso muerto con barra hexagonal",
+      "aliases": [
+        "Trap Bar Deadlift"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Glúteos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Otro",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Trap_Bar_Deadlift",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Walking-Treadmill",
+      "name": "Caminata en cinta",
+      "aliases": [
+        "Walking, Treadmill"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Máquina",
+      "category": "Resistencia",
+      "level": "Inicial",
+      "sourceId": "Walking_Treadmill",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Wide-Stance-Barbell-Squat",
+      "name": "Sentadilla con barra y postura amplia",
+      "aliases": [
+        "Wide Stance Barbell Squat"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales",
+        "Zona lumbar"
+      ],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Wide_Stance_Barbell_Squat",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Alternate-Hammer-Curl",
+      "name": "Curl martillo alterno",
+      "aliases": [
+        "Alternate Hammer Curl"
+      ],
+      "primary": [
+        "Bíceps"
+      ],
+      "secondary": [
+        "Antebrazos"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Alternate_Hammer_Curl",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Alternate-Incline-Dumbbell-Curl",
+      "name": "Curl inclinado alterno con mancuernas",
+      "aliases": [
+        "Alternate Incline Dumbbell Curl"
+      ],
+      "primary": [
+        "Bíceps"
+      ],
+      "secondary": [
+        "Antebrazos"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Alternate_Incline_Dumbbell_Curl",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Barbell-Curl",
+      "name": "Curl de bíceps con barra",
+      "aliases": [
+        "Barbell Curl"
+      ],
+      "primary": [
+        "Bíceps"
+      ],
+      "secondary": [
+        "Antebrazos"
+      ],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Barbell_Curl",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Barbell-Curls-Lying-Against-An-Incline",
+      "name": "Curl con barra apoyado en banco inclinado",
+      "aliases": [
+        "Barbell Curls Lying Against An Incline"
+      ],
+      "primary": [
+        "Bíceps"
+      ],
+      "secondary": [],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Barbell_Curls_Lying_Against_An_Incline",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Cable-Hammer-Curls-Rope-Attachment",
+      "name": "Curl martillo en polea con cuerda",
+      "aliases": [
+        "Cable Hammer Curls - Rope Attachment"
+      ],
+      "primary": [
+        "Bíceps"
+      ],
+      "secondary": [],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Cable_Hammer_Curls_-_Rope_Attachment",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Cable-Preacher-Curl",
+      "name": "Curl predicador en polea",
+      "aliases": [
+        "Cable Preacher Curl"
+      ],
+      "primary": [
+        "Bíceps"
+      ],
+      "secondary": [
+        "Antebrazos"
+      ],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Cable_Preacher_Curl",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Close-Grip-EZ-Bar-Curl",
+      "name": "Curl con barra Z y agarre cerrado",
+      "aliases": [
+        "Close-Grip EZ Bar Curl"
+      ],
+      "primary": [
+        "Bíceps"
+      ],
+      "secondary": [
+        "Antebrazos"
+      ],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Close-Grip_EZ_Bar_Curl",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Close-Grip-Standing-Barbell-Curl",
+      "name": "Curl de pie con barra y agarre cerrado",
+      "aliases": [
+        "Close-Grip Standing Barbell Curl"
+      ],
+      "primary": [
+        "Bíceps"
+      ],
+      "secondary": [
+        "Antebrazos"
+      ],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Close-Grip_Standing_Barbell_Curl",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Concentration-Curls",
+      "name": "Curl concentrado con mancuerna",
+      "aliases": [
+        "Concentration Curls"
+      ],
+      "primary": [
+        "Bíceps"
+      ],
+      "secondary": [
+        "Antebrazos"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Concentration_Curls",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Cross-Body-Hammer-Curl",
+      "name": "Curl martillo cruzado",
+      "aliases": [
+        "Cross Body Hammer Curl"
+      ],
+      "primary": [
+        "Bíceps"
+      ],
+      "secondary": [
+        "Antebrazos"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Cross_Body_Hammer_Curl",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Drag-Curl",
+      "name": "Curl de arrastre con barra",
+      "aliases": [
+        "Drag Curl"
+      ],
+      "primary": [
+        "Bíceps"
+      ],
+      "secondary": [
+        "Antebrazos"
+      ],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Drag_Curl",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Dumbbell-Alternate-Bicep-Curl",
+      "name": "Curl alterno con mancuernas",
+      "aliases": [
+        "Dumbbell Alternate Bicep Curl"
+      ],
+      "primary": [
+        "Bíceps"
+      ],
+      "secondary": [
+        "Antebrazos"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Dumbbell_Alternate_Bicep_Curl",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Dumbbell-Prone-Incline-Curl",
+      "name": "Curl prono sobre banco inclinado",
+      "aliases": [
+        "Dumbbell Prone Incline Curl"
+      ],
+      "primary": [
+        "Bíceps"
+      ],
+      "secondary": [],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Dumbbell_Prone_Incline_Curl",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-EZ-Bar-Curl",
+      "name": "Curl con barra Z",
+      "aliases": [
+        "EZ-Bar Curl"
+      ],
+      "primary": [
+        "Bíceps"
+      ],
+      "secondary": [],
+      "equipment": "Barra Z",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "EZ-Bar_Curl",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Hammer-Curls",
+      "name": "Curl martillo simultáneo",
+      "aliases": [
+        "Hammer Curls"
+      ],
+      "primary": [
+        "Bíceps"
+      ],
+      "secondary": [],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Hammer_Curls",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-High-Cable-Curls",
+      "name": "Curl en poleas altas",
+      "aliases": [
+        "High Cable Curls"
+      ],
+      "primary": [
+        "Bíceps"
+      ],
+      "secondary": [],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "High_Cable_Curls",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Incline-Hammer-Curls",
+      "name": "Curl martillo inclinado",
+      "aliases": [
+        "Incline Hammer Curls"
+      ],
+      "primary": [
+        "Bíceps"
+      ],
+      "secondary": [],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Incline_Hammer_Curls",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Lying-Cable-Curl",
+      "name": "Curl de bíceps tumbado en polea",
+      "aliases": [
+        "Lying Cable Curl"
+      ],
+      "primary": [
+        "Bíceps"
+      ],
+      "secondary": [],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Lying_Cable_Curl",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Machine-Bicep-Curl",
+      "name": "Curl de bíceps en máquina",
+      "aliases": [
+        "Machine Bicep Curl"
+      ],
+      "primary": [
+        "Bíceps"
+      ],
+      "secondary": [],
+      "equipment": "Máquina",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Machine_Bicep_Curl",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Machine-Preacher-Curls",
+      "name": "Curl predicador en máquina",
+      "aliases": [
+        "Machine Preacher Curls"
+      ],
+      "primary": [
+        "Bíceps"
+      ],
+      "secondary": [],
+      "equipment": "Máquina",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Machine_Preacher_Curls",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-One-Arm-Dumbbell-Preacher-Curl",
+      "name": "Curl predicador unilateral con mancuerna",
+      "aliases": [
+        "One Arm Dumbbell Preacher Curl"
+      ],
+      "primary": [
+        "Bíceps"
+      ],
+      "secondary": [],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "One_Arm_Dumbbell_Preacher_Curl",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Overhead-Cable-Curl",
+      "name": "Curl en polea por encima de la cabeza",
+      "aliases": [
+        "Overhead Cable Curl"
+      ],
+      "primary": [
+        "Bíceps"
+      ],
+      "secondary": [],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Overhead_Cable_Curl",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Preacher-Hammer-Dumbbell-Curl",
+      "name": "Curl predicador martillo",
+      "aliases": [
+        "Preacher Hammer Dumbbell Curl"
+      ],
+      "primary": [
+        "Bíceps"
+      ],
+      "secondary": [
+        "Antebrazos"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Preacher_Hammer_Dumbbell_Curl",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Reverse-Barbell-Curl",
+      "name": "Curl inverso con barra",
+      "aliases": [
+        "Reverse Barbell Curl"
+      ],
+      "primary": [
+        "Bíceps"
+      ],
+      "secondary": [
+        "Antebrazos"
+      ],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Reverse_Barbell_Curl",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Reverse-Cable-Curl",
+      "name": "Curl inverso en polea",
+      "aliases": [
+        "Reverse Cable Curl"
+      ],
+      "primary": [
+        "Bíceps"
+      ],
+      "secondary": [
+        "Antebrazos"
+      ],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Reverse_Cable_Curl",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Reverse-Plate-Curls",
+      "name": "Curl inverso con disco",
+      "aliases": [
+        "Reverse Plate Curls"
+      ],
+      "primary": [
+        "Bíceps"
+      ],
+      "secondary": [
+        "Antebrazos"
+      ],
+      "equipment": "Otro",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Reverse_Plate_Curls",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Seated-Dumbbell-Curl",
+      "name": "Curl sentado con mancuernas",
+      "aliases": [
+        "Seated Dumbbell Curl"
+      ],
+      "primary": [
+        "Bíceps"
+      ],
+      "secondary": [],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Seated_Dumbbell_Curl",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Spider-Curl",
+      "name": "Curl araña",
+      "aliases": [
+        "Spider Curl"
+      ],
+      "primary": [
+        "Bíceps"
+      ],
+      "secondary": [],
+      "equipment": "Barra Z",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Spider_Curl",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Standing-Biceps-Stretch",
+      "name": "Estiramiento de bíceps de pie",
+      "aliases": [
+        "Standing Biceps Stretch"
+      ],
+      "primary": [
+        "Bíceps"
+      ],
+      "secondary": [
+        "Pecho",
+        "Hombros"
+      ],
+      "equipment": "Otro",
+      "category": "Movilidad",
+      "level": "Inicial",
+      "sourceId": "Standing_Biceps_Stretch",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Standing-Dumbbell-Reverse-Curl",
+      "name": "Curl inverso con mancuernas",
+      "aliases": [
+        "Standing Dumbbell Reverse Curl"
+      ],
+      "primary": [
+        "Bíceps"
+      ],
+      "secondary": [
+        "Antebrazos"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Standing_Dumbbell_Reverse_Curl",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Standing-One-Arm-Cable-Curl",
+      "name": "Curl unilateral en polea",
+      "aliases": [
+        "Standing One-Arm Cable Curl"
+      ],
+      "primary": [
+        "Bíceps"
+      ],
+      "secondary": [],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Standing_One-Arm_Cable_Curl",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Two-Arm-Dumbbell-Preacher-Curl",
+      "name": "Curl predicador bilateral con mancuernas",
+      "aliases": [
+        "Two-Arm Dumbbell Preacher Curl"
+      ],
+      "primary": [
+        "Bíceps"
+      ],
+      "secondary": [],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Two-Arm_Dumbbell_Preacher_Curl",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Wide-Grip-Standing-Barbell-Curl",
+      "name": "Curl con barra y agarre ancho",
+      "aliases": [
+        "Wide-Grip Standing Barbell Curl"
+      ],
+      "primary": [
+        "Bíceps"
+      ],
+      "secondary": [],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Wide-Grip_Standing_Barbell_Curl",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Zottman-Curl",
+      "name": "Curl Zottman",
+      "aliases": [
+        "Zottman Curl"
+      ],
+      "primary": [
+        "Bíceps"
+      ],
+      "secondary": [
+        "Antebrazos"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Zottman_Curl",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Arnold-Dumbbell-Press",
+      "name": "Press Arnold",
+      "aliases": [
+        "Arnold Dumbbell Press"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [
+        "Tríceps"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Arnold_Dumbbell_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Back-Flyes-With-Bands",
+      "name": "Aperturas posteriores con banda",
+      "aliases": [
+        "Back Flyes - With Bands"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [
+        "Espalda media",
+        "Tríceps"
+      ],
+      "equipment": "Bandas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Back_Flyes_-_With_Bands",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Band-Pull-Apart",
+      "name": "Separación de banda frente al pecho",
+      "aliases": [
+        "Band Pull Apart"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [
+        "Espalda media",
+        "Trapecios"
+      ],
+      "equipment": "Bandas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Band_Pull_Apart",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Barbell-Rear-Delt-Row",
+      "name": "Remo para deltoides posterior con barra",
+      "aliases": [
+        "Barbell Rear Delt Row"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [
+        "Bíceps",
+        "Dorsales",
+        "Espalda media"
+      ],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Barbell_Rear_Delt_Row",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Barbell-Shoulder-Press",
+      "name": "Press de hombros con barra",
+      "aliases": [
+        "Barbell Shoulder Press"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [
+        "Pecho",
+        "Tríceps"
+      ],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Barbell_Shoulder_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Bent-Over-Dumbbell-Rear-Delt-Raise-With-Head-On-Bench",
+      "name": "Elevación posterior con cabeza apoyada en banco",
+      "aliases": [
+        "Bent Over Dumbbell Rear Delt Raise With Head On Bench"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Bent_Over_Dumbbell_Rear_Delt_Raise_With_Head_On_Bench",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Bent-Over-Low-Pulley-Side-Lateral",
+      "name": "Elevación posterior unilateral en polea baja",
+      "aliases": [
+        "Bent Over Low-Pulley Side Lateral"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [
+        "Zona lumbar",
+        "Espalda media",
+        "Trapecios"
+      ],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Bent_Over_Low-Pulley_Side_Lateral",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Cable-Internal-Rotation",
+      "name": "Rotación interna de hombro en polea",
+      "aliases": [
+        "Cable Internal Rotation"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Cable_Internal_Rotation",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Cable-Rear-Delt-Fly",
+      "name": "Aperturas posteriores en polea",
+      "aliases": [
+        "Cable Rear Delt Fly"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Cable_Rear_Delt_Fly",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Cable-Rope-Rear-Delt-Rows",
+      "name": "Remo alto para deltoides con cuerda",
+      "aliases": [
+        "Cable Rope Rear-Delt Rows"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [
+        "Bíceps",
+        "Espalda media"
+      ],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Cable_Rope_Rear-Delt_Rows",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Cable-Seated-Lateral-Raise",
+      "name": "Elevación lateral sentado en polea",
+      "aliases": [
+        "Cable Seated Lateral Raise"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [
+        "Espalda media",
+        "Trapecios"
+      ],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Cable_Seated_Lateral_Raise",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Cable-Shoulder-Press",
+      "name": "Press de hombros en polea",
+      "aliases": [
+        "Cable Shoulder Press"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [
+        "Tríceps"
+      ],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Cable_Shoulder_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Cuban-Press",
+      "name": "Press cubano",
+      "aliases": [
+        "Cuban Press"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [
+        "Trapecios"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Cuban_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Dumbbell-One-Arm-Shoulder-Press",
+      "name": "Press unilateral de hombro con mancuerna",
+      "aliases": [
+        "Dumbbell One-Arm Shoulder Press"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [
+        "Tríceps"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Dumbbell_One-Arm_Shoulder_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Dumbbell-Scaption",
+      "name": "Elevación en plano escapular con mancuernas",
+      "aliases": [
+        "Dumbbell Scaption"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [
+        "Trapecios"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Dumbbell_Scaption",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Dumbbell-Shoulder-Press",
+      "name": "Press de hombros con mancuernas",
+      "aliases": [
+        "Dumbbell Shoulder Press"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [
+        "Tríceps"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Dumbbell_Shoulder_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-External-Rotation-with-Band",
+      "name": "Rotación externa de hombro con banda",
+      "aliases": [
+        "External Rotation with Band"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [],
+      "equipment": "Bandas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "External_Rotation_with_Band",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-External-Rotation-with-Cable",
+      "name": "Rotación externa de hombro en polea",
+      "aliases": [
+        "External Rotation with Cable"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "External_Rotation_with_Cable",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Face-Pull",
+      "name": "Face pull en polea",
+      "aliases": [
+        "Face Pull"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [
+        "Espalda media"
+      ],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Face_Pull",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Front-Cable-Raise",
+      "name": "Elevación frontal en polea",
+      "aliases": [
+        "Front Cable Raise"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Front_Cable_Raise",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Front-Dumbbell-Raise",
+      "name": "Elevación frontal con mancuernas",
+      "aliases": [
+        "Front Dumbbell Raise"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Front_Dumbbell_Raise",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Front-Incline-Dumbbell-Raise",
+      "name": "Elevación frontal en banco inclinado",
+      "aliases": [
+        "Front Incline Dumbbell Raise"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Front_Incline_Dumbbell_Raise",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Front-Plate-Raise",
+      "name": "Elevación frontal con disco",
+      "aliases": [
+        "Front Plate Raise"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [],
+      "equipment": "Otro",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Front_Plate_Raise",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Internal-Rotation-with-Band",
+      "name": "Rotación interna de hombro con banda",
+      "aliases": [
+        "Internal Rotation with Band"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [],
+      "equipment": "Bandas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Internal_Rotation_with_Band",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Kettlebell-Arnold-Press",
+      "name": "Press Arnold con kettlebell",
+      "aliases": [
+        "Kettlebell Arnold Press"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [
+        "Tríceps"
+      ],
+      "equipment": "Kettlebell",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Kettlebell_Arnold_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Kettlebell-Halo",
+      "name": "Halo con kettlebell",
+      "aliases": [
+        "Kettlebell Halo"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [
+        "Trapecios",
+        "Espalda media",
+        "Abdomen",
+        "Tríceps"
+      ],
+      "equipment": "Kettlebell",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Kettlebell_Halo",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Kettlebell-Seated-Press",
+      "name": "Press sentado con kettlebell",
+      "aliases": [
+        "Kettlebell Seated Press"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [
+        "Tríceps"
+      ],
+      "equipment": "Kettlebell",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Kettlebell_Seated_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Lateral-Raise-With-Bands",
+      "name": "Elevación lateral con banda",
+      "aliases": [
+        "Lateral Raise - With Bands"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [],
+      "equipment": "Bandas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Lateral_Raise_-_With_Bands",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Leverage-Shoulder-Press",
+      "name": "Press de hombros en máquina de palancas",
+      "aliases": [
+        "Leverage Shoulder Press"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [
+        "Tríceps"
+      ],
+      "equipment": "Máquina",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Leverage_Shoulder_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Machine-Shoulder-Military-Press",
+      "name": "Press militar en máquina",
+      "aliases": [
+        "Machine Shoulder (Military) Press"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [
+        "Tríceps"
+      ],
+      "equipment": "Máquina",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Machine_Shoulder_Military_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-One-Arm-Incline-Lateral-Raise",
+      "name": "Elevación lateral unilateral en banco inclinado",
+      "aliases": [
+        "One-Arm Incline Lateral Raise"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "One-Arm_Incline_Lateral_Raise",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-One-Arm-Side-Laterals",
+      "name": "Elevación lateral unilateral con mancuerna",
+      "aliases": [
+        "One-Arm Side Laterals"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "One-Arm_Side_Laterals",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Reverse-Flyes-With-External-Rotation",
+      "name": "Aperturas posteriores con rotación externa",
+      "aliases": [
+        "Reverse Flyes With External Rotation"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Reverse_Flyes_With_External_Rotation",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Seated-Barbell-Military-Press",
+      "name": "Press militar sentado con barra",
+      "aliases": [
+        "Seated Barbell Military Press"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [
+        "Tríceps"
+      ],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Seated_Barbell_Military_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Seated-Bent-Over-Rear-Delt-Raise",
+      "name": "Elevación posterior sentado e inclinado",
+      "aliases": [
+        "Seated Bent-Over Rear Delt Raise"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Seated_Bent-Over_Rear_Delt_Raise",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Seated-Cable-Shoulder-Press",
+      "name": "Press de hombros sentado en polea",
+      "aliases": [
+        "Seated Cable Shoulder Press"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [
+        "Tríceps"
+      ],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Seated_Cable_Shoulder_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Seated-Dumbbell-Press",
+      "name": "Press sentado con mancuernas",
+      "aliases": [
+        "Seated Dumbbell Press"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [
+        "Tríceps"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Seated_Dumbbell_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Seated-Side-Lateral-Raise",
+      "name": "Elevación lateral sentado con mancuernas",
+      "aliases": [
+        "Seated Side Lateral Raise"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Seated_Side_Lateral_Raise",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Shoulder-Press-With-Bands",
+      "name": "Press de hombros con banda",
+      "aliases": [
+        "Shoulder Press - With Bands"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [
+        "Tríceps"
+      ],
+      "equipment": "Bandas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Shoulder_Press_-_With_Bands",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Smith-Machine-Overhead-Shoulder-Press",
+      "name": "Press de hombros en multipower",
+      "aliases": [
+        "Smith Machine Overhead Shoulder Press"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [
+        "Tríceps"
+      ],
+      "equipment": "Máquina",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Smith_Machine_Overhead_Shoulder_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Standing-Alternating-Dumbbell-Press",
+      "name": "Press alterno de hombros de pie",
+      "aliases": [
+        "Standing Alternating Dumbbell Press"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [
+        "Tríceps"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Standing_Alternating_Dumbbell_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Standing-Military-Press",
+      "name": "Press militar estricto de pie",
+      "aliases": [
+        "Standing Military Press"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [
+        "Tríceps"
+      ],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Standing_Military_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Standing-Palm-In-One-Arm-Dumbbell-Press",
+      "name": "Press unilateral neutro de pie",
+      "aliases": [
+        "Standing Palm-In One-Arm Dumbbell Press"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [
+        "Tríceps"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Standing_Palm-In_One-Arm_Dumbbell_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Standing-Palms-In-Dumbbell-Press",
+      "name": "Press neutro de hombros de pie",
+      "aliases": [
+        "Standing Palms-In Dumbbell Press"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [
+        "Tríceps"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Standing_Palms-In_Dumbbell_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Upright-Barbell-Row",
+      "name": "Remo vertical con barra",
+      "aliases": [
+        "Upright Barbell Row"
+      ],
+      "primary": [
+        "Hombros"
+      ],
+      "secondary": [
+        "Trapecios"
+      ],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Upright_Barbell_Row",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Alternating-Floor-Press",
+      "name": "Press alterno en el suelo",
+      "aliases": [
+        "Alternating Floor Press"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [
+        "Abdomen",
+        "Hombros",
+        "Tríceps"
+      ],
+      "equipment": "Kettlebell",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Alternating_Floor_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Bent-Arm-Dumbbell-Pullover",
+      "name": "Pullover con mancuerna y codos flexionados",
+      "aliases": [
+        "Bent-Arm Dumbbell Pullover"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [
+        "Dorsales",
+        "Hombros",
+        "Tríceps"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Bent-Arm_Dumbbell_Pullover",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Butterfly",
+      "name": "Aperturas en máquina pec deck",
+      "aliases": [
+        "Butterfly"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [],
+      "equipment": "Máquina",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Butterfly",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Cable-Chest-Press",
+      "name": "Press de pecho en polea",
+      "aliases": [
+        "Cable Chest Press"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [
+        "Hombros",
+        "Tríceps"
+      ],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Cable_Chest_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Cable-Crossover",
+      "name": "Cruce de poleas",
+      "aliases": [
+        "Cable Crossover"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [
+        "Hombros"
+      ],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Cable_Crossover",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Cross-Over-With-Bands",
+      "name": "Cruce de bandas para pecho",
+      "aliases": [
+        "Cross Over - With Bands"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [
+        "Bíceps",
+        "Hombros"
+      ],
+      "equipment": "Bandas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Cross_Over_-_With_Bands",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Decline-Barbell-Bench-Press",
+      "name": "Press declinado con barra",
+      "aliases": [
+        "Decline Barbell Bench Press"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [
+        "Hombros",
+        "Tríceps"
+      ],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Decline_Barbell_Bench_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Decline-Dumbbell-Bench-Press",
+      "name": "Press declinado con mancuernas",
+      "aliases": [
+        "Decline Dumbbell Bench Press"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [
+        "Hombros",
+        "Tríceps"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Decline_Dumbbell_Bench_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Decline-Dumbbell-Flyes",
+      "name": "Aperturas declinadas con mancuernas",
+      "aliases": [
+        "Decline Dumbbell Flyes"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Decline_Dumbbell_Flyes",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Decline-Smith-Press",
+      "name": "Press declinado en multipower",
+      "aliases": [
+        "Decline Smith Press"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [
+        "Hombros",
+        "Tríceps"
+      ],
+      "equipment": "Máquina",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Decline_Smith_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Dips-Chest-Version",
+      "name": "Fondos con énfasis en pecho",
+      "aliases": [
+        "Dips - Chest Version"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [
+        "Hombros",
+        "Tríceps"
+      ],
+      "equipment": "Otro",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Dips_-_Chest_Version",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Dumbbell-Bench-Press-with-Neutral-Grip",
+      "name": "Press plano neutro con mancuernas",
+      "aliases": [
+        "Dumbbell Bench Press with Neutral Grip"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [
+        "Hombros",
+        "Tríceps"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Dumbbell_Bench_Press_with_Neutral_Grip",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Dumbbell-Flyes",
+      "name": "Aperturas planas con mancuernas",
+      "aliases": [
+        "Dumbbell Flyes"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Dumbbell_Flyes",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Flat-Bench-Cable-Flyes",
+      "name": "Aperturas en polea sobre banco plano",
+      "aliases": [
+        "Flat Bench Cable Flyes"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Flat_Bench_Cable_Flyes",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Hammer-Grip-Incline-DB-Bench-Press",
+      "name": "Press inclinado neutro con mancuernas",
+      "aliases": [
+        "Hammer Grip Incline DB Bench Press"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [
+        "Hombros",
+        "Tríceps"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Hammer_Grip_Incline_DB_Bench_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Incline-Cable-Chest-Press",
+      "name": "Press inclinado en polea",
+      "aliases": [
+        "Incline Cable Chest Press"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [
+        "Hombros",
+        "Tríceps"
+      ],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Incline_Cable_Chest_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Incline-Cable-Flye",
+      "name": "Aperturas inclinadas en polea",
+      "aliases": [
+        "Incline Cable Flye"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [
+        "Hombros"
+      ],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Incline_Cable_Flye",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Incline-Dumbbell-Flyes",
+      "name": "Aperturas inclinadas con mancuernas",
+      "aliases": [
+        "Incline Dumbbell Flyes"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [
+        "Hombros"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Incline_Dumbbell_Flyes",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Incline-Push-Up",
+      "name": "Flexiones con manos elevadas",
+      "aliases": [
+        "Incline Push-Up"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [
+        "Hombros",
+        "Tríceps"
+      ],
+      "equipment": "Peso corporal",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Incline_Push-Up",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Incline-Push-Up-Wide",
+      "name": "Flexiones inclinadas con manos anchas",
+      "aliases": [
+        "Incline Push-Up Wide"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [
+        "Abdomen",
+        "Hombros",
+        "Tríceps"
+      ],
+      "equipment": "Peso corporal",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Incline_Push-Up_Wide",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Low-Cable-Crossover",
+      "name": "Cruce de poleas bajas",
+      "aliases": [
+        "Low Cable Crossover"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [
+        "Hombros"
+      ],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Low_Cable_Crossover",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-One-Arm-Flat-Bench-Dumbbell-Flye",
+      "name": "Apertura unilateral con mancuerna",
+      "aliases": [
+        "One-Arm Flat Bench Dumbbell Flye"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "One-Arm_Flat_Bench_Dumbbell_Flye",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-One-Arm-Dumbbell-Bench-Press",
+      "name": "Press plano unilateral con mancuerna",
+      "aliases": [
+        "One Arm Dumbbell Bench Press"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [
+        "Hombros",
+        "Tríceps"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "One_Arm_Dumbbell_Bench_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Push-Up-Wide",
+      "name": "Flexiones con manos anchas",
+      "aliases": [
+        "Push-Up Wide"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [
+        "Abdomen",
+        "Hombros",
+        "Tríceps"
+      ],
+      "equipment": "Peso corporal",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Push-Up_Wide",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Push-Ups-With-Feet-Elevated",
+      "name": "Flexiones con pies elevados",
+      "aliases": [
+        "Push-Ups With Feet Elevated"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [
+        "Hombros",
+        "Tríceps"
+      ],
+      "equipment": "Peso corporal",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Push-Ups_With_Feet_Elevated",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Push-Up-to-Side-Plank",
+      "name": "Flexión con transición a plancha lateral",
+      "aliases": [
+        "Push Up to Side Plank"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [
+        "Abdomen",
+        "Hombros",
+        "Tríceps"
+      ],
+      "equipment": "Peso corporal",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Push_Up_to_Side_Plank",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Pushups",
+      "name": "Flexiones de brazos",
+      "aliases": [
+        "Pushups"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [
+        "Hombros",
+        "Tríceps"
+      ],
+      "equipment": "Peso corporal",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Pushups",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Single-Arm-Cable-Crossover",
+      "name": "Cruce unilateral en polea",
+      "aliases": [
+        "Single-Arm Cable Crossover"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Single-Arm_Cable_Crossover",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Smith-Machine-Bench-Press",
+      "name": "Press plano en multipower",
+      "aliases": [
+        "Smith Machine Bench Press"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [
+        "Hombros",
+        "Tríceps"
+      ],
+      "equipment": "Máquina",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Smith_Machine_Bench_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Smith-Machine-Incline-Bench-Press",
+      "name": "Press inclinado en multipower",
+      "aliases": [
+        "Smith Machine Incline Bench Press"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [
+        "Hombros",
+        "Tríceps"
+      ],
+      "equipment": "Máquina",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Smith_Machine_Incline_Bench_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Standing-Cable-Chest-Press",
+      "name": "Press de pecho de pie en polea",
+      "aliases": [
+        "Standing Cable Chest Press"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [
+        "Hombros",
+        "Tríceps"
+      ],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Standing_Cable_Chest_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Straight-Arm-Dumbbell-Pullover",
+      "name": "Pullover con mancuerna y brazos extendidos",
+      "aliases": [
+        "Straight-Arm Dumbbell Pullover"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [
+        "Dorsales",
+        "Hombros",
+        "Tríceps"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Straight-Arm_Dumbbell_Pullover",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Wide-Grip-Barbell-Bench-Press",
+      "name": "Press banca con agarre ancho",
+      "aliases": [
+        "Wide-Grip Barbell Bench Press"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [
+        "Hombros",
+        "Tríceps"
+      ],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Wide-Grip_Barbell_Bench_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Alternating-Kettlebell-Row",
+      "name": "Remo alterno con kettlebells",
+      "aliases": [
+        "Alternating Kettlebell Row"
+      ],
+      "primary": [
+        "Espalda media"
+      ],
+      "secondary": [
+        "Bíceps",
+        "Dorsales"
+      ],
+      "equipment": "Kettlebell",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Alternating_Kettlebell_Row",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Bent-Over-Barbell-Row",
+      "name": "Remo inclinado con barra",
+      "aliases": [
+        "Bent Over Barbell Row"
+      ],
+      "primary": [
+        "Espalda media"
+      ],
+      "secondary": [
+        "Bíceps",
+        "Dorsales",
+        "Hombros"
+      ],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Bent_Over_Barbell_Row",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Bent-Over-One-Arm-Long-Bar-Row",
+      "name": "Remo unilateral con barra anclada",
+      "aliases": [
+        "Bent Over One-Arm Long Bar Row"
+      ],
+      "primary": [
+        "Espalda media"
+      ],
+      "secondary": [
+        "Bíceps",
+        "Dorsales",
+        "Zona lumbar",
+        "Trapecios"
+      ],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Bent_Over_One-Arm_Long_Bar_Row",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Bent-Over-Two-Arm-Long-Bar-Row",
+      "name": "Remo con barra anclada a dos manos",
+      "aliases": [
+        "Bent Over Two-Arm Long Bar Row"
+      ],
+      "primary": [
+        "Espalda media"
+      ],
+      "secondary": [
+        "Bíceps",
+        "Dorsales"
+      ],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Bent_Over_Two-Arm_Long_Bar_Row",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Bent-Over-Two-Dumbbell-Row",
+      "name": "Remo inclinado con dos mancuernas",
+      "aliases": [
+        "Bent Over Two-Dumbbell Row"
+      ],
+      "primary": [
+        "Espalda media"
+      ],
+      "secondary": [
+        "Bíceps",
+        "Dorsales",
+        "Hombros"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Bent_Over_Two-Dumbbell_Row",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Bent-Over-Two-Dumbbell-Row-With-Palms-In",
+      "name": "Remo inclinado neutro con mancuernas",
+      "aliases": [
+        "Bent Over Two-Dumbbell Row With Palms In"
+      ],
+      "primary": [
+        "Espalda media"
+      ],
+      "secondary": [
+        "Bíceps",
+        "Dorsales"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Bent_Over_Two-Dumbbell_Row_With_Palms_In",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Bodyweight-Mid-Row",
+      "name": "Remo invertido con peso corporal",
+      "aliases": [
+        "Bodyweight Mid Row"
+      ],
+      "primary": [
+        "Espalda media"
+      ],
+      "secondary": [
+        "Bíceps",
+        "Dorsales"
+      ],
+      "equipment": "Otro",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Bodyweight_Mid_Row",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Inverted-Row-with-Straps",
+      "name": "Remo invertido con correas",
+      "aliases": [
+        "Inverted Row with Straps"
+      ],
+      "primary": [
+        "Espalda media"
+      ],
+      "secondary": [
+        "Bíceps",
+        "Dorsales"
+      ],
+      "equipment": "Otro",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Inverted_Row_with_Straps",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Leverage-High-Row",
+      "name": "Remo alto en máquina",
+      "aliases": [
+        "Leverage High Row"
+      ],
+      "primary": [
+        "Espalda media"
+      ],
+      "secondary": [
+        "Dorsales"
+      ],
+      "equipment": "Máquina",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Leverage_High_Row",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Lying-T-Bar-Row",
+      "name": "Remo T tumbado",
+      "aliases": [
+        "Lying T-Bar Row"
+      ],
+      "primary": [
+        "Espalda media"
+      ],
+      "secondary": [
+        "Bíceps",
+        "Dorsales"
+      ],
+      "equipment": "Máquina",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Lying_T-Bar_Row",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-One-Arm-Dumbbell-Row",
+      "name": "Remo unilateral con mancuerna",
+      "aliases": [
+        "One-Arm Dumbbell Row"
+      ],
+      "primary": [
+        "Espalda media"
+      ],
+      "secondary": [
+        "Bíceps",
+        "Dorsales",
+        "Hombros"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "One-Arm_Dumbbell_Row",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-One-Arm-Kettlebell-Row",
+      "name": "Remo unilateral con kettlebell",
+      "aliases": [
+        "One-Arm Kettlebell Row"
+      ],
+      "primary": [
+        "Espalda media"
+      ],
+      "secondary": [
+        "Bíceps",
+        "Dorsales"
+      ],
+      "equipment": "Kettlebell",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "One-Arm_Kettlebell_Row",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Reverse-Grip-Bent-Over-Rows",
+      "name": "Remo inclinado supino con barra",
+      "aliases": [
+        "Reverse Grip Bent-Over Rows"
+      ],
+      "primary": [
+        "Espalda media"
+      ],
+      "secondary": [
+        "Bíceps",
+        "Dorsales",
+        "Hombros"
+      ],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Reverse_Grip_Bent-Over_Rows",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Seated-One-arm-Cable-Pulley-Rows",
+      "name": "Remo sentado unilateral en polea",
+      "aliases": [
+        "Seated One-arm Cable Pulley Rows"
+      ],
+      "primary": [
+        "Espalda media"
+      ],
+      "secondary": [
+        "Bíceps",
+        "Dorsales",
+        "Trapecios"
+      ],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Seated_One-arm_Cable_Pulley_Rows",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Smith-Machine-Bent-Over-Row",
+      "name": "Remo inclinado en multipower",
+      "aliases": [
+        "Smith Machine Bent Over Row"
+      ],
+      "primary": [
+        "Espalda media"
+      ],
+      "secondary": [
+        "Bíceps",
+        "Dorsales",
+        "Hombros"
+      ],
+      "equipment": "Máquina",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Smith_Machine_Bent_Over_Row",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-T-Bar-Row-with-Handle",
+      "name": "Remo T con agarre",
+      "aliases": [
+        "T-Bar Row with Handle"
+      ],
+      "primary": [
+        "Espalda media"
+      ],
+      "secondary": [
+        "Bíceps",
+        "Dorsales"
+      ],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "T-Bar_Row_with_Handle",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Two-Arm-Kettlebell-Row",
+      "name": "Remo bilateral con kettlebells",
+      "aliases": [
+        "Two-Arm Kettlebell Row"
+      ],
+      "primary": [
+        "Espalda media"
+      ],
+      "secondary": [
+        "Bíceps",
+        "Dorsales"
+      ],
+      "equipment": "Kettlebell",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Two-Arm_Kettlebell_Row",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Barbell-Seated-Calf-Raise",
+      "name": "Elevación de gemelos sentado con barra",
+      "aliases": [
+        "Barbell Seated Calf Raise"
+      ],
+      "primary": [
+        "Gemelos"
+      ],
+      "secondary": [],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Barbell_Seated_Calf_Raise",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Calf-Raises-With-Bands",
+      "name": "Elevación de gemelos con banda",
+      "aliases": [
+        "Calf Raises - With Bands"
+      ],
+      "primary": [
+        "Gemelos"
+      ],
+      "secondary": [],
+      "equipment": "Bandas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Calf_Raises_-_With_Bands",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Calves-SMR",
+      "name": "Automasaje de gemelos con rodillo",
+      "aliases": [
+        "Calves-SMR"
+      ],
+      "primary": [
+        "Gemelos"
+      ],
+      "secondary": [],
+      "equipment": "Rodillo de espuma",
+      "category": "Movilidad",
+      "level": "Intermedio",
+      "sourceId": "Calves-SMR",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Dumbbell-Seated-One-Leg-Calf-Raise",
+      "name": "Elevación de gemelo unilateral sentado",
+      "aliases": [
+        "Dumbbell Seated One-Leg Calf Raise"
+      ],
+      "primary": [
+        "Gemelos"
+      ],
+      "secondary": [],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Dumbbell_Seated_One-Leg_Calf_Raise",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Seated-Calf-Raise",
+      "name": "Elevación de gemelos sentado en máquina",
+      "aliases": [
+        "Seated Calf Raise"
+      ],
+      "primary": [
+        "Gemelos"
+      ],
+      "secondary": [],
+      "equipment": "Máquina",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Seated_Calf_Raise",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Smith-Machine-Calf-Raise",
+      "name": "Elevación de gemelos en multipower",
+      "aliases": [
+        "Smith Machine Calf Raise"
+      ],
+      "primary": [
+        "Gemelos"
+      ],
+      "secondary": [],
+      "equipment": "Máquina",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Smith_Machine_Calf_Raise",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Standing-Barbell-Calf-Raise",
+      "name": "Elevación de gemelos de pie con barra",
+      "aliases": [
+        "Standing Barbell Calf Raise"
+      ],
+      "primary": [
+        "Gemelos"
+      ],
+      "secondary": [],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Standing_Barbell_Calf_Raise",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Standing-Dumbbell-Calf-Raise",
+      "name": "Elevación de gemelos de pie con mancuernas",
+      "aliases": [
+        "Standing Dumbbell Calf Raise"
+      ],
+      "primary": [
+        "Gemelos"
+      ],
+      "secondary": [],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Standing_Dumbbell_Calf_Raise",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Band-Assisted-Pull-Up",
+      "name": "Dominadas asistidas con banda",
+      "aliases": [
+        "Band Assisted Pull-Up"
+      ],
+      "primary": [
+        "Dorsales"
+      ],
+      "secondary": [
+        "Abdomen",
+        "Antebrazos",
+        "Espalda media"
+      ],
+      "equipment": "Otro",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Band_Assisted_Pull-Up",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Chin-Up",
+      "name": "Dominadas supinas",
+      "aliases": [
+        "Chin-Up"
+      ],
+      "primary": [
+        "Dorsales"
+      ],
+      "secondary": [
+        "Bíceps",
+        "Antebrazos",
+        "Espalda media"
+      ],
+      "equipment": "Peso corporal",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Chin-Up",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Close-Grip-Front-Lat-Pulldown",
+      "name": "Jalón al pecho con agarre cerrado",
+      "aliases": [
+        "Close-Grip Front Lat Pulldown"
+      ],
+      "primary": [
+        "Dorsales"
+      ],
+      "secondary": [
+        "Bíceps",
+        "Espalda media",
+        "Hombros"
+      ],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Close-Grip_Front_Lat_Pulldown",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Kneeling-Single-Arm-High-Pulley-Row",
+      "name": "Remo unilateral arrodillado en polea alta",
+      "aliases": [
+        "Kneeling Single-Arm High Pulley Row"
+      ],
+      "primary": [
+        "Dorsales"
+      ],
+      "secondary": [
+        "Bíceps",
+        "Espalda media"
+      ],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Kneeling_Single-Arm_High_Pulley_Row",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-One-Arm-Lat-Pulldown",
+      "name": "Jalón unilateral al pecho",
+      "aliases": [
+        "One Arm Lat Pulldown"
+      ],
+      "primary": [
+        "Dorsales"
+      ],
+      "secondary": [
+        "Bíceps",
+        "Espalda media"
+      ],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "One_Arm_Lat_Pulldown",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Rope-Straight-Arm-Pulldown",
+      "name": "Jalón con brazos extendidos y cuerda",
+      "aliases": [
+        "Rope Straight-Arm Pulldown"
+      ],
+      "primary": [
+        "Dorsales"
+      ],
+      "secondary": [],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Rope_Straight-Arm_Pulldown",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Straight-Arm-Pulldown",
+      "name": "Jalón con brazos extendidos",
+      "aliases": [
+        "Straight-Arm Pulldown"
+      ],
+      "primary": [
+        "Dorsales"
+      ],
+      "secondary": [],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Straight-Arm_Pulldown",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-V-Bar-Pulldown",
+      "name": "Jalón con agarre en V",
+      "aliases": [
+        "V-Bar Pulldown"
+      ],
+      "primary": [
+        "Dorsales"
+      ],
+      "secondary": [
+        "Bíceps",
+        "Espalda media",
+        "Hombros"
+      ],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "V-Bar_Pulldown",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Weighted-Pull-Ups",
+      "name": "Dominadas con lastre",
+      "aliases": [
+        "Weighted Pull Ups"
+      ],
+      "primary": [
+        "Dorsales"
+      ],
+      "secondary": [
+        "Bíceps",
+        "Espalda media"
+      ],
+      "equipment": "Otro",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Weighted_Pull_Ups",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Wide-Grip-Lat-Pulldown",
+      "name": "Jalón al pecho con agarre ancho",
+      "aliases": [
+        "Wide-Grip Lat Pulldown"
+      ],
+      "primary": [
+        "Dorsales"
+      ],
+      "secondary": [
+        "Bíceps",
+        "Espalda media",
+        "Hombros"
+      ],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Wide-Grip_Lat_Pulldown",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Band-Skull-Crusher",
+      "name": "Extensión de tríceps tumbado con banda",
+      "aliases": [
+        "Band Skull Crusher"
+      ],
+      "primary": [
+        "Tríceps"
+      ],
+      "secondary": [],
+      "equipment": "Bandas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Band_Skull_Crusher",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Cable-Incline-Triceps-Extension",
+      "name": "Extensión inclinada de tríceps en polea",
+      "aliases": [
+        "Cable Incline Triceps Extension"
+      ],
+      "primary": [
+        "Tríceps"
+      ],
+      "secondary": [],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Cable_Incline_Triceps_Extension",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Cable-Lying-Triceps-Extension",
+      "name": "Extensión tumbada de tríceps en polea",
+      "aliases": [
+        "Cable Lying Triceps Extension"
+      ],
+      "primary": [
+        "Tríceps"
+      ],
+      "secondary": [],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Cable_Lying_Triceps_Extension",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Cable-One-Arm-Tricep-Extension",
+      "name": "Extensión unilateral de tríceps en polea",
+      "aliases": [
+        "Cable One Arm Tricep Extension"
+      ],
+      "primary": [
+        "Tríceps"
+      ],
+      "secondary": [],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Cable_One_Arm_Tricep_Extension",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Close-Grip-Barbell-Bench-Press",
+      "name": "Press banca cerrado con barra",
+      "aliases": [
+        "Close-Grip Barbell Bench Press"
+      ],
+      "primary": [
+        "Tríceps"
+      ],
+      "secondary": [
+        "Pecho",
+        "Hombros"
+      ],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Close-Grip_Barbell_Bench_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Close-Grip-Dumbbell-Press",
+      "name": "Press cerrado con mancuernas",
+      "aliases": [
+        "Close-Grip Dumbbell Press"
+      ],
+      "primary": [
+        "Tríceps"
+      ],
+      "secondary": [
+        "Pecho",
+        "Hombros"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Close-Grip_Dumbbell_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Decline-Dumbbell-Triceps-Extension",
+      "name": "Extensión declinada de tríceps con mancuernas",
+      "aliases": [
+        "Decline Dumbbell Triceps Extension"
+      ],
+      "primary": [
+        "Tríceps"
+      ],
+      "secondary": [],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Decline_Dumbbell_Triceps_Extension",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Dip-Machine",
+      "name": "Fondos en máquina",
+      "aliases": [
+        "Dip Machine"
+      ],
+      "primary": [
+        "Tríceps"
+      ],
+      "secondary": [
+        "Pecho",
+        "Hombros"
+      ],
+      "equipment": "Máquina",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Dip_Machine",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Dips-Triceps-Version",
+      "name": "Fondos con énfasis en tríceps",
+      "aliases": [
+        "Dips - Triceps Version"
+      ],
+      "primary": [
+        "Tríceps"
+      ],
+      "secondary": [
+        "Pecho",
+        "Hombros"
+      ],
+      "equipment": "Peso corporal",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Dips_-_Triceps_Version",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Dumbbell-One-Arm-Triceps-Extension",
+      "name": "Extensión unilateral de tríceps con mancuerna",
+      "aliases": [
+        "Dumbbell One-Arm Triceps Extension"
+      ],
+      "primary": [
+        "Tríceps"
+      ],
+      "secondary": [],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Dumbbell_One-Arm_Triceps_Extension",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-EZ-Bar-Skullcrusher",
+      "name": "Extensión francesa con barra Z",
+      "aliases": [
+        "EZ-Bar Skullcrusher"
+      ],
+      "primary": [
+        "Tríceps"
+      ],
+      "secondary": [
+        "Antebrazos"
+      ],
+      "equipment": "Barra Z",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "EZ-Bar_Skullcrusher",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Incline-Barbell-Triceps-Extension",
+      "name": "Extensión francesa inclinada con barra",
+      "aliases": [
+        "Incline Barbell Triceps Extension"
+      ],
+      "primary": [
+        "Tríceps"
+      ],
+      "secondary": [
+        "Antebrazos"
+      ],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Incline_Barbell_Triceps_Extension",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Kettlebell-Overhead-Triceps-Extension",
+      "name": "Extensión sobre cabeza con kettlebell",
+      "aliases": [
+        "Kettlebell Overhead Triceps Extension"
+      ],
+      "primary": [
+        "Tríceps"
+      ],
+      "secondary": [
+        "Hombros",
+        "Abdomen"
+      ],
+      "equipment": "Kettlebell",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Kettlebell_Overhead_Triceps_Extension",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Kneeling-Cable-Triceps-Extension",
+      "name": "Extensión de tríceps arrodillado en polea",
+      "aliases": [
+        "Kneeling Cable Triceps Extension"
+      ],
+      "primary": [
+        "Tríceps"
+      ],
+      "secondary": [],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Kneeling_Cable_Triceps_Extension",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Lying-Triceps-Press",
+      "name": "Extensión francesa con barra",
+      "aliases": [
+        "Lying Triceps Press"
+      ],
+      "primary": [
+        "Tríceps"
+      ],
+      "secondary": [],
+      "equipment": "Barra Z",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Lying_Triceps_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Machine-Triceps-Extension",
+      "name": "Extensión de tríceps en máquina",
+      "aliases": [
+        "Machine Triceps Extension"
+      ],
+      "primary": [
+        "Tríceps"
+      ],
+      "secondary": [],
+      "equipment": "Máquina",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Machine_Triceps_Extension",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Push-Ups-Close-Triceps-Position",
+      "name": "Flexiones con manos juntas",
+      "aliases": [
+        "Push-Ups - Close Triceps Position"
+      ],
+      "primary": [
+        "Tríceps"
+      ],
+      "secondary": [
+        "Pecho",
+        "Hombros"
+      ],
+      "equipment": "Peso corporal",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Push-Ups_-_Close_Triceps_Position",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Reverse-Grip-Triceps-Pushdown",
+      "name": "Extensión en polea con agarre supino",
+      "aliases": [
+        "Reverse Grip Triceps Pushdown"
+      ],
+      "primary": [
+        "Tríceps"
+      ],
+      "secondary": [],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Reverse_Grip_Triceps_Pushdown",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Seated-Bent-Over-One-Arm-Dumbbell-Triceps-Extension",
+      "name": "Patada unilateral de tríceps sentado",
+      "aliases": [
+        "Seated Bent-Over One-Arm Dumbbell Triceps Extension"
+      ],
+      "primary": [
+        "Tríceps"
+      ],
+      "secondary": [],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Seated_Bent-Over_One-Arm_Dumbbell_Triceps_Extension",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Seated-Triceps-Press",
+      "name": "Extensión sobre cabeza sentado con mancuerna",
+      "aliases": [
+        "Seated Triceps Press"
+      ],
+      "primary": [
+        "Tríceps"
+      ],
+      "secondary": [],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Seated_Triceps_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Smith-Machine-Close-Grip-Bench-Press",
+      "name": "Press cerrado en multipower",
+      "aliases": [
+        "Smith Machine Close-Grip Bench Press"
+      ],
+      "primary": [
+        "Tríceps"
+      ],
+      "secondary": [
+        "Pecho",
+        "Hombros"
+      ],
+      "equipment": "Máquina",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Smith_Machine_Close-Grip_Bench_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Standing-Bent-Over-Two-Arm-Dumbbell-Triceps-Extension",
+      "name": "Patada bilateral de tríceps con mancuernas",
+      "aliases": [
+        "Standing Bent-Over Two-Arm Dumbbell Triceps Extension"
+      ],
+      "primary": [
+        "Tríceps"
+      ],
+      "secondary": [],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Standing_Bent-Over_Two-Arm_Dumbbell_Triceps_Extension",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Standing-Overhead-Barbell-Triceps-Extension",
+      "name": "Extensión sobre cabeza con barra",
+      "aliases": [
+        "Standing Overhead Barbell Triceps Extension"
+      ],
+      "primary": [
+        "Tríceps"
+      ],
+      "secondary": [
+        "Hombros"
+      ],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Standing_Overhead_Barbell_Triceps_Extension",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Tate-Press",
+      "name": "Press Tate con mancuernas",
+      "aliases": [
+        "Tate Press"
+      ],
+      "primary": [
+        "Tríceps"
+      ],
+      "secondary": [
+        "Pecho",
+        "Hombros"
+      ],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Tate_Press",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Tricep-Dumbbell-Kickback",
+      "name": "Patada de tríceps con mancuerna",
+      "aliases": [
+        "Tricep Dumbbell Kickback"
+      ],
+      "primary": [
+        "Tríceps"
+      ],
+      "secondary": [],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Tricep_Dumbbell_Kickback",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Triceps-Pushdown-Rope-Attachment",
+      "name": "Extensión de tríceps en polea con cuerda",
+      "aliases": [
+        "Triceps Pushdown - Rope Attachment"
+      ],
+      "primary": [
+        "Tríceps"
+      ],
+      "secondary": [],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Triceps_Pushdown_-_Rope_Attachment",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Triceps-Pushdown-V-Bar-Attachment",
+      "name": "Extensión de tríceps con barra en V",
+      "aliases": [
+        "Triceps Pushdown - V-Bar Attachment"
+      ],
+      "primary": [
+        "Tríceps"
+      ],
+      "secondary": [],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Triceps_Pushdown_-_V-Bar_Attachment",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Barbell-Deadlift",
+      "name": "Peso muerto convencional con barra",
+      "aliases": [
+        "Barbell Deadlift"
+      ],
+      "primary": [
+        "Zona lumbar"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Antebrazos",
+        "Glúteos",
+        "Isquiotibiales",
+        "Dorsales",
+        "Espalda media",
+        "Cuádriceps",
+        "Trapecios"
+      ],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Barbell_Deadlift",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Hyperextensions-Back-Extensions",
+      "name": "Extensiones de espalda en banco",
+      "aliases": [
+        "Hyperextensions (Back Extensions)"
+      ],
+      "primary": [
+        "Zona lumbar"
+      ],
+      "secondary": [
+        "Glúteos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Otro",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Hyperextensions_Back_Extensions",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Superman",
+      "name": "Superman tumbado",
+      "aliases": [
+        "Superman"
+      ],
+      "primary": [
+        "Zona lumbar"
+      ],
+      "secondary": [
+        "Glúteos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Peso corporal",
+      "category": "Movilidad",
+      "level": "Inicial",
+      "sourceId": "Superman",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Barbell-Shrug",
+      "name": "Encogimiento de hombros con barra",
+      "aliases": [
+        "Barbell Shrug"
+      ],
+      "primary": [
+        "Trapecios"
+      ],
+      "secondary": [],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Barbell_Shrug",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Cable-Shrugs",
+      "name": "Encogimiento de hombros en polea",
+      "aliases": [
+        "Cable Shrugs"
+      ],
+      "primary": [
+        "Trapecios"
+      ],
+      "secondary": [],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Cable_Shrugs",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Dumbbell-Shrug",
+      "name": "Encogimiento de hombros con mancuernas",
+      "aliases": [
+        "Dumbbell Shrug"
+      ],
+      "primary": [
+        "Trapecios"
+      ],
+      "secondary": [],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Dumbbell_Shrug",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Leverage-Shrug",
+      "name": "Encogimiento de hombros en máquina",
+      "aliases": [
+        "Leverage Shrug"
+      ],
+      "primary": [
+        "Trapecios"
+      ],
+      "secondary": [
+        "Antebrazos"
+      ],
+      "equipment": "Máquina",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Leverage_Shrug",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Upright-Cable-Row",
+      "name": "Remo vertical en polea",
+      "aliases": [
+        "Upright Cable Row"
+      ],
+      "primary": [
+        "Trapecios"
+      ],
+      "secondary": [
+        "Hombros"
+      ],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Upright_Cable_Row",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Upright-Row-With-Bands",
+      "name": "Remo vertical con banda",
+      "aliases": [
+        "Upright Row - With Bands"
+      ],
+      "primary": [
+        "Trapecios"
+      ],
+      "secondary": [
+        "Hombros"
+      ],
+      "equipment": "Bandas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Upright_Row_-_With_Bands",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Cable-Wrist-Curl",
+      "name": "Flexión de muñeca en polea",
+      "aliases": [
+        "Cable Wrist Curl"
+      ],
+      "primary": [
+        "Antebrazos"
+      ],
+      "secondary": [],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Cable_Wrist_Curl",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Dumbbell-Lying-Pronation",
+      "name": "Pronación de antebrazo con mancuerna",
+      "aliases": [
+        "Dumbbell Lying Pronation"
+      ],
+      "primary": [
+        "Antebrazos"
+      ],
+      "secondary": [],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Dumbbell_Lying_Pronation",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Dumbbell-Lying-Supination",
+      "name": "Supinación de antebrazo con mancuerna",
+      "aliases": [
+        "Dumbbell Lying Supination"
+      ],
+      "primary": [
+        "Antebrazos"
+      ],
+      "secondary": [],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Dumbbell_Lying_Supination",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Palms-Down-Dumbbell-Wrist-Curl-Over-A-Bench",
+      "name": "Extensión de muñeca con mancuerna apoyada",
+      "aliases": [
+        "Palms-Down Dumbbell Wrist Curl Over A Bench"
+      ],
+      "primary": [
+        "Antebrazos"
+      ],
+      "secondary": [],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Palms-Down_Dumbbell_Wrist_Curl_Over_A_Bench",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Palms-Up-Barbell-Wrist-Curl-Over-A-Bench",
+      "name": "Flexión de muñecas con barra apoyada",
+      "aliases": [
+        "Palms-Up Barbell Wrist Curl Over A Bench"
+      ],
+      "primary": [
+        "Antebrazos"
+      ],
+      "secondary": [],
+      "equipment": "Barra y discos",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Palms-Up_Barbell_Wrist_Curl_Over_A_Bench",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Palms-Up-Dumbbell-Wrist-Curl-Over-A-Bench",
+      "name": "Flexión de muñeca con mancuerna apoyada",
+      "aliases": [
+        "Palms-Up Dumbbell Wrist Curl Over A Bench"
+      ],
+      "primary": [
+        "Antebrazos"
+      ],
+      "secondary": [],
+      "equipment": "Mancuernas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Palms-Up_Dumbbell_Wrist_Curl_Over_A_Bench",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Plate-Pinch",
+      "name": "Agarre de discos por pinza",
+      "aliases": [
+        "Plate Pinch"
+      ],
+      "primary": [
+        "Antebrazos"
+      ],
+      "secondary": [],
+      "equipment": "Otro",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "Plate_Pinch",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Wrist-Circles",
+      "name": "Círculos de muñeca",
+      "aliases": [
+        "Wrist Circles"
+      ],
+      "primary": [
+        "Antebrazos"
+      ],
+      "secondary": [],
+      "equipment": "Peso corporal",
+      "category": "Movilidad",
+      "level": "Inicial",
+      "sourceId": "Wrist_Circles",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Wrist-Roller",
+      "name": "Rodillo de muñeca",
+      "aliases": [
+        "Wrist Roller"
+      ],
+      "primary": [
+        "Antebrazos"
+      ],
+      "secondary": [
+        "Hombros"
+      ],
+      "equipment": "Otro",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Wrist_Roller",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Hip-Extension-with-Bands",
+      "name": "Extensión de cadera con banda",
+      "aliases": [
+        "Hip Extension with Bands"
+      ],
+      "primary": [
+        "Glúteos"
+      ],
+      "secondary": [
+        "Isquiotibiales"
+      ],
+      "equipment": "Bandas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Hip_Extension_with_Bands",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-One-Legged-Cable-Kickback",
+      "name": "Extensión unilateral de cadera en polea",
+      "aliases": [
+        "One-Legged Cable Kickback"
+      ],
+      "primary": [
+        "Glúteos"
+      ],
+      "secondary": [
+        "Isquiotibiales"
+      ],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Intermedio",
+      "sourceId": "One-Legged_Cable_Kickback",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Physioball-Hip-Bridge",
+      "name": "Puente de cadera sobre pelota suiza",
+      "aliases": [
+        "Physioball Hip Bridge"
+      ],
+      "primary": [
+        "Glúteos"
+      ],
+      "secondary": [
+        "Isquiotibiales"
+      ],
+      "equipment": "Pelota suiza",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Physioball_Hip_Bridge",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Piriformis-SMR",
+      "name": "Automasaje de piriforme con rodillo",
+      "aliases": [
+        "Piriformis-SMR"
+      ],
+      "primary": [
+        "Glúteos"
+      ],
+      "secondary": [],
+      "equipment": "Rodillo de espuma",
+      "category": "Movilidad",
+      "level": "Intermedio",
+      "sourceId": "Piriformis-SMR",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Pull-Through",
+      "name": "Pull through en polea",
+      "aliases": [
+        "Pull Through"
+      ],
+      "primary": [
+        "Glúteos"
+      ],
+      "secondary": [
+        "Isquiotibiales",
+        "Zona lumbar"
+      ],
+      "equipment": "Polea",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Pull_Through",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Single-Leg-Glute-Bridge",
+      "name": "Puente de glúteos unilateral",
+      "aliases": [
+        "Single Leg Glute Bridge"
+      ],
+      "primary": [
+        "Glúteos"
+      ],
+      "secondary": [
+        "Isquiotibiales"
+      ],
+      "equipment": "Peso corporal",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Single_Leg_Glute_Bridge",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Step-up-with-Knee-Raise",
+      "name": "Subida a escalón con elevación de rodilla",
+      "aliases": [
+        "Step-up with Knee Raise"
+      ],
+      "primary": [
+        "Glúteos"
+      ],
+      "secondary": [
+        "Isquiotibiales",
+        "Cuádriceps"
+      ],
+      "equipment": "Peso corporal",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Step-up_with_Knee_Raise",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-IT-Band-and-Glute-Stretch",
+      "name": "Movilidad lateral de cadera y glúteo",
+      "aliases": [
+        "IT Band and Glute Stretch"
+      ],
+      "primary": [
+        "Abductores"
+      ],
+      "secondary": [],
+      "equipment": "Otro",
+      "category": "Movilidad",
+      "level": "Intermedio",
+      "sourceId": "IT_Band_and_Glute_Stretch",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Monster-Walk",
+      "name": "Caminata monstruo con banda",
+      "aliases": [
+        "Monster Walk"
+      ],
+      "primary": [
+        "Abductores"
+      ],
+      "secondary": [],
+      "equipment": "Bandas",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Monster_Walk",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Standing-Hip-Circles",
+      "name": "Círculos de cadera de pie",
+      "aliases": [
+        "Standing Hip Circles"
+      ],
+      "primary": [
+        "Abductores"
+      ],
+      "secondary": [
+        "Aductores"
+      ],
+      "equipment": "Peso corporal",
+      "category": "Movilidad",
+      "level": "Inicial",
+      "sourceId": "Standing_Hip_Circles",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Thigh-Abductor",
+      "name": "Abducción de cadera en máquina",
+      "aliases": [
+        "Thigh Abductor"
+      ],
+      "primary": [
+        "Abductores"
+      ],
+      "secondary": [
+        "Glúteos"
+      ],
+      "equipment": "Máquina",
+      "category": "Fuerza",
+      "level": "Inicial",
+      "sourceId": "Thigh_Abductor",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Box-Jump-Multiple-Response",
+      "name": "Saltos repetidos al cajón",
+      "aliases": [
+        "Box Jump (Multiple Response)"
+      ],
+      "primary": [
+        "Isquiotibiales"
+      ],
+      "secondary": [
+        "Abductores",
+        "Aductores",
+        "Gemelos",
+        "Glúteos",
+        "Cuádriceps"
+      ],
+      "equipment": "Cajón estable",
+      "category": "Pliometría",
+      "level": "Requiere evaluación técnica",
+      "sourceId": "Box_Jump_Multiple_Response",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Front-Box-Jump",
+      "name": "Salto frontal al cajón",
+      "aliases": [
+        "Front Box Jump"
+      ],
+      "primary": [
+        "Isquiotibiales"
+      ],
+      "secondary": [
+        "Abductores",
+        "Aductores",
+        "Gemelos",
+        "Glúteos",
+        "Cuádriceps"
+      ],
+      "equipment": "Cajón estable",
+      "category": "Pliometría",
+      "level": "Requiere evaluación técnica",
+      "sourceId": "Front_Box_Jump",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Hurdle-Hops",
+      "name": "Saltos sobre vallas",
+      "aliases": [
+        "Hurdle Hops"
+      ],
+      "primary": [
+        "Isquiotibiales"
+      ],
+      "secondary": [
+        "Abductores",
+        "Aductores",
+        "Gemelos",
+        "Glúteos"
+      ],
+      "equipment": "Vallas bajas",
+      "category": "Pliometría",
+      "level": "Requiere evaluación técnica",
+      "sourceId": "Hurdle_Hops",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Knee-Tuck-Jump",
+      "name": "Salto con rodillas al pecho",
+      "aliases": [
+        "Knee Tuck Jump"
+      ],
+      "primary": [
+        "Isquiotibiales"
+      ],
+      "secondary": [
+        "Abductores",
+        "Aductores",
+        "Gemelos",
+        "Glúteos",
+        "Cuádriceps"
+      ],
+      "equipment": "Peso corporal",
+      "category": "Pliometría",
+      "level": "Requiere evaluación técnica",
+      "sourceId": "Knee_Tuck_Jump",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Lateral-Bound",
+      "name": "Salto lateral con transferencia de apoyo",
+      "aliases": [
+        "Lateral Bound"
+      ],
+      "primary": [
+        "Aductores"
+      ],
+      "secondary": [
+        "Abductores",
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales",
+        "Cuádriceps"
+      ],
+      "equipment": "Peso corporal",
+      "category": "Pliometría",
+      "level": "Requiere evaluación técnica",
+      "sourceId": "Lateral_Bound",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Lateral-Box-Jump",
+      "name": "Salto lateral al cajón",
+      "aliases": [
+        "Lateral Box Jump"
+      ],
+      "primary": [
+        "Aductores"
+      ],
+      "secondary": [
+        "Abductores",
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales",
+        "Cuádriceps"
+      ],
+      "equipment": "Cajón estable",
+      "category": "Pliometría",
+      "level": "Requiere evaluación técnica",
+      "sourceId": "Lateral_Box_Jump",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Lateral-Cone-Hops",
+      "name": "Saltos laterales sobre conos",
+      "aliases": [
+        "Lateral Cone Hops"
+      ],
+      "primary": [
+        "Aductores"
+      ],
+      "secondary": [
+        "Abductores",
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales",
+        "Cuádriceps"
+      ],
+      "equipment": "Conos",
+      "category": "Pliometría",
+      "level": "Requiere evaluación técnica",
+      "sourceId": "Lateral_Cone_Hops",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Front-Cone-Hops-or-hurdle-hops",
+      "name": "Saltos frontales sobre marcas",
+      "aliases": [
+        "Front Cone Hops (or hurdle hops)"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Abductores",
+        "Aductores",
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Conos o vallas bajas",
+      "category": "Pliometría",
+      "level": "Requiere evaluación técnica",
+      "sourceId": "Front_Cone_Hops_or_hurdle_hops",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Single-Leg-Hop-Progression",
+      "name": "Progresión de saltos unipodales",
+      "aliases": [
+        "Single-Leg Hop Progression"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Abductores",
+        "Aductores",
+        "Gemelos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Equipo por verificar",
+      "category": "Pliometría",
+      "level": "Requiere evaluación técnica",
+      "sourceId": "Single-Leg_Hop_Progression",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Single-Leg-Lateral-Hop",
+      "name": "Salto lateral unipodal",
+      "aliases": [
+        "Single-Leg Lateral Hop"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Abductores",
+        "Aductores",
+        "Gemelos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Equipo por verificar",
+      "category": "Pliometría",
+      "level": "Requiere evaluación técnica",
+      "sourceId": "Single-Leg_Lateral_Hop",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Standing-Long-Jump",
+      "name": "Salto horizontal desde parado",
+      "aliases": [
+        "Standing Long Jump"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Peso corporal",
+      "category": "Pliometría",
+      "level": "Requiere evaluación técnica",
+      "sourceId": "Standing_Long_Jump",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Star-Jump",
+      "name": "Salto estrella",
+      "aliases": [
+        "Star Jump"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales",
+        "Hombros"
+      ],
+      "equipment": "Peso corporal",
+      "category": "Pliometría",
+      "level": "Requiere evaluación técnica",
+      "sourceId": "Star_Jump",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Split-Jump",
+      "name": "Salto en posición de zancada",
+      "aliases": [
+        "Split Jump"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Gemelos",
+        "Glúteos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Peso corporal",
+      "category": "Pliometría",
+      "level": "Requiere evaluación técnica",
+      "sourceId": "Split_Jump",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Side-Hop-Sprint",
+      "name": "Salto lateral seguido de aceleración",
+      "aliases": [
+        "Side Hop-Sprint"
+      ],
+      "primary": [
+        "Cuádriceps"
+      ],
+      "secondary": [
+        "Abductores",
+        "Aductores",
+        "Gemelos",
+        "Isquiotibiales"
+      ],
+      "equipment": "Equipo por verificar",
+      "category": "Pliometría",
+      "level": "Requiere evaluación técnica",
+      "sourceId": "Side_Hop-Sprint",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Plyo-Push-up",
+      "name": "Flexión pliométrica",
+      "aliases": [
+        "Plyo Push-up"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [
+        "Hombros",
+        "Tríceps"
+      ],
+      "equipment": "Peso corporal",
+      "category": "Pliometría",
+      "level": "Requiere evaluación técnica",
+      "sourceId": "Plyo_Push-up",
+      "media": null,
+      "technique": null
+    },
+    {
+      "id": "fed-Medicine-Ball-Chest-Pass",
+      "name": "Pase explosivo de pecho con balón medicinal",
+      "aliases": [
+        "Medicine Ball Chest Pass"
+      ],
+      "primary": [
+        "Pecho"
+      ],
+      "secondary": [
+        "Hombros",
+        "Tríceps"
+      ],
+      "equipment": "Balón medicinal",
+      "category": "Pliometría",
+      "level": "Requiere evaluación técnica",
+      "sourceId": "Medicine_Ball_Chest_Pass",
+      "media": null,
+      "technique": null
+    }
+  ]
+}

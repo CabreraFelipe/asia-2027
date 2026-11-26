@@ -107,10 +107,19 @@ dependencies(web+'/staging/source/V11.42-INTEGRACION/src/rekey-client1159.mjs');
 dependencies(web+'/staging/source/V11.42-INTEGRACION/src/recovery-review1161.mjs');
 dependencies(web+'/staging/source/V11.42-INTEGRACION/src/recovery-apply1162.mjs');
 const schedule1173=patchPlanning1173(web);
+// Catalog discovery generated from pinned metadata and immutable original/sports IDs.
+const legacyCatalog=runInNewContext(readFileSync('gym84_catalog.mjs','utf8').replace('export const catalog','const catalog')+'\n;catalog;');
+const sportContext={};runInNewContext(readFileSync(base+'/src/sport1177.js','utf8'),sportContext);
+const catalogData=JSON.parse(readFileSync(base+'/src/catalog1178-data.json','utf8')),catalogReview=JSON.parse(readFileSync(base+'/src/catalog1178-review.json','utf8'));
+let catalog1178=readFileSync(base+'/src/catalog1178.template.js','utf8');
+for(const [marker,value] of [['__DATA1178__',catalogData],['__REVIEW1178__',catalogReview],['__LEGACY1178__',legacyCatalog.library],['__SPORT1178__',sportContext.asiaSport1177.catalog]]){if(catalog1178.split(marker).length!==2)throw Error('Marcador catálogo');catalog1178=catalog1178.replace(marker,()=>JSON.stringify(value));}
+writeFileSync(web+'/diary/catalog1178.js',catalog1178);writeFileSync(web+'/catalog1178.js',catalog1178);
+cpSync(base+'/src/catalog1178-ui.js',web+'/diary/catalog1178-ui.js');
+for(const n of ['catalog1178.js','catalog1178-ui.js'])execFileSync(process.execPath,['--check',web+'/diary/'+n],{stdio:'inherit'});
 const runningUI=web+'/diary/running1174-ui.js';cpSync(base+'/src/running1174-ui.js',runningUI);execFileSync(process.execPath,['--check',runningUI],{stdio:'inherit'});
 const runningIndex=readFileSync(diary,'utf8');const runningAnchor='<script src="nutrition103.js?v=1060"></script>';if(runningIndex.split(runningAnchor).length!==2)throw Error('Marcador Running');writeFileSync(diary,runningIndex.replace(runningAnchor,runningAnchor+'<script src="running1174-ui.js"></script>'));
 for(const file of ['onboard1176.js','onboard1176-ui.js','sport1177-ui.js']){const to=web+'/diary/'+file;cpSync(base+'/src/'+file,to);execFileSync(process.execPath,['--check',to],{stdio:'inherit'});}
-const obIndex=readFileSync(diary,'utf8'),obAnchor='<script src="running1174-ui.js"></script>';if(obIndex.split(obAnchor).length!==2)throw Error('Marcador onboarding');writeFileSync(diary,obIndex.replace(obAnchor,obAnchor+'<script src="onboard1176.js"></script><script src="onboard1176-ui.js"></script><script src="sport1177-ui.js"></script>'));
+const obIndex=readFileSync(diary,'utf8'),obAnchor='<script src="running1174-ui.js"></script>';if(obIndex.split(obAnchor).length!==2)throw Error('Marcador onboarding');writeFileSync(diary,obIndex.replace(obAnchor,obAnchor+'<script src="onboard1176.js"></script><script src="onboard1176-ui.js"></script><script src="sport1177-ui.js"></script><script src="catalog1178.js"></script><script src="catalog1178-ui.js"></script>'));
 const planner1174=web+'/diary/planner820.js';let plannerText1174=readFileSync(planner1174,'utf8');const anchor1174='for(const s of d.sessions){';if(plannerText1174.split(anchor1174).length!==2)throw Error('Marcador agenda Running');plannerText1174=plannerText1174.replace(anchor1174,"const run=window.asiaRunning1174.planned(data.running1174,d.date);if(run){card.append(make('p','Running · '+run.type+' · '+run.minutes+' min'+(d.routine!==null?' · Revisá coincidencia con fuerza':'')));action(card,'Abrir Running',()=>window.asiaOpenRunning1174?.());}const sport=window.asiaSport1177.planned(data.sport1177,d.date),events=window.asiaSport1177.eventsOn(data.sport1177,d.date);if(sport||events.length){if(sport)card.append(make('p','Deportivo · '+sport.minutes+' min'));for(const e of events)card.append(make('p',e.type+' · '+e.minutes+' min'));action(card,'Abrir rendimiento deportivo',()=>window.asiaOpenSport1177?.());}for(const s of d.sessions){");writeFileSync(planner1174,plannerText1174);
 const shellSchedule=web+'/schedule829.js';if(readFileSync(shellSchedule,'utf8')!==readFileSync('schedule829.js','utf8'))throw Error('Validador calendario inesperado');writeFileSync(shellSchedule,schedule1173);
 for(const n of ['schedule829.js','training102.js','planner820.js','v42.js','goals101.js'])execFileSync(process.execPath,['--check',web+'/diary/'+n],{stdio:'inherit'});
@@ -122,7 +131,7 @@ for(const d of dirs){const src='staging/source/'+d+'/src';if(!existsSync(src))co
 for(const n of rootFiles.filter(n=>n.endsWith('.mjs')))cpSync(n,server+'/'+n);
 // Server-side remote rekey uses the exact same pure domain validators as
 // the candidate shell, including independent v2 goals. No originals edited.
-for(const n of ['core105.js','extras830.js','gym826.js','schedule829.js'])cpSync(web+'/'+n,server+'/'+n);
+for(const n of ['core105.js','extras830.js','gym826.js','schedule829.js','catalog1178.js'])cpSync(web+'/'+n,server+'/'+n);
 const official='staging/source/official/V11.24-STAGING/src';for(const n of readdirSync(official).filter(n=>n.endsWith('.mjs'))){const p=server+'/'+official+'/'+n;mkdirSync(dirname(p),{recursive:true});writeFileSync(p,patch(readFileSync(official+'/'+n,'utf8')))}
 // V11.51: only the packaged identity Worker gets the persistent session
 // policy. Original identity sources, existing schema and cookie name intact.

@@ -1,0 +1,623 @@
+[
+  {
+    "id": "fed-Ab-Crunch-Machine",
+    "required": "Máquina",
+    "part": "upper",
+    "groups": [
+      "Abdomen"
+    ],
+    "technique": "No tires del cuello; ajustá el asiento y flexioná el tronco de forma controlada.",
+    "unilateral": false,
+    "classic": true,
+    "pro": true
+  },
+  {
+    "id": "fed-Alternate-Heel-Touchers",
+    "required": "Peso corporal",
+    "part": "upper",
+    "groups": [
+      "Abdomen"
+    ],
+    "technique": "Tumbado con rodillas flexionadas, acercá una mano hacia el talón sin elevar la pelvis.",
+    "unilateral": true,
+    "classic": false,
+    "pro": true
+  },
+  {
+    "id": "fed-Cross-Body-Crunch",
+    "required": "Peso corporal",
+    "part": "upper",
+    "groups": [
+      "Abdomen"
+    ],
+    "technique": "Acercá hombro y rodilla contraria con rotación suave; no tracciones del cuello.",
+    "unilateral": true,
+    "classic": false,
+    "pro": true
+  },
+  {
+    "id": "fed-Crunches",
+    "required": "Peso corporal",
+    "part": "upper",
+    "groups": [
+      "Abdomen"
+    ],
+    "technique": "Elevá las escápulas sin tirar de la cabeza y bajá con control.",
+    "unilateral": false,
+    "classic": true,
+    "pro": true
+  },
+  {
+    "id": "fed-Dead-Bug",
+    "required": "Peso corporal",
+    "part": "full",
+    "groups": [
+      "Abdomen"
+    ],
+    "technique": "Alterná brazo y pierna opuestos sin perder el control del tronco; reducí el recorrido si se arquea la espalda.",
+    "unilateral": true,
+    "classic": false,
+    "pro": true
+  },
+  {
+    "id": "fed-Reverse-Crunch",
+    "required": "Peso corporal",
+    "part": "upper",
+    "groups": [
+      "Abdomen"
+    ],
+    "technique": "Acercá suavemente las rodillas y elevá la pelvis sin impulso; descendé controladamente.",
+    "unilateral": false,
+    "classic": true,
+    "pro": true
+  },
+  {
+    "id": "fed-Dumbbell-Side-Bend",
+    "required": "Mancuernas",
+    "part": "upper",
+    "groups": [
+      "Abdomen"
+    ],
+    "technique": "Mové el tronco en un arco corto y controlado, sin girar ni buscar un recorrido extremo.",
+    "unilateral": true,
+    "classic": false,
+    "pro": true
+  },
+  {
+    "id": "fed-Bodyweight-Squat",
+    "required": "Peso corporal",
+    "part": "lower",
+    "groups": [
+      "Cuádriceps",
+      "Glúteos"
+    ],
+    "technique": "Bajá dentro de tu rango cómodo con el pie completo apoyado y rodillas alineadas.",
+    "unilateral": false,
+    "classic": true,
+    "pro": true
+  },
+  {
+    "id": "fed-Chair-Squat",
+    "required": "Silla estable",
+    "part": "lower",
+    "groups": [
+      "Cuádriceps",
+      "Glúteos"
+    ],
+    "technique": "Usá una silla estable; tocá el asiento sin desplomarte y volvé a ponerte de pie.",
+    "unilateral": false,
+    "classic": false,
+    "pro": true
+  },
+  {
+    "id": "fed-Dumbbell-Squat",
+    "required": "Mancuernas",
+    "part": "lower",
+    "groups": [
+      "Cuádriceps",
+      "Glúteos"
+    ],
+    "technique": "Sostené las mancuernas a los lados; mantené estabilidad y controlá el descenso.",
+    "unilateral": false,
+    "classic": true,
+    "pro": true
+  },
+  {
+    "id": "fed-Dumbbell-Rear-Lunge",
+    "required": "Mancuernas",
+    "part": "lower",
+    "groups": [
+      "Cuádriceps",
+      "Glúteos"
+    ],
+    "technique": "Da un paso atrás manteniendo el apoyo del pie delantero; volvé sin impulso.",
+    "unilateral": true,
+    "classic": true,
+    "pro": true
+  },
+  {
+    "id": "fed-Split-Squat-with-Dumbbells",
+    "required": "Mancuernas",
+    "part": "lower",
+    "groups": [
+      "Cuádriceps",
+      "Glúteos"
+    ],
+    "technique": "Mantené los pies separados en una posición estable y flexioná ambas rodillas con control.",
+    "unilateral": true,
+    "classic": true,
+    "pro": true
+  },
+  {
+    "id": "fed-Seated-Band-Hamstring-Curl",
+    "required": "Banda y anclaje seguro",
+    "part": "lower",
+    "groups": [
+      "Isquiotibiales"
+    ],
+    "technique": "Asegurá la banda a un punto estable; flexioná la rodilla sin desplazar la cadera.",
+    "unilateral": true,
+    "classic": false,
+    "pro": true
+  },
+  {
+    "id": "fed-Single-Leg-Glute-Bridge",
+    "required": "Peso corporal",
+    "part": "lower",
+    "groups": [
+      "Glúteos",
+      "Isquiotibiales"
+    ],
+    "technique": "Apoyá un pie, elevá la pelvis sin girarla y evitá arquear la espalda.",
+    "unilateral": true,
+    "classic": true,
+    "pro": true
+  },
+  {
+    "id": "fed-Alternate-Hammer-Curl",
+    "required": "Mancuernas",
+    "part": "upper",
+    "groups": [
+      "Bíceps"
+    ],
+    "technique": "Mantené las palmas enfrentadas, alterná brazos y evitá balancear el torso.",
+    "unilateral": true,
+    "classic": false,
+    "pro": true
+  },
+  {
+    "id": "fed-Barbell-Curl",
+    "required": "Barra y discos",
+    "part": "upper",
+    "groups": [
+      "Bíceps"
+    ],
+    "technique": "Flexioná los codos sin desplazar hombros ni usar impulso; bajá con control.",
+    "unilateral": false,
+    "classic": true,
+    "pro": true
+  },
+  {
+    "id": "fed-EZ-Bar-Curl",
+    "required": "Barra Z",
+    "part": "upper",
+    "groups": [
+      "Bíceps"
+    ],
+    "technique": "Usá el agarre cómodo de la barra Z y mantené los codos estables.",
+    "unilateral": false,
+    "classic": true,
+    "pro": true
+  },
+  {
+    "id": "fed-Concentration-Curls",
+    "required": "Mancuerna y asiento",
+    "part": "upper",
+    "groups": [
+      "Bíceps"
+    ],
+    "technique": "Apoyá el brazo en el muslo y flexioná el codo sin mover el hombro.",
+    "unilateral": true,
+    "classic": false,
+    "pro": true
+  },
+  {
+    "id": "fed-Machine-Preacher-Curls",
+    "required": "Máquina",
+    "part": "upper",
+    "groups": [
+      "Bíceps"
+    ],
+    "technique": "Ajustá el apoyo del brazo, flexioná con control y evitá hiperextender el codo.",
+    "unilateral": false,
+    "classic": true,
+    "pro": true
+  },
+  {
+    "id": "fed-Cable-Hammer-Curls-Rope-Attachment",
+    "required": "Polea y cuerda",
+    "part": "upper",
+    "groups": [
+      "Bíceps"
+    ],
+    "technique": "Con agarre neutro, flexioná los codos manteniendo la postura estable.",
+    "unilateral": false,
+    "classic": true,
+    "pro": true
+  },
+  {
+    "id": "fed-Reverse-Barbell-Curl",
+    "required": "Barra y discos",
+    "part": "upper",
+    "groups": [
+      "Bíceps"
+    ],
+    "technique": "Palmas hacia abajo, muñecas neutras y carga moderada; evitá balancearte.",
+    "unilateral": false,
+    "classic": true,
+    "pro": true
+  },
+  {
+    "id": "fed-Seated-Dumbbell-Curl",
+    "required": "Mancuernas y banco",
+    "part": "upper",
+    "groups": [
+      "Bíceps"
+    ],
+    "technique": "Sentate con apoyo estable y flexioná los codos sin adelantar los hombros.",
+    "unilateral": false,
+    "classic": true,
+    "pro": true
+  },
+  {
+    "id": "fed-Arnold-Dumbbell-Press",
+    "required": "Mancuernas",
+    "part": "upper",
+    "groups": [
+      "Hombros",
+      "Tríceps"
+    ],
+    "technique": "Girando los antebrazos de forma controlada, elevá las mancuernas sin forzar el rango del hombro.",
+    "unilateral": false,
+    "classic": true,
+    "pro": true
+  },
+  {
+    "id": "fed-Dumbbell-Shoulder-Press",
+    "required": "Mancuernas",
+    "part": "upper",
+    "groups": [
+      "Hombros",
+      "Tríceps"
+    ],
+    "technique": "Mantené el tronco firme y empujá hacia arriba dentro de un rango cómodo.",
+    "unilateral": false,
+    "classic": true,
+    "pro": true
+  },
+  {
+    "id": "fed-Seated-Dumbbell-Press",
+    "required": "Mancuernas y banco",
+    "part": "upper",
+    "groups": [
+      "Hombros",
+      "Tríceps"
+    ],
+    "technique": "Usá un banco estable, no arquees la espalda y controlá la bajada.",
+    "unilateral": false,
+    "classic": true,
+    "pro": true
+  },
+  {
+    "id": "fed-Front-Dumbbell-Raise",
+    "required": "Mancuernas",
+    "part": "upper",
+    "groups": [
+      "Hombros"
+    ],
+    "technique": "Elevá los brazos hasta una altura cómoda sin impulso ni encoger los hombros.",
+    "unilateral": false,
+    "classic": true,
+    "pro": true
+  },
+  {
+    "id": "fed-Dumbbell-Scaption",
+    "required": "Mancuernas",
+    "part": "upper",
+    "groups": [
+      "Hombros"
+    ],
+    "technique": "Elevá los brazos levemente hacia delante del plano lateral y sin compensar el tronco.",
+    "unilateral": false,
+    "classic": true,
+    "pro": true
+  },
+  {
+    "id": "fed-Face-Pull",
+    "required": "Polea y cuerda",
+    "part": "upper",
+    "groups": [
+      "Hombros",
+      "Espalda"
+    ],
+    "technique": "Tirá de la cuerda hacia la cara manteniendo cuello y tronco estables.",
+    "unilateral": false,
+    "classic": true,
+    "pro": true
+  },
+  {
+    "id": "fed-External-Rotation-with-Band",
+    "required": "Banda y anclaje seguro",
+    "part": "upper",
+    "groups": [
+      "Hombros"
+    ],
+    "technique": "Con codo cerca del cuerpo, girá el antebrazo hacia fuera sin mover el tronco.",
+    "unilateral": true,
+    "classic": false,
+    "pro": true
+  },
+  {
+    "id": "fed-Band-Pull-Apart",
+    "required": "Banda",
+    "part": "upper",
+    "groups": [
+      "Hombros",
+      "Espalda"
+    ],
+    "technique": "Separá las manos con brazos al frente, sin arquear la espalda ni elevar hombros.",
+    "unilateral": false,
+    "classic": false,
+    "pro": true
+  },
+  {
+    "id": "fed-Dumbbell-Bench-Press-with-Neutral-Grip",
+    "required": "Mancuernas y banco",
+    "part": "upper",
+    "groups": [
+      "Pecho",
+      "Tríceps"
+    ],
+    "technique": "Con palmas enfrentadas, bajá las cargas con control y mantené apoyo estable.",
+    "unilateral": false,
+    "classic": true,
+    "pro": true
+  },
+  {
+    "id": "fed-Dumbbell-Flyes",
+    "required": "Mancuernas y banco",
+    "part": "upper",
+    "groups": [
+      "Pecho"
+    ],
+    "technique": "Mantené codos levemente flexionados y evitá bajar más allá de un rango cómodo.",
+    "unilateral": false,
+    "classic": true,
+    "pro": true
+  },
+  {
+    "id": "fed-Pushups",
+    "required": "Peso corporal",
+    "part": "upper",
+    "groups": [
+      "Pecho",
+      "Tríceps"
+    ],
+    "technique": "Mantené el cuerpo alineado, bajá controladamente y empujá sin perder estabilidad.",
+    "unilateral": false,
+    "classic": true,
+    "pro": true
+  },
+  {
+    "id": "fed-Incline-Push-Up",
+    "required": "Apoyo estable",
+    "part": "upper",
+    "groups": [
+      "Pecho",
+      "Tríceps"
+    ],
+    "technique": "Colocá las manos en una superficie estable y mantené el cuerpo alineado.",
+    "unilateral": false,
+    "classic": false,
+    "pro": true
+  },
+  {
+    "id": "fed-Cable-Crossover",
+    "required": "Polea doble",
+    "part": "upper",
+    "groups": [
+      "Pecho"
+    ],
+    "technique": "Acercá los brazos delante del pecho manteniendo una ligera flexión de codos.",
+    "unilateral": false,
+    "classic": true,
+    "pro": true
+  },
+  {
+    "id": "fed-One-Arm-Dumbbell-Row",
+    "required": "Mancuerna y banco",
+    "part": "upper",
+    "groups": [
+      "Espalda",
+      "Bíceps"
+    ],
+    "technique": "Apoyate en una superficie estable, tirá hacia la cadera y evitá girar el tronco.",
+    "unilateral": true,
+    "classic": false,
+    "pro": true
+  },
+  {
+    "id": "fed-Bent-Over-Two-Dumbbell-Row",
+    "required": "Mancuernas",
+    "part": "upper",
+    "groups": [
+      "Espalda",
+      "Bíceps"
+    ],
+    "technique": "Inclinate desde la cadera con espalda estable y llevá los codos hacia atrás.",
+    "unilateral": false,
+    "classic": true,
+    "pro": true
+  },
+  {
+    "id": "fed-Bent-Over-Barbell-Row",
+    "required": "Barra y discos",
+    "part": "upper",
+    "groups": [
+      "Espalda",
+      "Bíceps"
+    ],
+    "technique": "Realizá bisagra de cadera, sostené el tronco y acercá la barra sin tirones.",
+    "unilateral": false,
+    "classic": true,
+    "pro": true
+  },
+  {
+    "id": "fed-Wide-Grip-Lat-Pulldown",
+    "required": "Polea alta",
+    "part": "upper",
+    "groups": [
+      "Espalda",
+      "Bíceps"
+    ],
+    "technique": "Tirá hacia la parte alta del pecho sin balancear el torso ni llevar la barra detrás de la cabeza.",
+    "unilateral": false,
+    "classic": true,
+    "pro": true
+  },
+  {
+    "id": "fed-Straight-Arm-Pulldown",
+    "required": "Polea alta",
+    "part": "upper",
+    "groups": [
+      "Espalda"
+    ],
+    "technique": "Con codos suavemente flexionados, llevá las manos hacia los muslos sin arquear la espalda.",
+    "unilateral": false,
+    "classic": true,
+    "pro": true
+  },
+  {
+    "id": "fed-Standing-Dumbbell-Calf-Raise",
+    "required": "Mancuernas",
+    "part": "lower",
+    "groups": [
+      "Gemelos"
+    ],
+    "technique": "Subí sobre las puntas de los pies, controlá el descenso y buscá apoyo si es necesario.",
+    "unilateral": false,
+    "classic": true,
+    "pro": true
+  },
+  {
+    "id": "fed-Seated-Calf-Raise",
+    "required": "Máquina",
+    "part": "lower",
+    "groups": [
+      "Gemelos"
+    ],
+    "technique": "Ajustá el apoyo sobre muslos y elevá los talones con un recorrido cómodo.",
+    "unilateral": false,
+    "classic": true,
+    "pro": true
+  },
+  {
+    "id": "fed-EZ-Bar-Skullcrusher",
+    "required": "Barra Z y banco",
+    "part": "upper",
+    "groups": [
+      "Tríceps"
+    ],
+    "technique": "Flexioná los codos manteniendo brazos estables; bajá despacio y evitá dolor.",
+    "unilateral": false,
+    "classic": true,
+    "pro": true
+  },
+  {
+    "id": "fed-Tricep-Dumbbell-Kickback",
+    "required": "Mancuerna",
+    "part": "upper",
+    "groups": [
+      "Tríceps"
+    ],
+    "technique": "Con el brazo alineado al tronco, extendé el codo sin balancear el hombro.",
+    "unilateral": true,
+    "classic": false,
+    "pro": true
+  },
+  {
+    "id": "fed-Triceps-Pushdown-Rope-Attachment",
+    "required": "Polea y cuerda",
+    "part": "upper",
+    "groups": [
+      "Tríceps"
+    ],
+    "technique": "Mantené los codos cerca del cuerpo y extendé con control.",
+    "unilateral": false,
+    "classic": false,
+    "pro": false
+  },
+  {
+    "id": "fed-Push-Ups-Close-Triceps-Position",
+    "required": "Peso corporal",
+    "part": "upper",
+    "groups": [
+      "Tríceps",
+      "Pecho"
+    ],
+    "technique": "Usá una separación de manos cómoda, conservá el tronco estable y controlá la bajada.",
+    "unilateral": false,
+    "classic": true,
+    "pro": true
+  },
+  {
+    "id": "fed-Barbell-Deadlift",
+    "required": "Barra y discos",
+    "part": "lower",
+    "groups": [
+      "Glúteos",
+      "Isquiotibiales",
+      "Espalda"
+    ],
+    "technique": "Con técnica conocida, empujá el suelo y extendé cadera y rodillas manteniendo la barra cerca; no fijes carga automáticamente.",
+    "unilateral": false,
+    "classic": true,
+    "pro": true
+  },
+  {
+    "id": "fed-Dumbbell-Shrug",
+    "required": "Mancuernas",
+    "part": "upper",
+    "groups": [
+      "Espalda"
+    ],
+    "technique": "Elevá los hombros verticalmente sin rotarlos y bajá despacio.",
+    "unilateral": false,
+    "classic": true,
+    "pro": true
+  },
+  {
+    "id": "fed-Thigh-Adductor",
+    "required": "Máquina",
+    "part": "lower",
+    "groups": [
+      "Glúteos"
+    ],
+    "technique": "Ajustá la máquina al rango cómodo y acercá los muslos sin impulso.",
+    "unilateral": false,
+    "classic": false,
+    "pro": true
+  },
+  {
+    "id": "fed-Thigh-Abductor",
+    "required": "Máquina",
+    "part": "lower",
+    "groups": [
+      "Glúteos"
+    ],
+    "technique": "Separá las piernas con pelvis estable y controlá el retorno.",
+    "unilateral": false,
+    "classic": false,
+    "pro": true
+  }
+]
