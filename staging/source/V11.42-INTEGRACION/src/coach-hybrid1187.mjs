@@ -13,7 +13,7 @@ export function createHybrid1187({bundle,api,state,persist,newId,transport=null,
  let phase='idle',epoch=0,local=null,input=null,reply=null,proposal=null,choice=null,expires=0;
  function read(){const x=state();check(x&&x.busy===false&&typeof x.disk==='string'&&x.data&&x.current&&typeof x.today==='string','Diario no disponible');return x}
  function live(mark){check(mark===epoch&&local&&now()<expires,'Revisión vencida o descartada');const s=read();check(s.disk===local.disk&&s.today===local.today&&eq(s.current,local.current),'Cambió el diario o los objetivos');return s}
- function view(){return clone({phase,epoch,payload:phase==='consent'?input:null,reply,choice,proposal:proposal?.view??null,expires:expires||null,available:transport?.available?.()===true});}
+ function view(){return clone({phase,epoch,payload:phase==='consent'?input:null,reply,choice,options:input?.options??[],proposal:proposal?.view??null,expires:expires||null,available:transport?.available?.()===true});}
  function discard(){check(!['saving','unconfirmed'].includes(phase),'Verificá el guardado antes de continuar');epoch++;transport?.discard();persist.discard();local=input=reply=proposal=choice=null;expires=0;phase='idle'}
  function prepare({question,goal='',alternatives}){
   check(!['sending','reviewing','saving','unconfirmed'].includes(phase),'Operación en curso');discard();const s=read();check(Array.isArray(alternatives)&&alternatives.length>=1&&alternatives.length<=8,'Elegí de una a ocho alternativas revisadas');

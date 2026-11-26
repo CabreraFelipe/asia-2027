@@ -6,8 +6,12 @@ on:
 permissions:
   contents: read
 jobs:
-  pilot:
+  chrome:
     if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/development/multiuser'
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [normal, slow]
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
@@ -24,8 +28,20 @@ jobs:
       - run: node staging/source/V11.42-INTEGRACION/tests/build.mjs
       - run: node staging/source/V11.42-INTEGRACION/tests/package.test.mjs
       - name: Chrome normal
+        if: matrix.mode == 'normal'
         run: node staging/source/V11.43-INTEGRACION/tests/package-browser.mjs
       - name: Chrome recurso secundario lento
+        if: matrix.mode == 'slow'
         env:
           ASIA_SLOW_DIARY: '1'
         run: node staging/source/V11.43-INTEGRACION/tests/package-browser.mjs
+  pilot:
+    if: always() && github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/development/multiuser'
+    needs: chrome
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Exigir ambas variantes completas
+        env:
+          MATRIX_RESULT: ${{ needs.chrome.result }}
+        run: test "$MATRIX_RESULT" = success
