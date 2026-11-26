@@ -248,8 +248,8 @@ try{
   const addDay=(d,n)=>new Date(Date.parse(d)+n*86400000).toISOString().slice(0,10);
   for(const [k,v] of Object.entries({runStart1174:todayB,runEnd1174:addDay(todayB,14),runVolume1174:'90',runLongest1174:'40',runLevel1175:'Habitual',runSurface1175:'Cinta',runAvailable1175:'40',runSymptoms1175:'Sin síntomas preocupantes',runNutritionAction1175:'Guardar sin aplicar',runEnergy1175:'2300',runProtein1175:'110',runFat1175:'65','runShare1175-0':'20','runShare1175-1':'30','runShare1175-2':'20','runShare1175-3':'30'}))diaryB.getElementById(k).value=v;
   diaryB.getElementById('runGenerate1174').click();
-  if(!diaryB.getElementById('runPreview1174').textContent.includes('2300 kcal'))throw Error('No hay borrador híbrido/nutricional: '+diaryB.getElementById('runStatus1174').textContent);
-  try{w.confirm=()=>false;diaryB.getElementById('runActivate1174').click();if(diaryB.getElementById('runAgenda1174').textContent.includes('Rodaje suave'))throw Error('Rechazo activó plan');w.confirm=()=>true;diaryB.getElementById('runActivate1174').click()}finally{w.confirm=originalConfirm}
+  await wait(()=>diaryB.getElementById('running1174').getAttribute('aria-busy')==='false'&&diaryB.getElementById('runPreview1174').textContent.includes('2300 kcal'),'No hay borrador híbrido/nutricional: '+diaryB.getElementById('runStatus1174').textContent);
+  try{w.confirm=()=>false;diaryB.getElementById('runActivate1174').click();await wait(()=>diaryB.getElementById('running1174').getAttribute('aria-busy')==='false','Rechazo Running no terminó');if(diaryB.getElementById('runAgenda1174').textContent.includes('Rodaje suave'))throw Error('Rechazo activó plan');w.confirm=()=>true;diaryB.getElementById('runActivate1174').click()}finally{w.confirm=originalConfirm}
   await wait(()=>diaryB.getElementById('runStatus1174').textContent==='Bloque guardado.'&&el('status1140').textContent.includes('saved'),'Plan híbrido no guardado');
   const onboard=diaryB.getElementById('onboard1176');if(onboard.hidden)throw Error('Asistente manual no disponible');onboard.open=true;
   const ob=id=>diaryB.getElementById('ob1176-'+id),obStart=addDay(todayB,60),obEnd=addDay(obStart,21);

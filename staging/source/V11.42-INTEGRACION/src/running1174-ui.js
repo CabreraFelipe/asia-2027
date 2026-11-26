@@ -5,7 +5,7 @@ const root=n('details');root.id='running1174';root.className='card sectionfold';
 const text=n('p','Registrá carreras en exterior, pista o cinta. Los bloques suaves son borradores conservadores, no garantizan un tiempo de carrera.');root.append(text);
 const msg=n('p');msg.id='runStatus1174';msg.setAttribute('role','status');
 let flight=false;
-const button=(parent,id,label,fn)=>{const b=n('button',label);b.id=id;b.type='button';b.onclick=async()=>{if(flight)return;flight=true;try{const result=fn();if(result&&typeof result.then==='function')await result}catch(e){msg.textContent=e.message}finally{flight=false}};parent.append(b);return b};
+const button=(parent,id,label,fn)=>{const b=n('button',label);b.id=id;b.type='button';b.onclick=async()=>{if(flight)return;flight=true;root.setAttribute('aria-busy','true');try{const result=fn();if(result&&typeof result.then==='function')await result}catch(e){msg.textContent=e.message}finally{flight=false;root.setAttribute('aria-busy','false')}};parent.append(b);return b};
 const field=(parent,id,label,type,opts={})=>{const l=n('label',label),e=n(type==='select'?'select':'input');e.id=id;l.htmlFor=id;if(type==='select'){for(const v of opts.values??[])e.add(new Option(v,v))}else{e.type=type;for(const [k,v] of Object.entries(opts))e[k]=v}parent.append(l,e);return e};
 const uuid=p=>p+'-'+Array.from(crypto.getRandomValues(new Uint8Array(16)),v=>v.toString(16).padStart(2,'0')).join('');
 const optional=e=>e.value===''?null:Number(e.value),num=e=>e.value===''?NaN:Number(e.value);

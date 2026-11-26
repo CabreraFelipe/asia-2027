@@ -295,3 +295,6 @@ Base V11.94 fecae4bf7581f426c35d14d0035166092c9b321d; no promover antes de gates
 
 ## V11.96 — borrador independiente Running de calidad
 Base V11.95 601fc287c6904180d110464b2e952c7836ccc999, no promover antes de gates anteriores. Calidad optativa intervalos/tempo controlados tras dos semanas de bloque, máximo una cada siete días, sin progresión simultánea de volumen, fuera de semana de carrera, con base mínima declarada y vecinos libres. Plan antiguo sigue reproducible; perfil opcional añade quality solo si elegido. Guardado de calidad manual reutiliza frontera cifrada y comprobaciones de PRO/deporte, nutrición separada para este recorrido. Pruebas de dominio preparadas; CI integral y Chrome de ruta nueva pendientes. No prescripción individual, ni cambios a producción.
+
+## V11.96 — corrección de regresión Chrome
+SHA original e89e94e0978b17eb012506005463d495df4bc9bf: fuentes, D1/R2 y PWA aprobados; Chrome normal/lento fallaron con «Plan híbrido no guardado | sin mensaje | Diario abierto · saved» (run 45911184475). Bloqueo de UI asíncrono conservado; expone aria-busy y la prueba espera terminar revisión/rechazo. No se cambian motores ni reglas de planificación. Repetir cuatro gates antes de promover. Los candidatos descendientes deberán reconstruirse sobre este SHA corregido; no forzar refs ni mezclar workflows de validación. Producción intacta.
