@@ -346,3 +346,6 @@ La rama consolidada 7bd9c96c4d4cafe2996fb354b6a59d498d05b68a aprobó fuentes y r
 
 ## Salud — selección de fuentes autorizadas
 Proyección pura de agregados diarios normalizados con procedencia, revisión y unidades; no suma fuentes, distingue cero/ausente/conflicto, no usa fuentes revocadas ni métricas sin permiso, compatibilidad Apple solo para Apple. No persiste, no conecta dispositivos ni modifica UI histórica. Adaptadores, autorización real, ingesta cifrada, representación genérica, retención y pruebas físicas pendientes. Prueba de dominio añadida al paquete. Sin producción.
+
+## Salud — integración de lectura dentro de Salud original
+Se añade vista de fuentes autorizadas dentro de Comparar pasos manuales y Apple Salud, solo si el shell otorga capacidad real; no aparece en piloto sin grant. Fachada verifica identidad al iniciar/antes/después, descarta consultas, no expone identificadores de cuenta, no suma ni persiste. Fecha y selección explícita; se limpian al cerrar o cambiar día. Se preservan gráficos y registro original. No hay adaptador de proveedor ni alta de conexión real aún. Pruebas de dominio añadidas; UI pendiente navegador autorizado. Sin despliegue.
