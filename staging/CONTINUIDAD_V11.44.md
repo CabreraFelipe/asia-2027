@@ -308,3 +308,8 @@ Reconstruido sobre V11.96 corregida aa1ca875678df195f3a9ee8a9fde28c182d065d9. In
 Base V11.97 963336aea32c997429d7645538d0a9e5625b34b1; no promover hasta gates anteriores. Proyección local de 14 días de clásico/PRO/Running/deporte, eventos y registros separados, advertencias de coincidencia/vecindad y estado PRO desconocido. No deduce descanso, carga fisiológica ni cumplimiento; refresco explícito, sin escrituras ni nuevos datos persistidos. Pruebas dominio preparadas; CI y Chrome del recorrido nuevo pendientes. No acredita coordinación distribuida ni completa el bloque entrenamiento. Sin cambios a producción.
 
 Reconstruido V11.98 sobre b8558c17e57c2c80595198a90d952b48a3cebccd; SHA original ded891a13a2fcf4a38797bef95045e35e69012ca. Corrección de sincronización Running conservada. Pendiente CI propia.
+
+## V11.99 — candidato contrato inicial conversacional
+Base V11.98 ded891a13a2fcf4a38797bef95045e35e69012ca; no promover antes de gates anteriores. Contrato v3 mínimo de meta libre y aclaraciones consentidas, respuesta descriptiva editable sin dosis ni fechas inferidas. Adaptador OpenAI y transporte existentes aceptan v3 con validación estricta; no monta ruta, no conecta proveedor ni expone secretos. Continuación vinculada a preguntas exactas, máximo seis respuestas. Prueba proveedor con fetch inyectado, todavía sin UI inicial ni integración de formulario/guardado. CI integral pendiente. No se declara Coach real activo ni V12 liberada.
+
+Reconstruido V11.99 sobre 112bc33888d1367d0c4b0f6908551be77b35ab93; original 13610ba25c4b3a9bea128c72a096abc958ffa2df. CI pendiente.
