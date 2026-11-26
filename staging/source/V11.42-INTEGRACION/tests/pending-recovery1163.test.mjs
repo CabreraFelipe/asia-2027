@@ -1,0 +1,38 @@
+import assert from 'node:assert/strict';
+import '../../../../accounts106.js';
+import {preparePendingRecovery1163} from '../dist/assets/v11.42/staging/source/V11.42-INTEGRACION/src/recovery-apply1162.mjs';
+import {encrypt84,decrypt84} from '../../../../model84.mjs';
+import {hashBytes} from '../dist/assets/v11.42/staging/source/V11.38-INTEGRACION/src/large-sync.mjs';
+const id='acct_'+'b'.repeat(32),oldPhrase='frase sintética pendiente anterior',newSecret='Z'.repeat(43),backupPhrase='respaldo independiente pendiente',identity={accountId:id,csrf:'b'.repeat(43)};
+const entries=[['asia2027-v1',JSON.stringify({body:{'2026-11-26':{weight:81}},diet:{},work:{},settings:{},photos:{}})]];
+const base={entries,modules:{coach:{history:['original']}}},local={entries,modules:{...base.modules,recovery:{samples:['local']}}},work={entries,modules:{...base.modules,planner:{plans:['pendiente']}}},cloud={entries,modules:{...base.modules,visual:{photos:['nube']}}};
+const plain=payload=>({format:'asia-v1136-sync-v1',accountId:id,payload});
+const old=await encrypt84(plain(base),oldPhrase),migrated=await encrypt84(plain(base),newSecret),latest=await encrypt84(plain(cloud),newSecret);
+const sha=x=>hashBytes(new TextEncoder().encode(JSON.stringify(x)));
+const receipt={operationId:crypto.randomUUID(),phase:'committed',sourceRevision:1,sourceSha:await sha(old),revision:2,targetSha:await sha(migrated)};
+async function row(p,revision,phrase=oldPhrase){
+ return {local:{revision,envelope:await encrypt84({format:'asia-v1126-local-vault-v1',accountId:id,revision,entries:[...p.entries,['asia-timers-v4','null']]},phrase)},modules:{revision,envelope:await encrypt84({format:'asia-v1128-modules-v1',accountId:id,revision,modules:Object.fromEntries(Object.entries(p.modules).map(([name,payload])=>[name,{name,revision,payload}]))},phrase)},baseline:{remote:1,local:1,modules:1,namespace:'objects-v1138'}};
+}
+const original=await row(local,3),branchBase=await row(base,1),branchWorking=await row(work,5);
+let source=structuredClone(original),branch={phase:'editing',base:branchBase,working:branchWorking},backup=null,objects=[old,migrated,latest],writes=0,commits=0,finishes=0,loseFinish=false;
+const repository={readSync:async()=>structuredClone(source),readRekey:async()=>null,readRecovery:async()=>structuredClone(backup),async commitPendingRecovery(account,expected,target,proof,expectedBranch,prior){assert.equal(account,id);assert.deepEqual(source,expected);assert.deepEqual(expectedBranch,branch);assert.equal(prior,null);assert.equal(backup,null);backup={source:structuredClone(expected),proof:structuredClone(proof),branch:structuredClone(expectedBranch)};source=structuredClone(target);commits++;return 'applied'}};
+const pending={inspect:async()=>structuredClone(branch),async finish(account,snapshot){assert.equal(account,id);assert.equal(branch.phase,'frozen');assert.deepEqual(snapshot,{base:branch.base,working:branch.working});if(loseFinish){loseFinish=false;throw Error('interrupción antes de finalizar')}branch=null;finishes++;return true}};
+const client={accountId:id,verify:async()=>identity,discover:async()=>structuredClone(receipt),managedKey:async()=>newSecret,request:async(method,body,revision)=>{assert.equal(method,'GET');return revision?{ok:true,revision,envelope:structuredClone(objects[revision-1])}:{ok:true,head:objects.length,versions:[{revision:objects.length,bytes:100,created_at:'2026-11-26T00:00:00.000Z'}]}},async writeManaged({expectedRevision,envelope}){assert.equal(expectedRevision,objects.length);objects.push(structuredClone(envelope));writes++;return {ok:true,revision:objects.length}}};
+const options={client,repository,pending,policy:globalThis.asiaAccounts106,oldPhrase,backupPhrase,maintenanceConfirmed:true};
+const apply=p=>p.apply({confirmed:true,backupSaved:true,savedArchive:structuredClone(p.archive)});
+let plan=await preparePendingRecovery1163(options);assert.equal(plan.kind,'blocked');assert.equal(plan.reason,'freeze-required');assert.equal(writes,0);
+branch.phase='frozen';const frozen=structuredClone(branch);
+branch.working=await row({...work,modules:{...work.modules,coach:{history:['diferente']}}},5);
+plan=await preparePendingRecovery1163(options);assert.equal(plan.kind,'conflict');assert.equal(writes,0);assert.equal(finishes,0);
+branch=structuredClone(frozen);
+plan=await preparePendingRecovery1163(options);assert.equal(plan.kind,'ready');assert.equal(plan.willAppend,true);
+loseFinish=true;await assert.rejects(apply(plan));assert.equal(writes,1);assert.equal(commits,1);assert.equal(finishes,0);assert.deepEqual(branch,frozen);assert.deepEqual(backup.branch,frozen);assert.deepEqual(backup.source,original);
+assert.equal(source.modules.revision,6);
+const recovered=await decrypt84(source.modules.envelope,newSecret);
+assert.deepEqual(recovered.modules.planner.payload,work.modules.planner);assert.equal(recovered.modules.planner.revision,5);
+assert.deepEqual(recovered.modules.recovery.payload,local.modules.recovery);
+assert.deepEqual(recovered.modules.visual.payload,cloud.modules.visual);
+plan=await preparePendingRecovery1163(options);assert.equal(plan.kind,'ready-finalize');
+assert.equal((await apply(plan)).kind,'already-applied');assert.equal(finishes,1);assert.equal(branch,null);assert.equal(writes,1);assert.equal(commits,1);
+assert.deepEqual(backup.branch,frozen);assert.deepEqual(objects.slice(0,3),[old,migrated,latest]);
+console.log('Pending recovery: editing blocked, conflicts retained, legacy branch and original archived, revision fencing, interrupted finalization resumed without duplicate PASS.');

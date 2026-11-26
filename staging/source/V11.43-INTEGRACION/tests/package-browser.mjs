@@ -378,6 +378,35 @@ try{
    return true;
   }finally{repo.close()}
  }.toString()+')()',true);assert.equal(recoveryCAS,true);
+ const pendingCAS=await evalJS('('+async function(){
+  const {openUnifiedRepository}=await import('/v11.42/staging/source/V11.34-INTEGRACION/src/unified-repository.mjs');
+  const {openOfflineRepository}=await import('/v11.42/staging/source/V11.37-INTEGRACION/src/offline-repository.mjs');
+  const {encrypt84}=await import('/v11.42/model84.mjs');
+  const repo=await openUnifiedRepository(),pending=await openOfflineRepository(),phrase='frase sintética pending CAS';
+  const check=(ok,m)=>{if(!ok)throw Error(m)},eq=(a,b)=>JSON.stringify(a)===JSON.stringify(b),rejects=async f=>{try{await f()}catch{return true}return false};
+  try{
+   const id='acct_'+'5'.repeat(32),localPlain={format:'asia-v1126-local-vault-v1',accountId:id,revision:1,entries:[]},modulesPlain={format:'asia-v1128-modules-v1',accountId:id,revision:1,modules:{}};
+   const local=async revision=>({revision,envelope:await encrypt84({...localPlain,revision},phrase)}),modules=async revision=>({revision,envelope:await encrypt84({...modulesPlain,revision},phrase)});
+   await repo.initialize(id,await local(1),await modules(1));
+   const source=await repo.readSync(id),adapters=await pending.begin(id,source,crypto.randomUUID()),inspected=await pending.inspect(id);
+   const next=await local(2);await adapters.local.compareAndSwap(id,1,next);
+   check(await rejects(()=>pending.freezeReviewed(id,inspected)),'Congeló una rama cambiada');
+   const frozen=await pending.freezeReviewed(id,await pending.inspect(id));
+   check(frozen.phase==='frozen'&&eq(frozen.working.local,next),'Rama no congelada');
+   const third=await local(3);check(await rejects(()=>adapters.local.compareAndSwap(id,2,third)),'Lease antiguo escribió tras congelar');
+   const target={local:third,modules:await modules(2),baseline:{remote:3,local:3,modules:2,namespace:'objects-v1138'}},proof={format:'asia-v1163-pending-recovery-v1',archiveSha:'a'.repeat(64),remoteSha:'b'.repeat(64),remoteRevision:3};
+   check(await repo.commitPendingRecovery(id,source,target,proof,frozen,null)==='applied','No confirmó rama');
+   const backup=await repo.readRecovery(id);
+   check(eq(backup,{source,proof,branch:frozen})&&eq(await repo.readSync(id),target)&&eq(await pending.inspect(id),frozen),'Respaldo/commit incorrecto');
+   check(await repo.commitPendingRecovery(id,source,target,proof,frozen,null)==='already-applied','Commit no idempotente');
+   check(await rejects(()=>pending.finish(id,{base:source,working:source})),'Finalizó rama incorrecta');
+   await pending.finish(id,{base:frozen.base,working:frozen.working});
+   check(!await pending.inspect(id)&&eq(await repo.readRecovery(id),backup),'Rama archivada perdida');
+   check(await rejects(()=>repo.commitPendingRecovery(id,source,target,{...proof,archiveSha:'c'.repeat(64)},frozen,null)),'Respaldo reemplazado');
+   return true;
+  }finally{repo.close();pending.close()}
+ }.toString()+')()',true);assert.equal(pendingCAS,true);
+
 
  await evalJS("fetch('/__ci/offline').then(r=>r.text())",true);await cmd('Page.navigate',{url:home});await ready("document.body?.textContent.includes('Volvé a conectarte para verificar tu cuenta')");
  console.log('Chrome paquete generado: autorización, diario, guardado, conciliación, Worker sync, logout, aislamiento, caché pública y fallback offline.');

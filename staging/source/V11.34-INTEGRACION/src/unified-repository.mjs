@@ -80,6 +80,27 @@ export async function openUnifiedRepository(factory=globalThis.indexedDB){
     return 'applied';
    });
   },
+  commitPendingRecovery(id,expected,target,proof,branch,priorRekey){
+   const rev=r=>r?.revision??0,eq=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
+   check(branch?.phase==='frozen'&&branch.base&&branch.working&&proof?.format==='asia-v1163-pending-recovery-v1'&&/^[a-f0-9]{64}$/.test(proof.archiveSha||'')&&/^[a-f0-9]{64}$/.test(proof.remoteSha||'')&&Number.isSafeInteger(proof.remoteRevision)&&proof.remoteRevision>=1&&proof.remoteRevision<=200,'Recibo pendiente inválido');
+   for(const k of ['local','modules']){
+    for(const r of [expected[k],branch.base[k],branch.working[k]])check(r===null||validRecord(r),'Bóveda de origen inválida');
+    check(validRecord(target[k])&&target[k].revision===Math.max(rev(expected[k]),rev(branch.base[k]),rev(branch.working[k]))+1,'Revisión de recuperación inválida');
+   }
+   check(target.baseline?.namespace==='objects-v1138'&&target.baseline.remote===proof.remoteRevision&&target.baseline.local===rev(target.local)&&target.baseline.modules===rev(target.modules),'Marcador inválido');
+   return tx(id,true,(row,s)=>{
+    const current={local:row?.local??null,modules:row?.modules??null,baseline:row?.baseline??null};
+    check(eq(row?.rekeyBackup??null,priorRekey),'Respaldo de recifrado cambió');
+    if(row?.recoveryBackup1162){
+     const b=row.recoveryBackup1162;
+     check(eq(b.source,expected)&&eq(b.proof,proof)&&eq(b.branch,branch)&&eq(current,target),'Respaldo previo; no se reemplaza');
+     return 'already-applied';
+    }
+    check(eq(current,expected),'Conflicto de revisión local');
+    s.put({...row,local:target.local,modules:target.modules,baseline:target.baseline,recoveryBackup1162:{source:structuredClone(expected),proof:structuredClone(proof),branch:structuredClone(branch)}},id);
+    return 'applied';
+   });
+  },
   initialize(id,local,modules){
    check(validRecord(local)&&validRecord(modules)&&local.revision===1&&modules.revision===1,'Importación inválida');
    return tx(id,true,(row,s)=>{check(row===null,'La cuenta ya contiene datos');s.add({local,modules},id);return true});

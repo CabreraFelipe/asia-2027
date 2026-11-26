@@ -29,6 +29,13 @@ export async function openOfflineRepository(factory=globalThis.indexedDB){
    });return Object.freeze({local:adapter(id,'local',lease),modules:adapter(id,'modules',lease)});
   },
   inspect:id=>tx(id,false,r=>r?{phase:r.phase,base:r.base,working:r.working}:null),
+  // Freeze only the exact inspected branch; no stale review may freeze a
+  // newer branch. Existing lease holders are fenced by phase.
+  freezeReviewed(id,expected){return tx(id,true,(r,s)=>{
+   check(r&&JSON.stringify({phase:r.phase,base:r.base,working:r.working})===JSON.stringify(expected),'Rama pendiente cambió');
+   check(['editing','frozen'].includes(r.phase),'Rama inválida');
+   r.phase='frozen';s.put(r,id);return {phase:r.phase,base:r.base,working:r.working};
+  })},
   freeze:id=>tx(id,true,(r,s)=>{check(r,'No hay rama pendiente');r.phase='frozen';s.put(r,id);return {base:r.base,working:r.working}}),
   finish(id,snapshot){return tx(id,true,(r,s)=>{check(r?.phase==='frozen'&&JSON.stringify({base:r.base,working:r.working})===JSON.stringify(snapshot),'Rama pendiente cambió');s.delete(id);return true})},
   close(){closed=true;db.close()}

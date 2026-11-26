@@ -14,8 +14,8 @@ const req=(p,auth=false,e=env)=>worker.fetch(new Request(origin+p,{headers:auth?
 const prefix='/v11.42/';
 assert.equal((await req(prefix+'index.html')).status,200);const m=await (await req(prefix+'manifest.json')).json();assert.equal(m.scope,prefix);assert.equal(m.start_url,prefix+'index.html');assert.equal(m.display,'standalone');assert.equal(m.icons.length,2);
 const publicIndex=await (await req(prefix+'index.html')).text();
-assert.ok(publicIndex.includes('<title>Asia 2027 · V11.62</title>'),'Versión exacta del título');
-assert.ok(publicIndex.includes('<p>V11.62 · Pruebas privadas. Solo datos sintéticos.</p>'),'Versión visible exacta');
+assert.ok(publicIndex.includes('<title>Asia 2027 · V11.63</title>'),'Versión exacta del título');
+assert.ok(publicIndex.includes('<p>V11.63 · Pruebas privadas. Solo datos sintéticos.</p>'),'Versión visible exacta');
 assert.equal(m.id,prefix);
 assert.match(readFileSync(root+prefix+'index.html','utf8'),/id="advancedUnlock" type="checkbox" autocomplete="off"/);
 // The pre-auth entry imports exactly this public, data-free helper.
@@ -131,3 +131,5 @@ await import('./rekey-transport1159.test.mjs');
 await import('./recovery-review1161.test.mjs');
 
 await import('./recovery-apply1162.test.mjs');
+
+await import('./pending-recovery1163.test.mjs');
