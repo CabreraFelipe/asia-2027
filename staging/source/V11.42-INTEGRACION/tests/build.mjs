@@ -34,6 +34,22 @@ replaceExtras('return {version:1,primary:raw.primary,items};','return {version:r
 replaceExtras('profile100,goals101,goalDay101','profile100,goals101,emptyGoals1148,goalDay101');
 writeFileSync(web+'/diary/extras830.js',extras1148);
 execFileSync(process.execPath,['--check',web+'/diary/extras830.js'],{stdio:'inherit'});
+// V11.49: first-use invitation only with an explicitly verified empty local
+// context and remote index. No automatic conversion of undefined/v1 books.
+const preloadFile=web+'/diary/candidate-preload.js';
+const preloadText=readFileSync(preloadFile,'utf8');
+if(preloadText.split('moduleStore:f.moduleStore,').length!==2)throw Error('Marcador preload metas');
+writeFileSync(preloadFile,preloadText.replace('moduleStore:f.moduleStore,','initialGoalSetup:f.initialGoalSetup===true,moduleStore:f.moduleStore,'));
+const goalsFile=web+'/diary/goals101.js';
+let goalsText=readFileSync(goalsFile,'utf8');
+function replaceGoals(from,to){if(goalsText.split(from).length!==2)throw Error('Marcador onboarding metas no único: '+from);goalsText=goalsText.replace(from,to)}
+replaceGoals("const newBtn=make('button','+ Crear nueva meta');","const setup=make('section',undefined,'card');setup.id='pilotGoals1149';setup.append(make('h3','Elegí tus propias metas'),make('p','Podés comenzar sin una meta predefinida. El calendario, las rutinas y los objetivos diarios del piloto todavía usan el programa de referencia; no son recomendaciones personales.','meta'));const startOwn=make('button','Empezar sin meta predefinida');startOwn.type='button';startOwn.id='pilotOwnGoals1149';setup.append(startOwn);el('home42').prepend(setup);const eligible=()=>asiaCandidateSession.initialGoalSetup===true&&data.settings?.goals101===undefined;const newBtn=make('button','+ Crear nueva meta');");
+replaceGoals("function renderHeader(){const g=primary(book());","function renderHeader(){const b=book();const reference=el('goalPlan101');if(b.version===2)reference.textContent='Calendario del piloto: programa de referencia aún no personalizado';const g=primary(b);");
+replaceGoals("function render(){renderHeader();if(!panel.open)return;","function render(){renderHeader();setup.hidden=!eligible();if(!panel.open)return;");
+replaceGoals("const next=upsert(book(),g,date());","const previous=book();let next=upsert(previous,g,date());if(previous.version===2&&previous.items.length===0)next=select(next,g.id);");
+replaceGoals("newBtn.onclick=()=>begin(null);","startOwn.onclick=()=>{try{if(!eligible())throw Error('Configuración inicial no disponible.');if(!canDiscard())return;if(!confirm('¿Comenzar con un libro de metas propio y vacío? No cambia tus registros, rutinas ni calendario de referencia.'))return;commit(validation.emptyGoals1148());endForm();panel.open=true;refresh();begin(null);message.textContent='Libro propio creado. Podés elegir una meta ahora o más adelante.';}catch(e){panel.open=true;message.textContent=e.message;}};newBtn.onclick=()=>begin(null);");
+writeFileSync(goalsFile,goalsText);
+execFileSync(process.execPath,['--check',goalsFile],{stdio:'inherit'});
 // Candidate-only header personalization uses the existing encrypted diary profile.
 // Never derive a display name from email or expose Google profile claims.
 const profileFile=web+'/diary/profile100.js';

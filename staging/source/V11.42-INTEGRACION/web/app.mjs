@@ -49,10 +49,11 @@ export async function start(passphrase,{maintenanceOnly=false}={}){
   // Existing local/pending records are never replaced by this check.
   const beforeOpen=async()=>{
    await verify();const row=await repository.readSync(identity.accountId),branch=await pending.inspect(identity.accountId);
-   if(row.local||row.modules||row.baseline||branch)return;
+   if(row.local||row.modules||row.baseline||branch)return false;
    const request=createLargeTransport({origin:location.origin,readSession:verify});let list;
    try{list=validateLargeList(await request('GET'));await verify();}catch{throw Error('No se pudo verificar si hay registros en la nube. Reintentá antes de abrir el diario.');}
    if(list.head>0)throw Error('Esta cuenta ya tiene una copia en la nube. Usá Comparar con nube y confirmá la recuperación antes de abrir el diario.');
+   return true;
   };
   const c=await createController({origin:location.origin,repository,pending,policy:globalThis.asiaAccounts106,passphrase,mount,beforeOpen,onState:s=>{shell?.render();panel?.render();if(s==='closed'){repository.close();pending.close();location.replace('/v11.42/index.html')}}});
   shell=mountShell({doc:document,anchor:document.getElementById('shell'),controller:c,onRender:()=>panel?.render()});

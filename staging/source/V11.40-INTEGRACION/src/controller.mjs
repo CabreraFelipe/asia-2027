@@ -29,13 +29,13 @@ export async function createController({origin,fetcher=fetch,repository,pending,
  return Object.freeze({
   get state(){return state},get hasPlan(){return plan!==null},get busy(){return busy},get status(){return editing?.status??null},
   async openDiary(){maintenance();return operation(async()=>{
-   await verify();await beforeOpen();await verify();editing=await openOfflineEditing({...options,onStatus:()=>{try{onState(state)}catch{}}});
+   await verify();const initialSetup=(await beforeOpen())===true;await verify();editing=await openOfflineEditing({...options,onStatus:()=>{try{onState(state)}catch{}}});
    try{
     services=await createAccountServices({origin,readSession:verify,fetcher});
     let calls=0;const guarded=fn=>(...a)=>{check(!closing&&!locked,'Diario bloqueado');calls++;return Promise.resolve().then(()=>fn(...a)).finally(()=>calls--)};
     const m=editing.moduleStore,serviceFacade=Object.freeze({available:()=>!closing&&!locked&&services.available(),request:guarded(services.request)});
     const storage=Object.freeze({getItem:k=>editing.storage.getItem(k),setItem(k,v){check(!closing&&!locked,'Diario bloqueado');editing.storage.setItem(k,v)},removeItem(k){check(!closing&&!locked,'Diario bloqueado');editing.storage.removeItem(k)},key:i=>editing.storage.key(i),get length(){return editing.storage.length}});
-    const fixture=Object.freeze({storage,sessionStorage:transient(),services:serviceFacade,moduleStore:Object.freeze({read:guarded(m.read),write:guarded(m.write),readPair:guarded(m.readPair),replacePair:guarded(m.replacePair),close(){}})});
+    const fixture=Object.freeze({storage,initialGoalSetup:initialSetup&&storage.getItem('asia2027-v1')===null,sessionStorage:transient(),services:serviceFacade,moduleStore:Object.freeze({read:guarded(m.read),write:guarded(m.write),readPair:guarded(m.readPair),replacePair:guarded(m.replacePair),close(){}})});
     view=await mount(fixture);check(view&&typeof view.remove==='function','Montaje incompleto');
     view.pending=()=>calls;publish('editing');
    }catch(e){services?.close();view?.remove?.();view=null;try{await editing.close()}catch{}editing=null;throw e}

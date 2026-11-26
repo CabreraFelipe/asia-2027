@@ -13,7 +13,7 @@ const env={STAGING_MODE:'asia-v1111-identity-private',STAGING_ORIGIN:origin,STAG
 const req=(p,auth=false,e=env)=>worker.fetch(new Request(origin+p,{headers:auth?{Cookie:'__Host-asia1111_session='+token}:{}}),e);
 const prefix='/v11.42/';
 assert.equal((await req(prefix+'index.html')).status,200);const m=await (await req(prefix+'manifest.json')).json();assert.equal(m.scope,prefix);assert.equal(m.start_url,prefix+'index.html');assert.equal(m.display,'standalone');assert.equal(m.icons.length,2);
-assert.match(await (await req(prefix+'index.html')).text(),/V11\.48/);
+assert.match(await (await req(prefix+'index.html')).text(),/V11\.49/);
 assert.equal(m.id,prefix);
 assert.match(readFileSync(root+prefix+'index.html','utf8'),/id="advancedUnlock" type="checkbox" autocomplete="off"/);
 assert.equal((await req(prefix+'app.mjs')).status,401);assert.equal((await req(prefix+'diary/index.html')).status,401);assert.equal((await req(prefix+'diary/index.html',true)).headers.get('cache-control'),'no-store');assert.match((await req(prefix+'diary/index.html',true)).headers.get('content-security-policy'),/connect-src 'none'/);
@@ -36,6 +36,8 @@ assert.match(candidateProfile,/h\.textContent=name\|\|'Mi progreso'/);
 assert.match(candidateProfile,/welcome\.hidden=!!name/);
 assert.match(candidateProfile,/inputs\.displayName\.focus/);
 assert.equal((await req(prefix+'diary/profile100.js')).status,401);
+assert.match(readFileSync(root+prefix+'diary/goals101.js','utf8'),/asiaCandidateSession\.initialGoalSetup===true&&data\.settings\?\.goals101===undefined/);
+assert.equal((await req(prefix+'diary/goals101.js')).status,401);
 assert.equal((await req(prefix+'sw.js')).headers.get('service-worker-allowed'),prefix);assert.equal((await req(prefix+'diary/sw.js',true)).status,404);assert.equal((await req('/v11.24/',true)).status,404);assert.equal((await req(prefix+'app.mjs',true,{...env,STAGING_ALLOW_V1142_TESTS:'false'})).status,403);
 assert.equal((await req('/v11.11/auth/me',true)).status,200);db.prepare('DELETE FROM auth_oidc_sessions_v1111').run();assert.equal((await req(prefix+'diary/index.html',true)).status,401);
 db.close();console.log('Package, manifest, isolated origin, Worker auth, no-store, CSP, revoked access and route allowlist verified.');

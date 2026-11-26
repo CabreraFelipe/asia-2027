@@ -92,6 +92,7 @@ try{
   check(!document.querySelector('iframe').inert,'Interacción no habilitada tras verificar Gym');
   if(document.querySelector('iframe').contentDocument.querySelector('img[src*="12345678"]'))check(document.querySelector('iframe').contentDocument.readyState!=='complete','La prueba no ejercitó apertura con carga secundaria pendiente');
   const d=document.querySelector('iframe').contentDocument;
+  check(!d.getElementById('pilotGoals1149').hidden,'Alta local vacía sin opción explícita de metas');
   const routine=d.getElementById('routine');routine.value='0';routine.dispatchEvent(new Event('change'));
   const reference=d.querySelector('.gymPhoto571[data-photo="Barbell_Bench_Press_-_Medium_Grip"]');
   check(reference,'Referencia original de press banca no disponible');
@@ -179,6 +180,7 @@ try{
   if(document.querySelector('iframe').contentDocument.querySelector('header .brand h1').textContent!=='Usuario A')throw Error('Nombre perdido al reabrir');
   const diaryA=document.querySelector('iframe').contentDocument;
   if(!diaryA.getElementById('pilotWelcome1146').hidden)throw Error('Invitación reaparece con perfil persistente');
+  if(!diaryA.getElementById('pilotGoals1149').hidden||!diaryA.getElementById('goalBrand101').textContent.includes('Asia 2027'))throw Error('Cuenta existente reinterpretada como nueva');
   if(diaryA.getElementById('reminderTime821_weight').value!=='06:35'||!diaryA.getElementById('reminderEnabled821_weight').checked||!diaryA.getElementById('reminderCloud95_weight').checked)throw Error('Preferencias de avisos perdidas al reabrir');
 
   el('close1140').click();await wait(()=>!document.querySelector('iframe')&&!el('reconcile1140').disabled,'No cerró');
@@ -218,6 +220,11 @@ try{
   if(diaryB.getElementById('reminderTime821_weight').value==='06:35'||[...diaryB.querySelectorAll('input[id^="reminderEnabled821_"],input[id^="reminderCloud95_"]')].some(x=>x.checked))throw Error('Horario o preferencias cruzadas entre cuentas');
 
   if((await (await fetch('/v11.38/sync')).json()).head!==0)throw Error('Nube cruzada');
+  const w=diaryB.defaultView,setup=diaryB.getElementById('pilotGoals1149'),own=diaryB.getElementById('pilotOwnGoals1149');if(setup.hidden)throw Error('B no tiene alta explícita');
+  const oldConfirm=w.confirm;try{w.confirm=()=>false;own.click();if(setup.hidden||!diaryB.getElementById('goalBrand101').textContent.includes('Asia 2027'))throw Error('Cancelar modificó las metas');w.confirm=()=>true;own.click()}finally{w.confirm=oldConfirm}
+  await wait(()=>setup.hidden&&diaryB.getElementById('goalBrand101').textContent==='Sin meta principal'&&el('status1140').textContent.includes('saved'),'Libro vacío no guardado');
+  for(const [k,v] of Object.entries({title:'Mi meta B',kind:'Fuerza',target:'5 dominadas',motivation:'Constancia',deadline:'2027-08-01'}))diaryB.getElementById('goal101-'+k).value=v;
+  diaryB.getElementById('goalForm101').requestSubmit();await wait(()=>diaryB.getElementById('goalBrand101').textContent==='Meta principal · Mi meta B'&&el('status1140').textContent.includes('saved'),'Primera meta propia no guardada');
   // Freeze a real B pending branch through the existing repository API. This
   // exercises the recovery gate, not a fabricated successful reconciliation.
   el('close1140').click();await wait(()=>!document.querySelector('iframe')&&!el('reconcile1140').disabled,'B no cerró');
@@ -234,6 +241,8 @@ try{
   const repo=await openOfflineRepository();try{if((await repo.inspect('acct_'+'b'.repeat(32)))?.phase!=='frozen')throw Error('Rama congelada perdida')}finally{repo.close()}
   el('reconcile1140').click();await wait(()=>!el('open1140').disabled,'Conciliación explícita no terminó');
   if(el('message1140').textContent.startsWith('No se completó:'))throw Error(el('message1140').textContent);
+  el('sync1140').click();await wait(()=>!el('apply1140').disabled,'No preparó sync de metas v2');el('apply1140').click();await wait(()=>el('message1140').textContent.includes('confirmada'),'Sync v2 no confirmado');
+  if((await (await fetch('/v11.38/sync')).json()).head!==1)throw Error('Copia v2 ausente');
   return true;
  }.toString()+')()',true);assert.equal(recovery,true);
  await cmd('Page.navigate',{url:home});await ready("document.readyState==='complete'&&typeof document.getElementById('openAccount')?.onclick==='function'&&!document.getElementById('shell1140')");
@@ -241,7 +250,9 @@ try{
   const el=id=>document.getElementById(id),wait=async(f,m)=>{for(let i=0;i<200;i++){if(f())return;await new Promise(r=>setTimeout(r,100))}throw Error(m)};
   el('advancedUnlock').checked=true;el('phrase').value='frase sintética paquete completo';el('openAccount').click();await wait(()=>el('unlock').hidden&&!!el('open1140')&&!el('open1140').disabled,'Herramientas avanzadas no disponibles');
   if(document.querySelector('iframe')||!el('maintenance1141')||!el('import1141')||!el('restore1141'))throw Error('Apertura avanzada no preservó recuperación');
-  el('open1140').click();await wait(()=>document.querySelector('iframe')?.contentWindow?.asiaGym84Ready===true&&!el('close1140').disabled,'Apertura manual no disponible');return true;
+  el('open1140').click();await wait(()=>document.querySelector('iframe')?.contentWindow?.asiaGym84Ready===true&&!el('close1140').disabled,'Apertura manual no disponible');
+  const d=document.querySelector('iframe').contentDocument;d.getElementById('goals101').open=true;await wait(()=>d.getElementById('goalActive101').textContent.includes('Constancia'),'Motivación no persistió');
+  if(!d.getElementById('pilotGoals1149').hidden||d.getElementById('goalBrand101').textContent!=='Meta principal · Mi meta B'||d.getElementById('goalActive101').textContent.includes('Asia 2027'))throw Error('Meta v2 perdida o heredada');return true;
  }.toString()+')()',true);assert.equal(advanced,true);
  await evalJS("fetch('/__ci/offline').then(r=>r.text())",true);await cmd('Page.navigate',{url:home});await ready("document.body?.textContent.includes('Volvé a conectarte para verificar tu cuenta')");
  console.log('Chrome paquete generado: autorización, diario, guardado, conciliación, Worker sync, logout, aislamiento, caché pública y fallback offline.');
