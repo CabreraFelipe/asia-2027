@@ -318,3 +318,8 @@ Reconstruido V11.99 sobre 112bc33888d1367d0c4b0f6908551be77b35ab93; original 136
 Base V11.99 13610ba25c4b3a9bea128c72a096abc958ffa2df; no promover hasta gates anteriores. Interfaz piloto explícitamente sintética sin red: revisión exacta de cada turno, preguntas/respuestas fijas, meta de ejemplo y consentimiento separado para copiar solo al formulario manual existente. Invalida revisión de formulario, desactiva acciones de fuerza/Running/nutrición previas, no guarda ni aplica nada. Controlador transportable con identidad/estado y vencimiento, sin persistencia. Pruebas de flujo y Chrome preparadas; no se habilita proveedor, no interpreta texto real ni genera prescripciones. Sin cambios producción.
 
 Reconstruido V11.99.1 sobre 72f62488c266537e39b920107c6b7c2b9b884c11; original 7fc142c4491d9efc3c1f58c484b9d6c1716b7969. CI pendiente.
+
+## V11.99.2 — candidato datos explícitos locales para onboarding
+Base V11.99.1 7fc142c4491d9efc3c1f58c484b9d6c1716b7969; no promover antes de gates anteriores. Captura opcional de fechas, fuerza, Running y nutrición revisados por usuario junto a meta sintética, sin enviar parámetros al proveedor ni inferirlos del texto libre. Transferencia validada a borrador manual, limpia parámetros anteriores, conserva registro y preferencias; nutrición solo guardar tras revisión, no aplicar. No añade prescripción deportiva inicial ni interpreta automáticamente respuestas libres. Pruebas aisladas y CI/browser propios pendientes. Producción intacta.
+
+Reconstruido V11.99.2 sobre e657c3dd3eb7b05192079727bdae70c1c8d255f3; original add1e3101447243c9a61c3ea4c6c57087e58af3d. CI pendiente.
