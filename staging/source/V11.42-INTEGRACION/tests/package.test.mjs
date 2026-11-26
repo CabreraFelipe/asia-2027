@@ -17,6 +17,16 @@ const publicIndex=await (await req(prefix+'index.html')).text();
 assert.ok(publicIndex.includes('<title>Asia 2027 · V11.99.3</title>'),'Versión exacta del título');
 assert.ok(publicIndex.includes('<p>V11.99.3 · Pruebas privadas. Solo datos sintéticos.</p>'),'Versión visible exacta');
 assert.equal(m.id,prefix);
+
+const originalHtml=readFileSync('index.html','utf8'),packagedHtml=readFileSync(root+prefix+'diary/index.html','utf8');
+const scriptBlocks=html=>[...html.matchAll(/<script\b[^>]*>[\s\S]*?<\/script>/gi)].map(m=>m[0]);
+const visibleMarkup=html=>html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'').replace(/<link rel="manifest" href="manifest.json">/,'');
+assert.equal(visibleMarkup(packagedHtml),visibleMarkup(originalHtml),'Conservar HTML y CSS del diario original');
+const originalBlocks=scriptBlocks(originalHtml),packagedBlocks=scriptBlocks(packagedHtml);
+assert.equal(originalBlocks.length,53);
+let originalPosition=0;for(const block of packagedBlocks)if(block===originalBlocks[originalPosition])originalPosition++;
+assert.equal(originalPosition,originalBlocks.length,'Conservar los 53 scripts originales del HTML en orden');
+
 assert.match(readFileSync(root+prefix+'index.html','utf8'),/id="advancedUnlock" type="checkbox" autocomplete="off"/);
 // The pre-auth entry imports exactly this public, data-free helper.
 const entrySource=await (await req(prefix+'entry.js')).text();
