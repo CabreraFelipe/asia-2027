@@ -12,13 +12,14 @@ function calculate(data,kind,proposal,today){
  check(day(today),'Fecha inválida');let next,dates,sportRows=null,qualityRows=null;const x=api();
  if(kind==='strength'){next=x.A.apply(data,proposal,today,x);dates=proposal.view.dates;}
  else if(kind==='bundle'){next=globalThis.asiaCoachBundle1180.apply(data,proposal,today,x,current(data));dates=proposal.view.affectedDates;sportRows=proposal.view.sport?.after??null;qualityRows=proposal.view.running?.after?.filter(x.R.isQuality)??null;}
- else if(kind==='runningQuality'){
+ else if(kind==='runningQuality'||kind==='runningRecovery'){
   check(proposal&&Object.keys(proposal).length===3&&Object.hasOwn(proposal,'draft')&&Object.hasOwn(proposal,'key')&&Object.hasOwn(proposal,'view')&&/^runplan-[a-f0-9]{32}$/.test(proposal.key),'Propuesta Running inválida');
   const {draft,key,view}=proposal,g=x.G(data.settings?.goals101);
-  check(draft.profile?.quality&&draft.rows.some(x.R.isQuality)&&eq(view,{rows:draft.rows}),'Vista Running no coincide');
-  const running=x.R.activate(data.running1174,draft,key,g,data.settings,today,x.S);
+  let running,rows;
+  if(kind==='runningQuality'){check(draft.profile?.quality&&draft.rows.some(x.R.isQuality)&&eq(view,{rows:draft.rows}),'Vista Running no coincide');running=x.R.activate(data.running1174,draft,key,g,data.settings,today,x.S);rows=draft.rows;}
+  else{check(eq(view,{rows:draft.plan.rows}),'Vista de recuperación no coincide');running=x.R.activateRecovery(data.running1174,draft,key,g,data.settings,today,x.S,data.work);rows=running.plans[key].rows;}
   x.R.validateHybrid(running,data.settings,x.S);x.Sport.assertCalendar(data.sport1177,data.settings,running,x.S,x.R);
-  dates=draft.rows.map(r=>r.day);qualityRows=draft.rows.filter(x.R.isQuality);
+  dates=rows.map(r=>r.day);qualityRows=rows.filter(x.R.isQuality);
   check(!dates.some(d=>Object.keys(data.work??{}).some(k=>k.slice(0,10)===d)||Object.values(data.running1174?.sessions??{}).some(s=>s.day===d)||x.Sport.eventsOn(data.sport1177,d).length),'Hay registros o eventos en fechas Running');
   next={...data,running1174:running};
  }

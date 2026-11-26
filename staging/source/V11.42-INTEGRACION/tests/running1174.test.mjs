@@ -67,3 +67,20 @@ assert.throws(()=>R.validateHybrid(qbook,{busy:new Date(Date.parse(qualityRows[0
 assert.doesNotThrow(()=>R.validate(next,goals));
 const tempo=R.draft({...qInput,profile:{...qInput.profile,quality:'Tempo'}},l,goals,settings,today,S);assert.ok(tempo.rows.some(r=>r.type==='Tempo'));
 console.log('Running quality: explicit opt-in, recovery, spacing, taper and legacy compatibility PASS');
+
+// V11.97: coverage is not an inference of missed work, and recovery cannot add dates or dose.
+const qid='runplan-'+'3'.repeat(32),recoveryId='runplan-'+'4'.repeat(32),recoveryInput={planId:qid,start:'2026-12-12',reduceMinutes:true};
+const recovery=plain(R.draftRecovery(recoveryInput,qbook,goals,settings,today,S)),recovered=plain(R.activateRecovery(qbook,recovery,recoveryId,goals,settings,today,S));
+assert.deepEqual(recovered.plans[qid],qbook.plans[qid]);assert.deepEqual(recovered.sessions,qbook.sessions);
+assert.deepEqual(recovery.plan.rows.map(r=>r.day),recovery.before.map(r=>r.day));assert.ok(recovery.plan.rows.every((r,i)=>!R.isQuality(r)&&r.minutes<=recovery.before[i].minutes));
+assert.deepEqual(plain(R.effectiveRows(recovered).filter(r=>r.day<recoveryInput.start)),plain(R.effectiveRows(qbook).filter(r=>r.day<recoveryInput.start)));
+assert.throws(()=>R.activateRecovery(qbook,{...recovery,plan:{...recovery.plan,rows:[]}},recoveryId,goals,settings,today,S));
+assert.throws(()=>R.draftRecovery({...recoveryInput,start:today},qbook,goals,settings,today,S));
+assert.throws(()=>R.draftRecovery(recoveryInput,recovered,goals,settings,today,S));
+assert.throws(()=>R.draftRecovery(recoveryInput,qbook,goals,settings,today,S,{[recovery.before[0].day+'_4']:{}}));
+assert.throws(()=>R.draftRecovery({planId:recoveryId,start:'2026-12-15',reduceMinutes:false},recovered,goals,settings,today,S));
+const coverage=plain(R.coverage(qbook,goals,'2026-12-17'));assert.ok(coverage.length&&coverage.every(r=>r.day<'2026-12-17'&&r.records===0));
+const actualRun={...row,id:'run-'+'e'.repeat(32),day:coverage[0].day},withRun=R.addSession(qbook,actualRun,goals,'2026-12-17');
+assert.equal(R.coverage(withRun,goals,'2026-12-17')[0].records,1);
+assert.deepEqual((await readPortable88(await makePortable88({...diary,running1174:recovered},pair,'frase sintetica running'),'frase sintetica running')).legacy.running1174,recovered);
+console.log('Running recovery: no inferred misses, monotone future reduction, exact review, historical and portable preservation PASS');
