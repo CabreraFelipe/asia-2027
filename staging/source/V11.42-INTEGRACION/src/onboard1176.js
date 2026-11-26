@@ -2,7 +2,7 @@
 (function(root){'use strict';
 const check=(ok,msg)=>{if(!ok)throw Error(msg)},clone=x=>JSON.parse(JSON.stringify(x)),exact=(x,ks)=>x&&typeof x==='object'&&!Array.isArray(x)&&Object.keys(x).length===ks.length&&ks.every(k=>Object.hasOwn(x,k)),day=d=>typeof d==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(d)&&d>='1900-01-01'&&d<='2199-12-31'&&Number.isFinite(Date.parse(d))&&new Date(d).toISOString().slice(0,10)===d;
 const add=(d,n)=>new Date(Date.parse(d)+n*86400000).toISOString().slice(0,10),id=(v,p)=>typeof v==='string'&&new RegExp('^'+p+'-[a-f0-9]{32}$').test(v);
-function snapshot(data,current,today){return JSON.stringify([today,data.settings??{},data.running1174??null,Object.keys(data.work??{}).sort(),current.calories,current.protein]);}
+function snapshot(data,current,today){return JSON.stringify([today,data.settings??{},data.running1174??null,data.sport1177??null,Object.keys(data.work??{}).sort(),current.calories,current.protein]);}
 function prepare(data,raw,ids,today,api,current){
  const {G,S,T,R,N,gym}=api,base=data.settings??{},old=G.validate(base.goals101);
  check(day(today)&&old.version===2,'El asistente manual requiere un libro de metas propio; no convierte el histórico Asia.');
@@ -42,6 +42,7 @@ function prepare(data,raw,ids,today,api,current){
  gym.compatibleSettings(base,settings,data.work);
  R.validate(running,book);if(running!==undefined)R.validateHybrid(running,settings,S);
  S.programmes(settings);
+ root.asiaSport1177?.assertCalendar(data.sport1177,settings,running,S,R);
  const next={...data,settings,...(running===undefined?{}:{running1174:running})};
  return {next,training,run,nutrition,goal:book.items.find(g=>g.id===ids.goal)};
 }

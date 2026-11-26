@@ -14,8 +14,8 @@ const req=(p,auth=false,e=env)=>worker.fetch(new Request(origin+p,{headers:auth?
 const prefix='/v11.42/';
 assert.equal((await req(prefix+'index.html')).status,200);const m=await (await req(prefix+'manifest.json')).json();assert.equal(m.scope,prefix);assert.equal(m.start_url,prefix+'index.html');assert.equal(m.display,'standalone');assert.equal(m.icons.length,2);
 const publicIndex=await (await req(prefix+'index.html')).text();
-assert.ok(publicIndex.includes('<title>Asia 2027 · V11.76</title>'),'Versión exacta del título');
-assert.ok(publicIndex.includes('<p>V11.76 · Pruebas privadas. Solo datos sintéticos.</p>'),'Versión visible exacta');
+assert.ok(publicIndex.includes('<title>Asia 2027 · V11.77</title>'),'Versión exacta del título');
+assert.ok(publicIndex.includes('<p>V11.77 · Pruebas privadas. Solo datos sintéticos.</p>'),'Versión visible exacta');
 assert.equal(m.id,prefix);
 assert.match(readFileSync(root+prefix+'index.html','utf8'),/id="advancedUnlock" type="checkbox" autocomplete="off"/);
 // The pre-auth entry imports exactly this public, data-free helper.
@@ -148,3 +148,5 @@ const {execFileSync:runIsolated1174}=await import('node:child_process');
 runIsolated1174(process.execPath,[new URL('./running1174.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
 
 runIsolated1174(process.execPath,[new URL('./onboard1176.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
+
+runIsolated1174(process.execPath,[new URL('./sport1177.test.mjs',import.meta.url).pathname],{stdio:'inherit'});

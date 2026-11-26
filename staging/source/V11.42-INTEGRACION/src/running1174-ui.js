@@ -9,7 +9,7 @@ const field=(parent,id,label,type,opts={})=>{const l=n('label',label),e=n(type==
 const uuid=p=>p+'-'+Array.from(crypto.getRandomValues(new Uint8Array(16)),v=>v.toString(16).padStart(2,'0')).join('');
 const optional=e=>e.value===''?null:Number(e.value),num=e=>e.value===''?NaN:Number(e.value);
 const fmtPace=p=>p===null?'—':Math.floor(p/60)+':'+String(p%60).padStart(2,'0')+' min/km',km=m=>(m/1000).toLocaleString('es-UY',{maximumFractionDigits:3})+' km';
-function save(next,nextSettings=data.settings){if(blocked600||localStorage.getItem(key)!==disk600)throw Error('Los datos cambiaron. Recargá antes de guardar.');R.validate(next,G.goals101(nextSettings?.goals101));R.validateHybrid(next,nextSettings,S);const old=data;data={...data,settings:nextSettings,running1174:next};if(!persist()){data=old;throw Error('No se guardó; conservá los registros anteriores')}refresh();render()}
+function save(next,nextSettings=data.settings){if(blocked600||localStorage.getItem(key)!==disk600)throw Error('Los datos cambiaron. Recargá antes de guardar.');R.validate(next,G.goals101(nextSettings?.goals101));R.validateHybrid(next,nextSettings,S);window.asiaSport1177?.assertCalendar(data.sport1177,nextSettings,next,S,R);const old=data;data={...data,settings:nextSettings,running1174:next};if(!persist()){data=old;throw Error('No se guardó; conservá los registros anteriores')}refresh();render()}
 function reveal(){tab('training');root.open=true;root.scrollIntoView({block:'start'});render()}
 window.asiaOpenRunning1174=reveal;
 button(el('home42'),'homeRunning1174','Running y preparación de carreras',reveal);

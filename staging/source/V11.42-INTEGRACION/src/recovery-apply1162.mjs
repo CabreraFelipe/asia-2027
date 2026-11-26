@@ -27,7 +27,7 @@ export function reconcileDiary1164(historical,local,cloud){
  const result=structuredClone(c??l);
  let changed=false;
  for(const k of keys(h,l,c)){
-  if(maps.includes(k)||k==='running1174')continue;
+  if(maps.includes(k)||k==='running1174'||k==='sport1177')continue;
   if(l&&c&&(own(l,k)!==own(c,k)||own(l,k)&&!eq(l[k],c[k])))conflict(k,'different-values');
   else if(own(h,k)&&!own(l,k)&&!own(c,k))conflict(k,'historical-only');
  }
@@ -42,6 +42,18 @@ export function reconcileDiary1164(historical,local,cloud){
     if(!inL&&!inC){conflict(path,'historical-only');continue}
     if(inL&&inC){if(!eq(b[name][k],d[name][k]))conflict(path,'different-values');continue}
     add(path,inL?'local':'cloud');if(inL&&c){result.running1174[name][k]=structuredClone(b[name][k]);changed=true}
+   }
+  }
+ }
+ if(own(h,'sport1177')||own(l,'sport1177')||own(c,'sport1177')){
+  const a=h?.sport1177,b=l?.sport1177,d=c?.sport1177;
+  if(!b&&!d)conflict('sport1177','historical-only');else{
+   if(!result.sport1177){result.sport1177=structuredClone(b??d);changed=true}
+   for(const name of ['profiles','events','plans','sessions','metrics'])for(const k of keys(a?.[name],b?.[name],d?.[name])){
+    const inL=Object.hasOwn(b?.[name]??{},k),inC=Object.hasOwn(d?.[name]??{},k),path='sport1177/'+name+'/'+k;
+    if(!inL&&!inC){conflict(path,'historical-only');continue}
+    if(inL&&inC){if(!eq(b[name][k],d[name][k]))conflict(path,'different-values');continue}
+    add(path,inL?'local':'cloud');if(inL&&c){result.sport1177[name][k]=structuredClone(b[name][k]);changed=true}
    }
   }
  }
