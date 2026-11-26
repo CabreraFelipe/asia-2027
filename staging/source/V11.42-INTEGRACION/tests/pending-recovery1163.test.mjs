@@ -10,7 +10,7 @@ function gymSession(id,date,now){
 const gymLocal=gymSession('gym-local','2026-11-25',1700000000000);
 const gymCloud=gymSession('gym-cloud','2026-11-24',1699999000000);
 
-import {preparePendingRecovery1163,prepareAdditiveRecovery1162} from '../dist/assets/v11.42/staging/source/V11.42-INTEGRACION/src/recovery-apply1162.mjs';
+import {preparePendingRecovery1163,prepareAdditiveRecovery1162,prepareGranularReview1168} from '../dist/assets/v11.42/staging/source/V11.42-INTEGRACION/src/recovery-apply1162.mjs';
 import {encrypt84,decrypt84,empty84} from '../../../../model84.mjs';
 const bookBase=empty84(),bookLocal={...bookBase,measurements:[{id:'local-measurement',day:'2026-11-25',kind:'Cintura',cm:80}]},bookCloud={...bookBase,threads:[{id:'cloud-thread',day:'2026-11-24',kind:'General',note:'nota sintética'}]};
 import {hashBytes} from '../dist/assets/v11.42/staging/source/V11.38-INTEGRACION/src/large-sync.mjs';
@@ -40,7 +40,17 @@ await assert.rejects(preparePendingRecovery1163({...options,repository:{...repos
 await assert.rejects(preparePendingRecovery1163({...options,pending:{inspect:pending.inspect}}),/Confirmá mantenimiento y repositorio/);
 assert.equal(writes,0);assert.equal(commits,0);assert.equal(finishes,0);
 let plan=await preparePendingRecovery1163(options);assert.equal(plan.kind,'blocked');assert.equal(plan.reason,'freeze-required');assert.equal(writes,0);
-branch.phase='frozen';const frozen=structuredClone(branch);
+const previewPending={...pending,async freezeReviewed(account,expected){assert.equal(account,id);assert.deepEqual(branch,expected);branch.phase='frozen';return structuredClone(branch)}};
+const previewOptions={...options,pending:previewPending};
+const preview=await prepareGranularReview1168(previewOptions);
+assert.equal(preview.granular.canFreeze,true);assert.deepEqual(preview.granular.conflicts,[]);assert.equal(branch.phase,'editing');
+assert.ok(preview.granular.additions.some(x=>x.group==='gym'&&x.key==='sessions/gym-local'));
+assert.equal((await preview.apply({confirmed:true,savedArchive:preview.archive})).kind,'verified-only');
+assert.equal(branch.phase,'editing');assert.equal(writes,0);assert.equal(commits,0);
+const freezePlan=await prepareGranularReview1168(previewOptions);
+assert.equal((await freezePlan.apply({confirmed:true,savedArchive:freezePlan.archive,freezeReviewed:true})).kind,'frozen-review');
+assert.equal(branch.phase,'frozen');assert.equal(writes,0);assert.equal(commits,0);
+const frozen=structuredClone(branch);
 branch.working=await row({...work,modules:{...work.modules,coach:{history:['diferente']}}},5);
 plan=await preparePendingRecovery1163(options);assert.equal(plan.kind,'conflict');assert.equal(writes,0);assert.equal(finishes,0);
 branch=structuredClone(frozen);

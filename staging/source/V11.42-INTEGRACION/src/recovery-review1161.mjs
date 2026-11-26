@@ -115,17 +115,19 @@ export async function verifyRecoveryArchive1161({archive,backupPhrase,accountId}
 
 // A review plan is deliberately read-only. Reopening a downloaded file does
 // not authorize migration, freezing a branch, or applying any changes.
-export async function makeReviewPlan1167({review,client,backupPhrase}){
+export async function makeReviewPlan1167({review,client,backupPhrase,freeze=null}){
  check(review?.kind==='review'&&review.commonAncestorProven===false,'Revisión inválida');
  const id=client.accountId,identity=await client.verify();
  check(identity.accountId===id,'Cuenta inválida');
  const digest=await checksum84(review.archive);
  let active=true;
- return Object.freeze({...review,cancel(){active=false},async apply({confirmed,savedArchive}={}){
+ return Object.freeze({...review,cancel(){active=false},async apply({confirmed,savedArchive,freezeReviewed=false}={}){
   check(active&&confirmed===true&&savedArchive,'Confirmá la verificación del archivo');active=false;
   const verify=async()=>{const s=await client.verify();check(s.accountId===id&&s.csrf===identity.csrf,'La sesión cambió')};
+  check(freezeReviewed===false||freezeReviewed===true&&typeof freeze==='function','Congelación no disponible');
   await verify();check(await checksum84(savedArchive)===digest,'El archivo no coincide con esta revisión');
   const result=await verifyRecoveryArchive1161({archive:savedArchive,backupPhrase,accountId:id});await verify();
+  if(freezeReviewed===true){check(await freeze()===true,'Congelación no confirmada');return {kind:'frozen-review',...result}}
   return {kind:'verified-only',...result};
  }});
 }

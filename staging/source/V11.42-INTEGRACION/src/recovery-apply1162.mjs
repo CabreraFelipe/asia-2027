@@ -1,6 +1,6 @@
 // Synthetic-only private additive recovery. No arbitrary conflict resolution,
 // no deletion, no UI. Remote append CAS precedes local CAS.
-import {prepareRecoveryReview1161,verifyRecoveryArchive1161} from './recovery-review1161.mjs';
+import {prepareRecoveryReview1161,verifyRecoveryArchive1161,makeReviewPlan1167} from './recovery-review1161.mjs';
 import {localPayload,validatePayload} from '../../V11.36-INTEGRACION/src/sync.mjs';
 import {validateLargeList} from '../../V11.38-INTEGRACION/src/large-sync-client.mjs';
 import {validLargeEnvelope,hashBytes} from '../../V11.38-INTEGRACION/src/large-sync.mjs';
@@ -168,6 +168,46 @@ function union(reference,local,cloud,policy){
   }else{const v=choose('module',k,getM(reference,k),getM(local,k),getM(cloud,k));if(v!==missing)modules[k]=v}
  }
  return {conflicts,additions,payload:conflicts.length?null:validatePayload({entries,modules},policy)};
+}
+// The preview uses the same whole-record union as actual recovery. A preview
+// never returns the merged plaintext to the UI and does not create a writer.
+export async function prepareGranularReview1168(options){
+ const {client,repository,pending,policy,oldPhrase,backupPhrase}=options,id=client.accountId;
+ const identity=await client.verify();
+ const verify=async()=>{const s=await client.verify();check(s.accountId===id&&s.csrf===identity.csrf,'La sesión cambió');return s};
+ check(identity.accountId===id,'Cuenta inválida');
+ const source=await repository.readSync(id),branch=await pending.inspect(id),saved=await repository.readRekey(id),previous=await repository.readRecovery(id);
+ const unchanged=async()=>{await verify();check(eq(source,await repository.readSync(id))&&eq(branch,await pending.inspect(id))&&eq(saved,await repository.readRekey(id))&&eq(previous,await repository.readRecovery(id)),'Los registros locales cambiaron')};
+ const review=await prepareRecoveryReview1161(options);await unchanged();
+ const manifest=await decrypt84(review.archive.manifest,backupPhrase);
+ const key=await client.managedKey();
+ const part=async name=>{const p=review.archive.parts.find(x=>x.name===name);check(p,'Parte ausente');return (await decrypt84(p.envelope,backupPhrase)).value};
+ const historical=validatePayload((await part('historical')).payload,policy);
+ const cloud=validatePayload((await part(manifest.head===manifest.receipt.revision?'migrated':'cloud-current')).payload,policy);
+ const read=async(label,row)=>{const epoch=review.views.find(v=>v.label===label)?.epoch;check(['legacy','managed','empty'].includes(epoch),'Época inválida');return localPayload({row,readSession:verify,passphrase:epoch==='legacy'?oldPhrase:key,policy})};
+ const local=await read('confirmed',source);let combined=local.payload,conflicts=[],additions=[];
+ if(branch){
+  for(const [label,row] of [['pending-base',branch.base],['pending-working',branch.working]]){
+   const p=await read(label,row);
+   if(!eq(p.devices,local.devices)){conflicts.push({group:'device',key:label,reason:'different-device-state'});break}
+   const merged=union({entries:[],modules:{}},combined,p.payload,policy);
+   if(merged.conflicts.length){conflicts.push(...merged.conflicts);break}
+   combined=merged.payload;
+  }
+ }
+ if(!conflicts.length){const merged=union(historical,combined,cloud,policy);conflicts=merged.conflicts;additions=merged.additions}
+ const canFreeze=!!branch&&branch.phase==='editing'&&!conflicts.length&&!previous&&typeof pending.freezeReviewed==='function';
+ async function freeze(){
+  check(canFreeze,'Congelación no disponible');
+  await unchanged();check(eq(await client.discover(),manifest.receipt)&&validateLargeList(await client.request('GET')).head===manifest.head,'La nube cambió');
+  const remote=await client.request('GET',null,manifest.head);
+  check(remote?.ok===true&&remote.revision===manifest.head&&await sha(remote.envelope)===manifest.headSha,'Huella remota cambió');
+  await unchanged();const result=await pending.freezeReviewed(id,branch);
+  check(result?.phase==='frozen'&&eq(result.base,branch.base)&&eq(result.working,branch.working),'Congelación no confirmada');await verify();
+  return true;
+ }
+ await unchanged();
+ return makeReviewPlan1167({review:{...review,granular:{conflicts,additions,branchPhase:branch?.phase??null,canFreeze}},client,backupPhrase,freeze:canFreeze?freeze:null});
 }
 export function prepareAdditiveRecovery1162(options){return prepare(options,false)}
 export function preparePendingRecovery1163(options){return prepare(options,true)}

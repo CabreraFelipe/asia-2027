@@ -10,7 +10,7 @@ import {openEncryptedModuleStore} from './staging/source/V11.28-INTEGRACION/src/
 import {createLargeTransport} from './staging/source/V11.38-INTEGRACION/src/large-transport.mjs';
 import {prepareLargeSync,validateLargeList} from './staging/source/V11.38-INTEGRACION/src/large-sync-client.mjs';
 import {createRekeyClient1159} from './staging/source/V11.42-INTEGRACION/src/rekey-client1159.mjs';
-import {prepareRecoveryReview1161,makeReviewPlan1167} from './staging/source/V11.42-INTEGRACION/src/recovery-review1161.mjs';
+import {prepareGranularReview1168} from './staging/source/V11.42-INTEGRACION/src/recovery-apply1162.mjs';
 export async function start(passphrase,{maintenanceOnly=false,expectedIdentity=null,managedRecovery=false}={}){
  const repository=await openUnifiedRepository(),pending=await openOfflineRepository();let shell,panel;
  const mount=async fixture=>{
@@ -89,7 +89,7 @@ export async function start(passphrase,{maintenanceOnly=false,expectedIdentity=n
    }catch(e){throw Error('No se completó la recuperación automática. No se enviaron ni descartaron registros. '+e.message)}
    finally{plan?.cancel()}
   };
-  const c=await createController({origin:location.origin,repository,pending,policy:globalThis.asiaAccounts106,passphrase,mount,beforeOpen,expectedIdentity:identity,managedWrite:managedRecovery,recoveryReview:async options=>{const client=await createRekeyClient1159(options);const review=await prepareRecoveryReview1161({...options,client});return makeReviewPlan1167({review,client,backupPhrase:options.backupPhrase})},onState:s=>{shell?.render();panel?.render();if(s==='closed'){repository.close();pending.close();location.replace('/v11.42/index.html')}}});
+  const c=await createController({origin:location.origin,repository,pending,policy:globalThis.asiaAccounts106,passphrase,mount,beforeOpen,expectedIdentity:identity,managedWrite:managedRecovery,recoveryReview:async options=>{const client=await createRekeyClient1159(options);return prepareGranularReview1168({...options,client})},onState:s=>{shell?.render();panel?.render();if(s==='closed'){repository.close();pending.close();location.replace('/v11.42/index.html')}}});
   shell=mountShell({doc:document,anchor:document.getElementById('shell'),controller:c,onRender:()=>panel?.render()});
   panel=mountMaintenance({doc:document,anchor:document.getElementById('shell'),controller:c,onChange:()=>shell.render()});
   // Use the same guarded shell action as manual opening. Its error handling
