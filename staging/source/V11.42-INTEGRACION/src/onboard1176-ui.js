@@ -30,6 +30,14 @@ btn('onboardReview1176','Revisar plan',()=>{proposal=null;preview.replaceChildre
 btn('onboardApply1176','Aceptar y aplicar plan',()=>{if(!proposal||rawAtReview!==JSON.stringify(input()))throw Error('Revisá el plan actualizado.');if(busy())throw Error('Finalizá la sesión activa o recargá los datos.');if(!confirm('¿Aplicar el plan completo revisado? No se alteran registros anteriores ni permisos.'))return;const next=O.apply(data,proposal,date(),api,window.asiaGoals50()),old=data;data=next;try{syncRoutineCatalog826();if(!persist())throw Error('No se pudo guardar el plan; se conserva la configuración anterior.')}catch(e){data=old;syncRoutineCatalog826();throw e}proposal=null;preview.replaceChildren();message.textContent='Plan personal guardado.';refresh()});
 btn('onboardReject1176','Descartar propuesta',()=>{proposal=null;preview.replaceChildren();message.textContent='Propuesta descartada. Sin cambios guardados.'});
 panel.append(preview,message);
+// Explicit form-only handoff from the initial conversation. Never saves or generates a plan.
+window.asiaOnboardDraft11991=Object.freeze({loadGoal(g){
+ if(panel.hidden||busy())throw Error('Asistente manual no disponible');
+ if(!g||Object.keys(g).length!==3||typeof g.title!=='string'||!g.title.trim()||g.title.length>80||typeof g.target!=='string'||g.target.length>120||![...kind.options].some(o=>o.value===g.kind))throw Error('Meta no compatible');
+ proposal=null;rawAtReview='';preview.replaceChildren();
+ title.value=g.title;kind.value=g.kind;target.value=g.target;motivation.value='';start.value=date();deadline.value='';end.value=O.add(date(),27);primary.checked=false;personal.checked=false;mode.value='Solo meta';action.value='Sin estrategia';
+ panel.open=true;message.textContent='Meta copiada al formulario. Revisá y completá los datos; no se guardó.';
+}});
 function visible(){panel.hidden=data.settings?.goals101?.version!==2;}
 const prior=refresh;refresh=function(){const v=prior.apply(this,arguments);visible();return v};visible();
 })();

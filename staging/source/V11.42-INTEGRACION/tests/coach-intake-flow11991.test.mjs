@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import {createIntakeFlow11991} from '../src/coach-intake-flow11991.mjs';
+let t=1000,stamp='diary-a',ready=true;const state=()=>({stamp,ready});
+const c=createIntakeFlow11991({getState:state,allowSynthetic:true,now:()=>t});
+let v=c.prepare('Objetivo de prueba');assert.equal(v.phase,'consent');assert.equal(v.providerAvailable,false);
+await assert.rejects(()=>c.send(v,false,'synthetic'));await assert.rejects(()=>c.send({...v,epoch:999},true,'synthetic'));await assert.rejects(()=>c.send(v,true,'provider'));
+v=await c.send(v,true,'synthetic');assert.equal(v.reply.kind,'clarify');assert.equal(v.source,'synthetic');
+assert.throws(()=>c.advance(v,['solo una']));v=c.advance(v,['5 km ficticios','3 días ficticios']);assert.equal(v.payload.turns.length,2);
+await assert.rejects(()=>c.send(v,false,'synthetic'));v=await c.send(v,true,'synthetic');assert.equal(v.reply.kind,'goal');
+assert.throws(()=>c.takeGoal(v,false));const goal=c.takeGoal(v,true);assert.equal(goal.kind,'Running');assert.equal(c.view().phase,'idle');assert.throws(()=>c.takeGoal(v,true));
+v=c.prepare('Otra prueba');stamp='diary-b';await assert.rejects(()=>c.send(v,true,'synthetic'));assert.equal(c.view().phase,'idle');
+v=c.prepare('Prueba vencida');t+=120001;await assert.rejects(()=>c.send(v,true,'synthetic'));
+ready=false;assert.throws(()=>c.prepare('Prueba bloqueada'));ready=true;c.close();assert.throws(()=>c.prepare('Cerrado'));
+let sent=0;const mock={available:()=>true,preview:input=>({payload:input,expiresAt:t+60000}),send:async a=>{sent++;return {input:a.payload,reply:{kind:'goal',answer:'Ejemplo inyectado',questions:[],goal:{title:'Meta revisada',kind:'Otro',target:''}},expiresAt:a.expiresAt}},take:async a=>a,discard(){}};
+const realFlow=createIntakeFlow11991({getState:state,transport:mock,now:()=>t});v=realFlow.prepare('Texto ficticio');assert.equal(v.providerAvailable,true);await assert.rejects(()=>realFlow.send(v,false,'provider'));assert.equal(sent,0);v=await realFlow.send(v,true,'provider');assert.equal(sent,1);assert.equal(realFlow.takeGoal(v,true).title,'Meta revisada');
+console.log('Intake flow: exact consent, clarification, transfer only, state changes, expiration, injected provider PASS');
