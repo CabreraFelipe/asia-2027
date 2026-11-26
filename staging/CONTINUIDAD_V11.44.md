@@ -298,3 +298,6 @@ Base V11.95 601fc287c6904180d110464b2e952c7836ccc999, no promover antes de gates
 
 ## V11.97 — candidato recuperación Running
 Base V11.96 e89e94e0978b17eb012506005463d495df4bc9bf; no promover antes de gates anteriores. Cobertura por fecha en 14 días (no acredita cumplimiento ni omisión), ajuste voluntario estrictamente futuro sin nuevas fechas, calidad a rodaje suave, reducción opcional de duración del 20% con mínimo histórico de 5 min. Preserva original, registros, perfil histórico y objetivos; sin crecimiento automático ni inferencia clínica. Guardado local coordinado cifrado y recálculo. Pruebas dominio y portable preparadas; CI integral y recorrido Chrome nuevo pendientes. No resuelve cancelación completa ni conflictos distribuidos. Producción intacta.
+
+## V11.98 — candidato agenda integral de lectura
+Base V11.97 963336aea32c997429d7645538d0a9e5625b34b1; no promover hasta gates anteriores. Proyección local de 14 días de clásico/PRO/Running/deporte, eventos y registros separados, advertencias de coincidencia/vecindad y estado PRO desconocido. No deduce descanso, carga fisiológica ni cumplimiento; refresco explícito, sin escrituras ni nuevos datos persistidos. Pruebas dominio preparadas; CI y Chrome del recorrido nuevo pendientes. No acredita coordinación distribuida ni completa el bloque entrenamiento. Sin cambios a producción.
