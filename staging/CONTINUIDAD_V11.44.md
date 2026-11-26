@@ -298,3 +298,8 @@ Base V11.95 601fc287c6904180d110464b2e952c7836ccc999, no promover antes de gates
 
 ## V11.96 — corrección de regresión Chrome
 SHA original e89e94e0978b17eb012506005463d495df4bc9bf: fuentes, D1/R2 y PWA aprobados; Chrome normal/lento fallaron con «Plan híbrido no guardado | sin mensaje | Diario abierto · saved» (run 45911184475). Bloqueo de UI asíncrono conservado; expone aria-busy y la prueba espera terminar revisión/rechazo. No se cambian motores ni reglas de planificación. Repetir cuatro gates antes de promover. Los candidatos descendientes deberán reconstruirse sobre este SHA corregido; no forzar refs ni mezclar workflows de validación. Producción intacta.
+
+## V11.97 — candidato recuperación Running
+Base V11.96 e89e94e0978b17eb012506005463d495df4bc9bf; no promover antes de gates anteriores. Cobertura por fecha en 14 días (no acredita cumplimiento ni omisión), ajuste voluntario estrictamente futuro sin nuevas fechas, calidad a rodaje suave, reducción opcional de duración del 20% con mínimo histórico de 5 min. Preserva original, registros, perfil histórico y objetivos; sin crecimiento automático ni inferencia clínica. Guardado local coordinado cifrado y recálculo. Pruebas dominio y portable preparadas; CI integral y recorrido Chrome nuevo pendientes. No resuelve cancelación completa ni conflictos distribuidos. Producción intacta.
+
+Reconstruido sobre V11.96 corregida aa1ca875678df195f3a9ee8a9fde28c182d065d9. Incluye sincronización de prueba Chrome y conserva el código de recuperación; no promover antes de CI V11.96.

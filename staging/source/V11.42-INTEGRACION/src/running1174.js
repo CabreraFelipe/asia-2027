@@ -103,9 +103,38 @@ function activate(raw,proposal,planId,goals,settings,today,schedule){
  const actual=draft(proposal,raw,goals,settings,today,schedule);check(JSON.stringify(actual)===JSON.stringify(proposal),'El borrador o calendario cambió; generá nuevamente');
  const b=clone(validate(raw,goals));check(!Object.hasOwn(b.plans,planId),'Plan ya existe');b.plans[planId]={id:planId,...clone(actual)};return validate(b,goals);
 }
+// Historical date coverage only; a missing record is not proof of a missed workout.
+function coverage(raw,goals,today,lookback=14){
+ const b=validate(raw,goals);check(day(today)&&int(lookback,1,90),'Período inválido');
+ const from=add(today,-lookback),counts=new Map();
+ for(const s of Object.values(b.sessions))if(s.day>=from&&s.day<today)counts.set(s.day,(counts.get(s.day)??0)+1);
+ return effectiveRows(b).filter(r=>r.day>=from&&r.day<today).map(r=>({day:r.day,planId:r.planId,type:r.type,minutes:r.minutes,records:counts.get(r.day)??0}));
+}
+// Reduce future prescribed work only; no recovery debt, shifted dates or new quality.
+function draftRecovery(input,raw,goals,settings,today,schedule,work={}){
+ const b=validate(raw,goals);
+ check(exact(input,['planId','start','reduceMinutes'])&&day(today)&&day(input.start)&&input.start>today&&typeof input.reduceMinutes==='boolean','Elegí un tramo futuro y una reducción');
+ const old=b.plans[input.planId];
+ check(old&&input.start>old.start&&input.start<=old.end&&!Object.values(b.plans).some(p=>p.replaces===old.id)&&goals.items.some(g=>g.id===old.goalId&&g.status==='Activa'),'Bloque Running no disponible');
+ check(!Object.values(b.sessions).some(s=>s.day>=input.start&&s.day<=old.end),'Hay carreras registradas en ese tramo');
+ const before=old.rows.filter(r=>r.day>=input.start);
+ check(before.length&&!before.some(r=>Object.keys(work).some(k=>k.slice(0,10)===r.day)),'Hay registros o no hay sesiones futuras para ajustar');
+ const rows=before.map(r=>({...r,type:isQuality(r)?'Rodaje suave':r.type,minutes:input.reduceMinutes?Math.max(5,Math.floor(r.minutes*.8)):r.minutes}));
+ check(rows.some((r,i)=>r.type!==before[i].type||r.minutes<before[i].minutes),'No hay reducción efectiva');
+ check(rows.every(r=>schedule.planned(r.day,settings)===null),'Revisá las coincidencias con fuerza antes de guardar');
+ const profile=old.profile?Object.fromEntries(Object.entries({...old.profile,progress:false}).filter(([k])=>k!=='quality')):undefined;
+ const candidate={goalId:old.goalId,start:input.start,end:old.end,days:clone(old.days),weeklyMinutes:old.weeklyMinutes,longestMinutes:old.longestMinutes,rows,...(profile?{profile}:{}),replaces:old.id};
+ const probe=clone(b);let i=0,key;do{key='runplan-'+(i++).toString(16).padStart(32,'0')}while(Object.hasOwn(probe.plans,key));
+ probe.plans[key]={id:key,...candidate};validate(probe,goals);validateHybrid(probe,settings,schedule);
+ return {input:clone(input),before:clone(before),plan:clone(candidate)};
+}
+function activateRecovery(raw,proposal,key,goals,settings,today,schedule,work={}){
+ const actual=draftRecovery(proposal.input,raw,goals,settings,today,schedule,work);check(JSON.stringify(actual)===JSON.stringify(proposal),'Cambió la revisión de recuperación');
+ const b=clone(validate(raw,goals));check(!Object.hasOwn(b.plans,key),'Plan ya existe');b.plans[key]={id:key,...actual.plan};validate(b,goals);validateHybrid(b,settings,schedule);return b;
+}
 function metrics(raw,today){check(day(today),'Fecha inválida');const from=add(today,-6),rows=Object.values(raw?.sessions??{}).filter(r=>r.day>=from&&r.day<=today);
  const byMode={};for(const mode of modes){const list=rows.filter(x=>x.mode===mode),distanceM=list.reduce((s,r)=>s+r.distanceM,0),seconds=list.reduce((s,r)=>s+r.seconds,0);byMode[mode]={sessions:list.length,distanceM,seconds,pace:distanceM?Math.round(seconds*1000/distanceM):null}}
  return {sessions:rows.length,distanceM:rows.reduce((s,r)=>s+r.distanceM,0),seconds:rows.reduce((s,r)=>s+r.seconds,0),longestM:Math.max(0,...rows.map(r=>r.distanceM)),byMode}
 }
-root.asiaRunning1174=Object.freeze({empty,validate,addTarget,addSession,pace,draft,activate,planned,effectiveRows,assertStrengthChange,validateHybrid,metrics,modes,types,levels,isQuality,qualityDetails,qualityTypes});
+root.asiaRunning1174=Object.freeze({empty,validate,addTarget,addSession,pace,draft,activate,planned,effectiveRows,assertStrengthChange,validateHybrid,metrics,modes,types,levels,isQuality,qualityDetails,qualityTypes,coverage,draftRecovery,activateRecovery});
 })(globalThis);
