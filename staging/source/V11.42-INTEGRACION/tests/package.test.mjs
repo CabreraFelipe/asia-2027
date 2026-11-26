@@ -12,7 +12,7 @@ const env={STAGING_MODE:'asia-v1111-identity-private',STAGING_ORIGIN:origin,STAG
 const req=(p,auth=false,e=env)=>worker.fetch(new Request(origin+p,{headers:auth?{Cookie:'__Host-asia1111_session='+token}:{}}),e);
 const prefix='/v11.42/';
 assert.equal((await req(prefix+'index.html')).status,200);const m=await (await req(prefix+'manifest.json')).json();assert.equal(m.scope,prefix);assert.equal(m.start_url,prefix+'index.html');assert.equal(m.display,'standalone');assert.equal(m.icons.length,2);
-assert.match(await (await req(prefix+'index.html')).text(),/V11\.45/);
+assert.match(await (await req(prefix+'index.html')).text(),/V11\.46/);
 assert.equal(m.id,prefix);
 assert.match(readFileSync(root+prefix+'index.html','utf8'),/id="advancedUnlock" type="checkbox" autocomplete="off"/);
 assert.equal((await req(prefix+'app.mjs')).status,401);assert.equal((await req(prefix+'diary/index.html')).status,401);assert.equal((await req(prefix+'diary/index.html',true)).headers.get('cache-control'),'no-store');assert.match((await req(prefix+'diary/index.html',true)).headers.get('content-security-policy'),/connect-src 'none'/);
@@ -30,7 +30,10 @@ for(const n of ['push.js','rest533.js','reminders845.js','gym53.js','v4.js'])ass
 const originalReminders=readFileSync('reminders821.js','utf8');
 const expectedReminders=originalReminders.replace("cloudKeys.includes(k)?raw?.enabled?.[k]!==false:raw?.enabled?.[k]===true","raw?.enabled?.[k]===true").replace("typeof raw?.cloudEnabled?.[k]==='boolean'?raw.cloudEnabled[k]:raw?.enabled?.[k]!==false","typeof raw?.cloudEnabled?.[k]==='boolean'?raw.cloudEnabled[k]:raw?.enabled?.[k]===true").replace("Horarios en Uruguay. Elegí qué mostrar al abrir la app y qué programar en la nube.","Horarios en Uruguay. Cada cuenta elige sus propios avisos; los horarios sugeridos no activan notificaciones. Elegí qué mostrar al abrir la app y qué programar en la nube.");
 assert.equal(readFileSync(root+prefix+'diary/reminders821.js','utf8'),expectedReminders,'Solo se permite adaptar consentimiento inicial y explicación');
-assert.match(readFileSync(root+prefix+'diary/profile100.js','utf8'),/h\.textContent=window\.asiaExtras830\.profile100/);
+const candidateProfile=readFileSync(root+prefix+'diary/profile100.js','utf8');
+assert.match(candidateProfile,/h\.textContent=name\|\|'Mi progreso'/);
+assert.match(candidateProfile,/welcome\.hidden=!!name/);
+assert.match(candidateProfile,/inputs\.displayName\.focus/);
 assert.equal((await req(prefix+'diary/profile100.js')).status,401);
 assert.equal((await req(prefix+'sw.js')).headers.get('service-worker-allowed'),prefix);assert.equal((await req(prefix+'diary/sw.js',true)).status,404);assert.equal((await req('/v11.24/',true)).status,404);assert.equal((await req(prefix+'app.mjs',true,{...env,STAGING_ALLOW_V1142_TESTS:'false'})).status,403);
 assert.equal((await req('/v11.11/auth/me',true)).status,200);db.prepare('DELETE FROM auth_oidc_sessions_v1111').run();assert.equal((await req(prefix+'diary/index.html',true)).status,401);

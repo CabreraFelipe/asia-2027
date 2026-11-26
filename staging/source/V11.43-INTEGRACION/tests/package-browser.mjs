@@ -105,11 +105,13 @@ try{
   d.getElementById('height').value='1.86';d.getElementById('saveHeight').click();
   await wait(()=>el('status1140').textContent.includes('saved'),'No guardó');
   const heading=d.querySelector('header .brand h1');check(heading.textContent==='Mi progreso','Cuenta sin nombre no conserva título');
-  const profile=d.getElementById('profile100');profile.open=true;
+  const profile=d.getElementById('profile100'),welcome=d.getElementById('pilotWelcome1146');
+  check(welcome&&!welcome.hidden,'Cuenta nueva sin invitación a personalizar nombre');
+  d.getElementById('pilotName1146').click();check(profile.open&&d.activeElement===d.getElementById('profile100-displayName'),'Acceso inicial a perfil no funcional');
   const name=d.getElementById('profile100-displayName'),form=d.getElementById('profileForm100');
   name.value='Usuario A <b>prueba</b>';name.dispatchEvent(new Event('input',{bubbles:true}));form.requestSubmit();
   await wait(()=>heading.textContent==='Usuario A <b>prueba</b>'&&el('status1140').textContent.includes('saved'),'No guardó nombre de perfil');
-  check(heading.children.length===0,'Nombre interpretado como HTML');
+  check(heading.children.length===0,'Nombre interpretado como HTML');check(welcome.hidden,'Invitación sigue visible con nombre guardado');
   name.value='Usuario A';name.dispatchEvent(new Event('input',{bubbles:true}));form.requestSubmit();
   await wait(()=>heading.textContent==='Usuario A'&&el('status1140').textContent.includes('saved'),'No actualizó nombre');
 
@@ -173,6 +175,7 @@ try{
   if(document.querySelector('iframe').contentDocument.getElementById('height').value!=='1.86')throw Error('Registro perdido tras reinicio');
   if(document.querySelector('iframe').contentDocument.querySelector('header .brand h1').textContent!=='Usuario A')throw Error('Nombre perdido al reabrir');
   const diaryA=document.querySelector('iframe').contentDocument;
+  if(!diaryA.getElementById('pilotWelcome1146').hidden)throw Error('Invitación reaparece con perfil persistente');
   if(diaryA.getElementById('reminderTime821_weight').value!=='06:35'||!diaryA.getElementById('reminderEnabled821_weight').checked||!diaryA.getElementById('reminderCloud95_weight').checked)throw Error('Preferencias de avisos perdidas al reabrir');
 
   el('close1140').click();await wait(()=>!document.querySelector('iframe')&&!el('reconcile1140').disabled,'No cerró');
@@ -189,6 +192,7 @@ try{
   if(document.querySelector('iframe').contentDocument.getElementById('height').value==='1.86')throw Error('Datos cruzados');
   if(document.querySelector('iframe').contentDocument.querySelector('header .brand h1').textContent!=='Mi progreso')throw Error('Nombre cruzado entre cuentas');
   const diaryB=document.querySelector('iframe').contentDocument;
+  if(diaryB.getElementById('pilotWelcome1146').hidden)throw Error('Cuenta B hereda personalización de A');
   if(diaryB.getElementById('reminderTime821_weight').value==='06:35'||[...diaryB.querySelectorAll('input[id^="reminderEnabled821_"],input[id^="reminderCloud95_"]')].some(x=>x.checked))throw Error('Horario o preferencias cruzadas entre cuentas');
 
   if((await (await fetch('/v11.38/sync')).json()).head!==0)throw Error('Nube cruzada');
