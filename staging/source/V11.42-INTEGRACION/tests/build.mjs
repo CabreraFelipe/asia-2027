@@ -112,7 +112,7 @@ const legacyCatalog=runInNewContext(readFileSync('gym84_catalog.mjs','utf8').rep
 const sportContext={};runInNewContext(readFileSync(base+'/src/sport1177.js','utf8'),sportContext);
 const catalogData=JSON.parse(readFileSync(base+'/src/catalog1178-data.json','utf8')),catalogReview=JSON.parse(readFileSync(base+'/src/catalog1178-review.json','utf8'));
 let catalog1178=readFileSync(base+'/src/catalog1178.template.js','utf8');
-for(const [marker,value] of [['__DATA1178__',catalogData],['__REVIEW1178__',catalogReview],['__LEGACY1178__',legacyCatalog.library],['__SPORT1178__',sportContext.asiaSport1177.catalog]]){if(catalog1178.split(marker).length!==2)throw Error('Marcador catálogo');catalog1178=catalog1178.replace(marker,()=>JSON.stringify(value));}
+for(const [marker,value] of [['__DATA1178__',catalogData],['__REVIEW1178__',catalogReview],['__LEGACY1178__',legacyCatalog.library],['__SPORT1178__',sportContext.asiaSport1177.catalog]]){if(catalog1178.split(marker).length!==2)throw Error('Marcador catálogo');catalog1178=catalog1178.replace(marker,()=>JSON.stringify(value,null,2));}
 writeFileSync(web+'/diary/catalog1178.js',catalog1178);writeFileSync(web+'/catalog1178.js',catalog1178);
 cpSync(base+'/src/catalog1178-ui.js',web+'/diary/catalog1178-ui.js');
 for(const n of ['catalog1178.js','catalog1178-ui.js'])execFileSync(process.execPath,['--check',web+'/diary/'+n],{stdio:'inherit'});
