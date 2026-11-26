@@ -340,3 +340,6 @@ Base d7349da96153a37aaa0d3cea983279f42cf9a186; candidato local. Usa favoritos y 
 
 ## Notificaciones por cuenta — cola persistente propuesta
 Base 2a720b777201aa6e2625b88ccafc8cc8a27704c2. Se prepara almacenamiento por cuenta/dispositivo, canales agenda y descanso separados, revisiones CAS, cancelación vacía, idempotencia de reemplazos y revocación. Solo tipos y vencimientos; sin credenciales ni datos de salud. No modifica UI ni temporizadores originales, no monta endpoint, no aplica migración, no suscribe ni envía push. El alta de dispositivo autorizada, scheduler, entrega, puente a controles V10.6 y pruebas físicas permanecen pendientes. Prueba SQLite real añadida al paquete, pendiente ejecución CI.
+
+## Paridad — corrección de prueba integral
+La rama consolidada 7bd9c96c4d4cafe2996fb354b6a59d498d05b68a aprobó fuentes y runtime pero falló package en orden de scripts (5/53); comparación HTML/CSS sin scripts aprobada. La copia del script inline contiene la protección explícita de persistencia introducida por patch-routine1190. Se incorpora únicamente esa modificación exacta al esperado de la prueba, sin flexibilizar comparación del resto de scripts ni quitar protección. Revalidar; no se acredita paridad funcional completa.

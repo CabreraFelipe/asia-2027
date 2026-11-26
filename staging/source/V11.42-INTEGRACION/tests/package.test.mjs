@@ -24,6 +24,9 @@ const visibleMarkup=html=>html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'')
 assert.equal(visibleMarkup(packagedHtml),visibleMarkup(originalHtml),'Conservar HTML y CSS del diario original');
 const originalBlocks=scriptBlocks(originalHtml),packagedBlocks=scriptBlocks(packagedHtml);
 assert.equal(originalBlocks.length,53);
+const expectedPersist="const next=JSON.stringify(data);localStorage.setItem(key,next);disk600=next;return true",expectedGuard="if(disk600!==null){const previous=JSON.parse(disk600);if(JSON.stringify(previous.settings??{})!==JSON.stringify(data.settings??{})){window.asiaGym826.compatibleSettings(previous.settings,data.settings,previous.work);const programmes=window.asiaSchedule829.programmes(data.settings);window.asiaCoachActions1179.validate(data.settings,window.asiaGym826,programmes);}}";
+assert.equal(originalBlocks[5].split(expectedPersist).length,2,'Marcador de persistencia original único');
+originalBlocks[5]=originalBlocks[5].replace(expectedPersist,()=>expectedGuard+expectedPersist);
 let originalPosition=0;for(const block of packagedBlocks)if(block===originalBlocks[originalPosition])originalPosition++;
 assert.equal(originalPosition,originalBlocks.length,'Conservar los 53 scripts originales del HTML en orden');
 
