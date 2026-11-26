@@ -1,0 +1,53 @@
+import assert from 'node:assert/strict';
+import '../../../../accounts106.js';
+import {prepareRecoveryReview1161,verifyRecoveryArchive1161} from '../dist/assets/v11.42/staging/source/V11.42-INTEGRACION/src/recovery-review1161.mjs';
+import {encrypt84,decrypt84,checksum84} from '../../../../model84.mjs';
+import {hashBytes} from '../dist/assets/v11.42/staging/source/V11.38-INTEGRACION/src/large-sync.mjs';
+const id='acct_'+'a'.repeat(32),oldPhrase='frase anterior sintética revisión',newSecret='X'.repeat(43),backupPhrase='respaldo separado sintético',identity={accountId:id,csrf:'a'.repeat(43)};
+const diary={body:{'2026-11-26':{weight:81}},diet:{},work:{},settings:{},photos:{}};
+const entries=[['asia2027-v1',JSON.stringify(diary)]],base={entries,modules:{coach:{history:['original']},visual:{photos:['original']}}};
+const local={entries,modules:{coach:{history:['original','offline']},visual:{photos:['original']},recovery:{samples:['local']}}};
+const cloud={entries,modules:{coach:{history:['original','online']},visual:{photos:['original','cloud']}}};
+const plain=p=>({format:'asia-v1136-sync-v1',accountId:id,payload:p});
+const old=await encrypt84(plain(base),oldPhrase),migrated=await encrypt84(plain(base),newSecret),latest=await encrypt84(plain(cloud),newSecret);
+const sha=x=>hashBytes(new TextEncoder().encode(JSON.stringify(x)));
+const receipt={operationId:crypto.randomUUID(),phase:'committed',sourceRevision:1,sourceSha:await sha(old),revision:2,targetSha:await sha(migrated)};
+async function row(p,revision,phrase){
+ return {local:{revision,envelope:await encrypt84({format:'asia-v1126-local-vault-v1',accountId:id,revision,entries:[...p.entries,['asia-timers-v4','null']]},phrase)},modules:{revision,envelope:await encrypt84({format:'asia-v1128-modules-v1',accountId:id,revision,modules:Object.fromEntries(Object.entries(p.modules).map(([name,payload])=>[name,{name,revision,payload}]))},phrase)},baseline:{remote:1,local:1,modules:1,namespace:'objects-v1138'}};
+}
+const confirmed=await row(local,2,oldPhrase),pendingBase=await row(base,1,oldPhrase),pendingWorking=await row({...local,modules:{...local.modules,coach:{history:['original','offline','pending']}}},3,oldPhrase);
+let source=confirmed,branch={phase:'editing',base:pendingBase,working:pendingWorking},head=3,session=identity;
+const repository={readSync:async()=>structuredClone(source),readRekey:async()=>null};
+const pending={inspect:async()=>structuredClone(branch)};
+const client={accountId:id,verify:async()=>session,discover:async()=>structuredClone(receipt),managedKey:async()=>newSecret,request:async(method,body,revision)=>{
+ assert.equal(method,'GET');assert.equal(body??null,null);
+ return revision?{ok:true,revision,envelope:structuredClone([old,migrated,latest][revision-1])}:{ok:true,head,versions:[{revision:head,bytes:100,created_at:'2026-11-26T00:00:00.000Z'}]};
+}};
+const options={client,repository,pending,policy:globalThis.asiaAccounts106,oldPhrase,backupPhrase,maintenanceConfirmed:true};
+const review=await prepareRecoveryReview1161(options);
+assert.equal(review.kind,'review');assert.equal(review.commonAncestorProven,false);assert.equal(review.head,3);
+const view=review.views.find(v=>v.label==='confirmed');
+assert.equal(view.epoch,'legacy');
+assert.equal(view.rows.find(r=>r.key==='coach').state,'both-differ');
+assert.equal(view.rows.find(r=>r.key==='visual').state,'cloud-differs');
+assert.equal(view.rows.find(r=>r.key==='recovery').state,'local-only');
+assert.equal(view.rows.find(r=>r.key==='asia2027-v1').state,'same');
+assert.equal(review.views.find(v=>v.label==='pending-working').rows.find(r=>r.key==='coach').requiresReview,true);
+assert.deepEqual(source,confirmed);assert.deepEqual(branch,{phase:'editing',base:pendingBase,working:pendingWorking});
+assert.equal(JSON.stringify(review).includes('offline'),false);assert.equal(JSON.stringify(review).includes(oldPhrase),false);
+const checked=await verifyRecoveryArchive1161({archive:review.archive,backupPhrase,accountId:id});
+assert.equal(checked.verified,true);assert.equal(checked.partCount,12);
+const archived=await decrypt84(review.archive.parts.find(x=>x.name==='pending-working-modules').envelope,backupPhrase);
+assert.deepEqual(archived.value,await decrypt84(pendingWorking.modules.envelope,oldPhrase));
+await assert.rejects(verifyRecoveryArchive1161({archive:review.archive,backupPhrase,accountId:'acct_'+'b'.repeat(32)}));
+await assert.rejects(verifyRecoveryArchive1161({archive:{...review.archive,parts:review.archive.parts.slice(1)},backupPhrase,accountId:id}));
+const swapped=structuredClone(review.archive);[swapped.parts[0].envelope,swapped.parts[1].envelope]=[swapped.parts[1].envelope,swapped.parts[0].envelope];
+await assert.rejects(verifyRecoveryArchive1161({archive:swapped,backupPhrase,accountId:id}));
+await assert.rejects(prepareRecoveryReview1161({...options,backupPhrase:oldPhrase}));
+await assert.rejects(prepareRecoveryReview1161({...options,oldPhrase:'frase anterior incorrecta'}));
+session={...identity,accountId:'acct_'+'b'.repeat(32)};await assert.rejects(prepareRecoveryReview1161(options));session=identity;
+// Reject a change in remote head during capture without mutating either copy.
+let reads=0;const advancing={...client,request:async(...args)=>{if(args[2]===undefined&&++reads===2)head=2;return client.request(...args)}};
+await assert.rejects(prepareRecoveryReview1161({...options,client:advancing}));head=3;
+assert.deepEqual(source,confirmed);assert.equal(branch.phase,'editing');
+console.log('Recovery review: historical/current cloud, local and pending copies, whole-module differences, encrypted verified multipart archive, account isolation, missing/swapped parts, stale head and wrong phrase PASS.');
