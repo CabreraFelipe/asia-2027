@@ -1,7 +1,7 @@
 // No persistence, provider calls or automatic intake. Rebuild if the library or strategy changes.
 (()=>{'use strict';
 const M=window.asiaNutritionMenu,N=window.asiaNutrition103,anchor=document.getElementById('nutrition103');if(!M||!N||!anchor)return;
-const n=(tag,t)=>{const x=document.createElement(tag);if(t!==undefined)x.textContent=t;return x},panel=n('details');panel.id='nutritionMenu';panel.className='card sectionfold';anchor.after(panel);
+const n=(tag,t)=>{const x=document.createElement(tag);if(t!==undefined)x.textContent=t;return x},panel=n('details');panel.id='nutritionMenu';panel.className='mini573';anchor.append(panel);
 panel.append(n('summary','Planificar comidas con mi biblioteca'),n('p','Compará menús con una estrategia que ya guardaste. Elegí solo alimentos, recetas y cantidades que hayas revisado y sean apropiados para vos. No se comprueban alergias, necesidades médicas ni suficiencia nutricional. Las cantidades no cambian automáticamente y no se registra ninguna ingesta.'));
 const strategy=n('select');strategy.id='nutritionMenuStrategy';const sl=n('label','Estrategia de referencia');sl.htmlFor=strategy.id;const input=n('div'),output=n('div'),status=n('p');status.id='nutritionMenuStatus';status.setAttribute('role','status');output.id='nutritionMenuOutput';
 let options=[[],[],[],[]],basis='',lib=[];
