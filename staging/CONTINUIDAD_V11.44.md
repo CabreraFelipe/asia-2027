@@ -301,3 +301,6 @@ Base V11.96 e89e94e0978b17eb012506005463d495df4bc9bf; no promover antes de gates
 
 ## V11.98 — candidato agenda integral de lectura
 Base V11.97 963336aea32c997429d7645538d0a9e5625b34b1; no promover hasta gates anteriores. Proyección local de 14 días de clásico/PRO/Running/deporte, eventos y registros separados, advertencias de coincidencia/vecindad y estado PRO desconocido. No deduce descanso, carga fisiológica ni cumplimiento; refresco explícito, sin escrituras ni nuevos datos persistidos. Pruebas dominio preparadas; CI y Chrome del recorrido nuevo pendientes. No acredita coordinación distribuida ni completa el bloque entrenamiento. Sin cambios a producción.
+
+## V11.99 — candidato contrato inicial conversacional
+Base V11.98 ded891a13a2fcf4a38797bef95045e35e69012ca; no promover antes de gates anteriores. Contrato v3 mínimo de meta libre y aclaraciones consentidas, respuesta descriptiva editable sin dosis ni fechas inferidas. Adaptador OpenAI y transporte existentes aceptan v3 con validación estricta; no monta ruta, no conecta proveedor ni expone secretos. Continuación vinculada a preguntas exactas, máximo seis respuestas. Prueba proveedor con fetch inyectado, todavía sin UI inicial ni integración de formulario/guardado. CI integral pendiente. No se declara Coach real activo ni V12 liberada.
