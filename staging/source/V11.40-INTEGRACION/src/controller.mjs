@@ -15,8 +15,9 @@ export async function createController({origin,fetcher=fetch,repository,pending,
  check(!expectedIdentity||same(identity,expectedIdentity),'La sesión cambió');
  let state='maintenance',busy=false,plan=null,editing=null,services=null,view=null,closing=false,locked=false,restricted=recoveryOnly===true,syncState=null;
  const publish=next=>{state=next;try{onState(next)}catch{}};
- async function verify(){check(!locked&&state!=='closed','Sesión bloqueada');let s;try{s=await read()}catch(e){if(e.revoked===true){locked=true;services?.close();view?.hide?.();publish('locked')}throw e}
-  if(!same(s,identity)){locked=true;services?.close();view?.hide?.();publish('locked');throw Error('La sesión cambió')}return s}
+ function lock(){if(locked||state==='closed')return;locked=true;services?.close();view?.hide?.();publish('locked')}
+ async function verify(){check(!locked&&state!=='closed','Sesión bloqueada');let s;try{s=await read()}catch(e){if(e.revoked===true)lock();throw e}
+  if(!same(s,identity)){lock();throw Error('La sesión cambió')}return s}
  const options={readSession:verify,origin,fetcher,repository,pending,policy,passphrase,now,managedWrite};
  const maintenance=()=>check(state==='maintenance'&&!busy&&!plan,'Cerrá el diario y la operación pendiente');
  const normal=()=>{check(!restricted,'Modo exclusivo de recuperación. Volvé a verificar el acceso antes de abrir o sincronizar.');maintenance()};
@@ -38,13 +39,14 @@ export async function createController({origin,fetcher=fetch,repository,pending,
  publish('maintenance');
  return Object.freeze({
   get state(){return state},get recoveryOnly(){return restricted},get canManagedSync(){return managedWrite&&!restricted},get syncState(){return syncState},get canRetrySync(){return managedWrite&&!restricted&&state==='maintenance'&&!busy&&!plan&&syncState?.kind==='retry-required'},get hasPlan(){return plan!==null},get busy(){return busy},get status(){return editing?.status??null},
+  async probeSession(){if(locked||state==='closed'||busy)return 'skipped';if(state==='editing'&&now()>=editing.deadline){lock();return 'expired'}return operation(async()=>{try{await verify();return 'verified'}catch{return locked?'locked':'unavailable'}})},
   async openDiary(){normal();return operation(async()=>{
    await verify();const initialSetup=(await beforeOpen())===true;await verify();editing=await openOfflineEditing({...options,onStatus:()=>{try{onState(state)}catch{}}});
    try{
     services=await createAccountServices({origin,readSession:verify,fetcher});
     let calls=0;const guarded=fn=>(...a)=>{check(!closing&&!locked,'Diario bloqueado');calls++;return Promise.resolve().then(()=>fn(...a)).finally(()=>calls--)};
     const m=editing.moduleStore,serviceFacade=Object.freeze({available:()=>!closing&&!locked&&services.available(),request:guarded(services.request)});
-    const storage=Object.freeze({getItem:k=>editing.storage.getItem(k),setItem(k,v){check(!closing&&!locked,'Diario bloqueado');editing.storage.setItem(k,v)},removeItem(k){check(!closing&&!locked,'Diario bloqueado');editing.storage.removeItem(k)},key:i=>editing.storage.key(i),get length(){return editing.storage.length}});
+    const storage=Object.freeze({getItem(k){check(!locked,'Diario bloqueado');return editing.storage.getItem(k)},setItem(k,v){check(!closing&&!locked,'Diario bloqueado');editing.storage.setItem(k,v)},removeItem(k){check(!closing&&!locked,'Diario bloqueado');editing.storage.removeItem(k)},key(i){check(!locked,'Diario bloqueado');return editing.storage.key(i)},get length(){check(!locked,'Diario bloqueado');return editing.storage.length}});
     const fixture=Object.freeze({storage,initialGoalSetup:initialSetup&&storage.getItem('asia2027-v1')===null,sessionStorage:transient(),services:serviceFacade,moduleStore:Object.freeze({read:guarded(m.read),write:guarded(m.write),readPair:guarded(m.readPair),replacePair:guarded(m.replacePair),close(){}})});
     view=await mount(fixture);check(view&&typeof view.remove==='function','Montaje incompleto');
     view.pending=()=>calls;publish('editing');

@@ -38,8 +38,11 @@ try{
  const operationId=crypto.randomUUID(),rekey=(s,body)=>call(s,'/v11.59/rekey',body);
  const started=await rekey(a,{action:'begin',operationId,expectedRevision:1,expectedSha:source.sha256,confirmed:true});assert.equal(started.status,200);assert.equal((await started.json()).operation.phase,'locked');
  assert.equal((await write(b,1)).status,409);
+ // Rotate during an existing migration: the old operation's wrapper remains readable.
+ Object.assign(env,{STAGING_ALLOW_KEK_ROTATION_1172:'true',STAGING_PREVIOUS_KEK_ID_1172:env.STAGING_MANAGED_KEK_ID_1152,STAGING_PREVIOUS_KEK_1172:env.STAGING_MANAGED_KEK_1152,STAGING_MANAGED_KEK_ID_1152:'ci-v2',STAGING_MANAGED_KEK_1152:generateAccountSecret()});
  const committed=await rekey(a,{action:'commit',operationId,confirmed:true,oldPhrase:phrase,consent:'transient-server-rekey-v1'});assert.equal(committed.status,200);assert.equal((await committed.json()).operation.phase,'committed');
  const keyResponse=await worker.fetch(new Request(origin+'/v11.52/account-key',{method:'POST',headers:{Cookie:'__Host-asia1111_session='+b.token,Origin:origin,'X-Asia-CSRF':b.csrf}}),env);assert.equal(keyResponse.status,200);const secret=(await keyResponse.json()).secret;
+ assert.equal(JSON.parse((await first('SELECT envelope FROM managed_account_keys_v1152 WHERE account_id=?',id)).envelope).kekId,'ci-v2');
  const remote=await call(b,'/v11.38/sync/2');assert.equal(remote.status,200);assert.deepEqual(await decrypt84((await remote.json()).envelope,secret),plain);
  assert.equal((await write(b,2)).status,409);
  const managed=await encrypt84(plain,secret);

@@ -1,7 +1,7 @@
 // Internal synthetic-only coordinator. No HTTP route, UI or deployment flag.
 // oldPhrase is a transient argument in this isolated implementation; no
 // transport decision is made here. Never store/log it or return it.
-import {generateAccountSecret,importWrappingKey,wrapAccountSecret,unwrapAccountSecret} from './account-key1150.mjs';
+import {generateAccountSecret,importWrappingKey,wrapAccountSecret,unwrapWithKeyring1172} from './account-key1150.mjs';
 import {hashBytes,validLargeEnvelope,MAX_BYTES} from '../../V11.38-INTEGRACION/src/large-sync.mjs';
 import {validatePayload} from '../../V11.36-INTEGRACION/src/sync.mjs';
 import {encrypt84,decrypt84,checksum84} from '../../../../model84.mjs';
@@ -9,7 +9,7 @@ const check=(ok,m)=>{if(!ok)throw Error(m)};
 const uuid=s=>typeof s==='string'&&/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(s);
 const hex=s=>typeof s==='string'&&/^[a-f0-9]{64}$/.test(s);
 const encode=x=>new TextEncoder().encode(JSON.stringify(x));
-export function createRemoteRekey1157({db,bucket,session,kekId,kekSecret,policy,enabled=false,now=Date.now}){
+export function createRemoteRekey1157({db,bucket,session,kekId,kekSecret,previousKekId=null,previousKekSecret=null,policy,enabled=false,now=Date.now}){
  check(enabled===true&&/^acct_[a-f0-9]{32}$/.test(session?.id||'')&&hex(session.digest)&&/^[A-Za-z0-9_-]{43}$/.test(session.csrf||''),'Migración no autorizada');
  const id=session.id;
  const live='EXISTS(SELECT 1 FROM auth_oidc_sessions_v1111 WHERE token_digest=? AND account_id=? AND csrf=? AND expires_at>?)';
@@ -60,7 +60,7 @@ export function createRemoteRekey1157({db,bucket,session,kekId,kekSecret,policy,
    const old=await readObject(source),plain=await decrypt84(old,oldPhrase);
    check(plain&&Object.keys(plain).sort().join(',')==='accountId,format,payload'&&plain.accountId===id&&plain.format==='asia-v1136-sync-v1','Copia de otra cuenta o incompatible');
    validatePayload(plain.payload,policy);
-   const key=await wrapping(),secret=await unwrapAccountSecret({accountId:id,kekId,key,envelope:JSON.parse(r.wrapped_key)});
+   const secret=await unwrapWithKeyring1172({accountId:id,kekId,kekSecret,previousKekId,previousKekSecret,envelope:JSON.parse(r.wrapped_key)});
    const next=await encrypt84(plain,secret);check(validLargeEnvelope(next)&&await checksum84(await decrypt84(next,secret))===await checksum84(plain),'Recifrado no verificado');
    const raw=encode(next),sha=await hashBytes(raw),objectKey='synthetic-sync-v1138/'+id+'/'+crypto.randomUUID();
    await verify();check((await requireRow(operationId)).phase==='locked','Migración cerrada');

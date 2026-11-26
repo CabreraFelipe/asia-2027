@@ -415,6 +415,9 @@ try{
  }.toString()+')()',true);assert.equal(pendingCAS,true);
 
 
+ db.prepare('DELETE FROM auth_oidc_sessions_v1111 WHERE account_id=?').run(C);
+ await evalJS("window.dispatchEvent(new Event('focus'));true",true);await ready("document.getElementById('status1140')?.textContent==='Sesión bloqueada'&&document.querySelector('iframe')?.hidden===true&&!document.getElementById('unlock1172').hidden");
+ assert.equal(await evalJS("(()=>{try{globalThis.__asiaCandidateFixture.storage.getItem('asia2027-v1');return false}catch{return true}})()"),true);
  await evalJS("fetch('/__ci/offline').then(r=>r.text())",true);await cmd('Page.navigate',{url:home});await ready("document.body?.textContent.includes('Volvé a conectarte para verificar tu cuenta')");
  console.log('Chrome paquete generado: autorización, diario, guardado, conciliación, Worker sync, logout, aislamiento, caché pública y fallback offline.');
 }finally{ws?.close();chrome?.kill();if(chrome&&chrome.exitCode===null)await Promise.race([once(chrome,'exit'),sleep(3000)]);server?.closeAllConnections();server?.close();db.close();await rm(dir,{recursive:true,force:true,maxRetries:3,retryDelay:100})}

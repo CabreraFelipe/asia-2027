@@ -40,7 +40,15 @@ try{
  db.prepare('INSERT INTO synthetic_journal_v115 VALUES(?,?,?,?)').run(D.id,1,'x'.repeat(24),new Date().toISOString());
  db.prepare('INSERT INTO encrypted_snapshots_v11 VALUES(?,?,?,?)').run(E.id,1,'old',new Date().toISOString());
  for(const a of [C,D,E]){assert.equal((await req(a)).status,409);assert.equal(row(a).envelope,null)}
+ const rotation={STAGING_ALLOW_KEK_ROTATION_1172:'true',STAGING_MANAGED_KEK_ID_1152:'fixture-v2',STAGING_MANAGED_KEK_1152:generateAccountSecret(),STAGING_PREVIOUS_KEK_ID_1172:env.STAGING_MANAGED_KEK_ID_1152,STAGING_PREVIOUS_KEK_1172:env.STAGING_MANAGED_KEK_1152};
+ assert.equal((await req(A,{env:{...rotation,STAGING_ALLOW_KEK_ROTATION_1172:'false'}})).status,503);assert.equal(row(A).envelope,original);
+ assert.equal((await req(A,{env:{...rotation,STAGING_PREVIOUS_KEK_1172:generateAccountSecret()}})).status,503);assert.equal(row(A).envelope,original);
+ const rotated=await Promise.all(Array.from({length:5},()=>req(A,{env:rotation})));
+ for(const r of rotated){assert.equal(r.status,200);assert.equal((await r.json()).secret,secret)}
+ const updated=row(A).envelope;assert.notEqual(updated,original);assert.equal(JSON.parse(updated).kekId,'fixture-v2');
+ assert.deepEqual(await decrypt84(encrypted,(await (await req(A,{env:rotation})).json()).secret),{history:['keep']});
+ assert.equal((await req(A)).status,503);assert.equal(row(A).envelope,updated);
  db.prepare('DELETE FROM auth_oidc_sessions_v1111 WHERE account_id=?').run(A.id);
- assert.equal((await req(A)).status,401);assert.equal(row(A).envelope,original);
+ assert.equal((await req(A,{env:rotation})).status,401);assert.equal(row(A).envelope,updated);
  console.log('Managed account key: disabled by default, explicit enrollment, 5 concurrent requests, isolation, legacy cloud blockers, KEK failure and revoked session PASS.');
 }finally{db.close()}

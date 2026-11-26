@@ -13,7 +13,7 @@ import {prepareLargeSync,validateLargeList} from './staging/source/V11.38-INTEGR
 import {createRekeyClient1159} from './staging/source/V11.42-INTEGRACION/src/rekey-client1159.mjs';
 import {prepareGranularReview1168,prepareRecoveryAction1169} from './staging/source/V11.42-INTEGRACION/src/recovery-apply1162.mjs';
 export async function start(passphrase,{maintenanceOnly=false,expectedIdentity=null,managedRecovery=false}={}){
- const repository=await openUnifiedRepository(),pending=await openOfflineRepository();let shell,panel,writer;
+ const repository=await openUnifiedRepository(),pending=await openOfflineRepository();let shell,panel,writer,stopProbe=()=>{};
  const mount=async fixture=>{
   if(globalThis.__asiaCandidateFixture)throw Error('Diario ya abierto');globalThis.__asiaCandidateFixture=fixture;
   const frame=document.createElement('iframe');frame.title='Diario original Asia V10.6';frame.src='/v11.42/diary/index.html';frame.inert=true;
@@ -97,7 +97,7 @@ export async function start(passphrase,{maintenanceOnly=false,expectedIdentity=n
    }catch(e){throw Error('No se completó la recuperación automática. No se enviaron ni descartaron registros. '+e.message)}
    finally{plan?.cancel()}
   };
-  const c=await createController({origin:location.origin,repository,pending,policy:globalThis.asiaAccounts106,passphrase,mount,beforeOpen,expectedIdentity:identity,managedWrite:managedRecovery,recoveryOnly,recoveryAction:async options=>{const client=await createRekeyClient1159(options);return prepareRecoveryAction1169({...options,client})},recoveryReview:async options=>{const client=await createRekeyClient1159(options);return prepareGranularReview1168({...options,client})},onState:s=>{shell?.render();panel?.render();if(s==='closed'){repository.close();pending.close();writer.release().finally(()=>location.replace('/v11.42/index.html'))}}});
+  const c=await createController({origin:location.origin,repository,pending,policy:globalThis.asiaAccounts106,passphrase,mount,beforeOpen,expectedIdentity:identity,managedWrite:managedRecovery,recoveryOnly,recoveryAction:async options=>{const client=await createRekeyClient1159(options);return prepareRecoveryAction1169({...options,client})},recoveryReview:async options=>{const client=await createRekeyClient1159(options);return prepareGranularReview1168({...options,client})},onState:s=>{shell?.render();panel?.render();if(s==='closed'){stopProbe();repository.close();pending.close();writer.release().finally(()=>location.replace('/v11.42/index.html'))}}});
   shell=mountShell({doc:document,anchor:document.getElementById('shell'),controller:c,onRender:()=>panel?.render()});
   panel=mountMaintenance({doc:document,anchor:document.getElementById('shell'),controller:c,onChange:()=>shell.render()});
   // Use the same guarded shell action as manual opening. Its error handling
@@ -105,6 +105,10 @@ export async function start(passphrase,{maintenanceOnly=false,expectedIdentity=n
   // Only the managed fresh-installation pull above is automatic. Never
   // reconcile, import, discard, or push automatically in this step.
   if(!maintenanceOnly&&!recoveryOnly)await document.getElementById('open1140').onclick();
+  const probe=()=>{void c.probeSession().finally(()=>shell.render())};
+  const visible=()=>{if(document.visibilityState==='visible')probe()};
+  const timer=setInterval(probe,30000);window.addEventListener('online',probe);window.addEventListener('focus',probe);document.addEventListener('visibilitychange',visible);
+  stopProbe=()=>{clearInterval(timer);window.removeEventListener('online',probe);window.removeEventListener('focus',probe);document.removeEventListener('visibilitychange',visible)};
   return c.state;
- }catch(e){try{panel?.remove();shell?.remove()}finally{repository.close();pending.close();await writer?.release()}throw e}
+ }catch(e){stopProbe();try{panel?.remove();shell?.remove()}finally{repository.close();pending.close();await writer?.release()}throw e}
 }

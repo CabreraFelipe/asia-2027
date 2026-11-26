@@ -1,7 +1,7 @@
 // V11.52 — guarded, synthetic-only account key custody. No enrollment API.
 // Explicit server enrollment is a separate future operation. Never infer it
 // from missing local/remote data; an old device may still have unsynced data.
-import {generateAccountSecret,importWrappingKey,wrapAccountSecret,unwrapAccountSecret} from './account-key1150.mjs';
+import {generateAccountSecret,importWrappingKey,wrapAccountSecret,unwrapWithKeyring1172} from './account-key1150.mjs';
 import {digest} from '../../official/V11.24-STAGING/src/security1111.mjs';
 const headers={'Cache-Control':'no-store, private','Pragma':'no-cache','Content-Type':'application/json; charset=utf-8','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Cross-Origin-Resource-Policy':'same-origin'};
 const json=(x,status=200)=>new Response(JSON.stringify(x),{status,headers});
@@ -25,8 +25,7 @@ export async function handleManagedKey(request,env,{authenticate,now=Date.now}){
   const read=()=>db.prepare('SELECT envelope,migration_lock,enrollment_kind FROM managed_account_keys_v1152 WHERE account_id=? AND '+live).bind(accountId,...liveArgs()).first();
   let row=await read();if(!row)return fail(409,'ALTA_NO_HABILITADA');
   if(row.migration_lock!==null)return fail(409,'MIGRACION_EN_CURSO');
-  // This initial route supports only a single configured KEK version. An
-  // unknown version must fail closed; it never replaces the stored key.
+  // The previous KEK is opt-in; an unknown version fails closed.
   const kekId=env.STAGING_MANAGED_KEK_ID_1152,key=await importWrappingKey(env.STAGING_MANAGED_KEK_1152);
   if(row.envelope===null&&row.enrollment_kind==='legacy')return fail(409,'MIGRACION_REQUERIDA');
   if(row.envelope===null){
@@ -41,7 +40,19 @@ export async function handleManagedKey(request,env,{authenticate,now=Date.now}){
    if(row.migration_lock!==null)return fail(409,'MIGRACION_EN_CURSO');
    if(row.envelope===null)return fail(409,'MIGRACION_REQUERIDA');
   }
-  const envelope=JSON.parse(row.envelope),secret=await unwrapAccountSecret({accountId,kekId,key,envelope});
+  const rotation=env.STAGING_ALLOW_KEK_ROTATION_1172==='true';
+  const keyring={accountId,kekId,kekSecret:env.STAGING_MANAGED_KEK_1152,...(rotation?{previousKekId:env.STAGING_PREVIOUS_KEK_ID_1172,previousKekSecret:env.STAGING_PREVIOUS_KEK_1172}:{})};
+  const envelope=JSON.parse(row.envelope),secret=await unwrapWithKeyring1172({...keyring,envelope});
+  if(envelope.kekId!==kekId){
+   const replacement=JSON.stringify(await wrapAccountSecret({accountId,kekId,key,secret}));
+   if(await unwrapWithKeyring1172({...keyring,envelope:JSON.parse(replacement)})!==secret)throw Error('Rotación no verificada');
+   if(!await current())return fail(401,'NO_AUTORIZADO');
+   await db.prepare('UPDATE managed_account_keys_v1152 SET envelope=? WHERE account_id=? AND envelope=? AND migration_lock IS NULL AND '+live+' RETURNING account_id').bind(replacement,accountId,row.envelope,...liveArgs()).first();
+   row=await read();if(!row)return fail(401,'NO_AUTORIZADO');
+   if(row.migration_lock!==null||!row.envelope)return fail(409,'CLAVE_CAMBIO');
+   const winner=JSON.parse(row.envelope);
+   if(winner.kekId!==kekId||await unwrapWithKeyring1172({...keyring,envelope:winner})!==secret)return fail(409,'CLAVE_CAMBIO');
+  }
   if(!await current())return fail(401,'NO_AUTORIZADO');
   const last=await read();if(!last)return fail(401,'NO_AUTORIZADO');
   if(last.migration_lock!==null)return fail(409,'MIGRACION_EN_CURSO');

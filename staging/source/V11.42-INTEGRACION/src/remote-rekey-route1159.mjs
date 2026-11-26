@@ -33,7 +33,7 @@ export async function handleRemoteRekey1159(request,env,{authenticate}){
   if(['begin','cancel','commit'].includes(action)&&input.confirmed!==true)return fail(400,'CONFIRMACION_REQUERIDA');
   if(action==='begin'&&(!Number.isSafeInteger(input.expectedRevision)||input.expectedRevision<1||input.expectedRevision>=200||!/^[a-f0-9]{64}$/.test(input.expectedSha||'')))return fail(400,'REVISION_INVALIDA');
   if(action==='commit'&&(input.consent!=='transient-server-rekey-v1'||typeof input.oldPhrase!=='string'||input.oldPhrase.length<12||input.oldPhrase.length>200))return fail(400,'CONSENTIMIENTO_REQUERIDO');
-  const service=createRemoteRekey1157({db:env.STAGING_DB,bucket:env.STAGING_SYNC_OBJECTS,session:{id:s.accountId,digest:await digest(tokens[0].split('=')[1]),csrf:s.csrf},policy,kekId:env.STAGING_MANAGED_KEK_ID_1152,kekSecret:env.STAGING_MANAGED_KEK_1152,enabled:true});
+  const service=createRemoteRekey1157({db:env.STAGING_DB,bucket:env.STAGING_SYNC_OBJECTS,session:{id:s.accountId,digest:await digest(tokens[0].split('=')[1]),csrf:s.csrf},policy,kekId:env.STAGING_MANAGED_KEK_ID_1152,kekSecret:env.STAGING_MANAGED_KEK_1152,...(env.STAGING_ALLOW_KEK_ROTATION_1172==='true'?{previousKekId:env.STAGING_PREVIOUS_KEK_ID_1172,previousKekSecret:env.STAGING_PREVIOUS_KEK_1172}:{}),enabled:true});
   let operation;
   try{
    if(action==='discover')operation=await service.discover();

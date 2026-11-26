@@ -19,3 +19,13 @@ export async function unwrapAccountSecret({accountId,kekId,key,envelope}){
  const iv=decode(envelope.iv,12),cipher=decode(envelope.cipher,48);
  let raw;try{raw=new Uint8Array(await crypto.subtle.decrypt({name:'AES-GCM',iv,additionalData:aad(accountId,kekId),tagLength:128},key,cipher));check(raw.length===32,'Clave inválida');return encode(raw)}catch{throw Error('No se pudo verificar la clave de cuenta')}finally{raw?.fill(0)}
 }
+
+// A single explicitly configured previous KEK is accepted only during a
+// deliberate rotation window. No guessing or deriving a key from an ID.
+export async function unwrapWithKeyring1172({accountId,envelope,kekId,kekSecret,previousKekId=null,previousKekSecret=null}){
+ const stored=envelope?.kekId;
+ check(idOK(kekId)&&idOK(stored),'Identidad de clave inválida');
+ if(stored===kekId)return unwrapAccountSecret({accountId,kekId,key:await importWrappingKey(kekSecret),envelope});
+ check(idOK(previousKekId)&&previousKekId!==kekId&&stored===previousKekId,'Versión de custodia no disponible');
+ return unwrapAccountSecret({accountId,kekId:previousKekId,key:await importWrappingKey(previousKekSecret),envelope});
+}
