@@ -1,3 +1,4 @@
+import {personalReminders,personalAgenda} from './personal-reminder-patch.mjs';
 // Produces a disposable deploy directory; never writes root/original files.
 import {cpSync,mkdirSync,readFileSync,writeFileSync,readdirSync,existsSync,statSync} from 'node:fs';
 import {join,dirname,resolve,relative} from 'node:path';
@@ -73,7 +74,9 @@ const replaceReminder=(from,to)=>{if(remindersText.split(from).length!==2)throw 
 replaceReminder("cloudKeys.includes(k)?raw?.enabled?.[k]!==false:raw?.enabled?.[k]===true","raw?.enabled?.[k]===true");
 replaceReminder("typeof raw?.cloudEnabled?.[k]==='boolean'?raw.cloudEnabled[k]:raw?.enabled?.[k]!==false","typeof raw?.cloudEnabled?.[k]==='boolean'?raw.cloudEnabled[k]:raw?.enabled?.[k]===true");
 replaceReminder("Horarios en Uruguay. Elegí qué mostrar al abrir la app y qué programar en la nube.","Horarios en Uruguay. Cada cuenta elige sus propios avisos; los horarios sugeridos no activan notificaciones. Elegí qué mostrar al abrir la app y qué programar en la nube.");
-writeFileSync(remindersFile,remindersText);
+writeFileSync(remindersFile,personalReminders(remindersText));
+const reminderAgendaFile=web+'/diary/reminders845.js';writeFileSync(reminderAgendaFile,personalAgenda(readFileSync(reminderAgendaFile,'utf8')));
+execFileSync(process.execPath,['--check',reminderAgendaFile],{stdio:'inherit'});
 execFileSync(process.execPath,['--check',remindersFile],{stdio:'inherit'});
 const diary=web+'/diary/index.html';writeFileSync(diary,readFileSync(diary,'utf8').replace(/<link rel="manifest" href="manifest.json">/,''));
 const patch=s=>s.replaceAll('asia-v1111-identity-staging',origin);

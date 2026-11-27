@@ -1,3 +1,4 @@
+import {personalReminders,personalAgenda} from './personal-reminder-patch.mjs';
 import assert from 'node:assert/strict';
 import {readFileSync,existsSync} from 'node:fs';
 import {DatabaseSync} from 'node:sqlite';
@@ -48,11 +49,12 @@ assert.equal(directive(shellCsp,'img-src'),"img-src 'self' data: blob:");
 assert.equal(directive(diaryCsp,'connect-src'),"connect-src 'none'");
 assert.equal(directive(diaryCsp,'worker-src'),"worker-src 'none'");
 assert.equal(readFileSync(root+prefix+'diary/gym571.js','utf8'),readFileSync('gym571.js','utf8'),'Gym original no debe modificarse');
-for(const n of ['push.js','rest533.js','reminders845.js','gym53.js','v4.js'])assert.equal(readFileSync(root+prefix+'diary/'+n,'utf8'),readFileSync(n,'utf8'),'Regresión de notificaciones: '+n);
+for(const n of ['push.js','rest533.js','gym53.js','v4.js'])assert.equal(readFileSync(root+prefix+'diary/'+n,'utf8'),readFileSync(n,'utf8'),'Regresión de notificaciones: '+n);
 
 const originalReminders=readFileSync('reminders821.js','utf8');
 const expectedReminders=originalReminders.replace("cloudKeys.includes(k)?raw?.enabled?.[k]!==false:raw?.enabled?.[k]===true","raw?.enabled?.[k]===true").replace("typeof raw?.cloudEnabled?.[k]==='boolean'?raw.cloudEnabled[k]:raw?.enabled?.[k]!==false","typeof raw?.cloudEnabled?.[k]==='boolean'?raw.cloudEnabled[k]:raw?.enabled?.[k]===true").replace("Horarios en Uruguay. Elegí qué mostrar al abrir la app y qué programar en la nube.","Horarios en Uruguay. Cada cuenta elige sus propios avisos; los horarios sugeridos no activan notificaciones. Elegí qué mostrar al abrir la app y qué programar en la nube.");
-assert.equal(readFileSync(root+prefix+'diary/reminders821.js','utf8'),expectedReminders,'Solo se permite adaptar consentimiento inicial y explicación');
+assert.equal(readFileSync(root+prefix+'diary/reminders821.js','utf8'),personalReminders(expectedReminders),'Solo se permite adaptar consentimiento y calendario personal');
+assert.equal(readFileSync(root+prefix+'diary/reminders845.js','utf8'),personalAgenda(readFileSync('reminders845.js','utf8')),'Solo adaptación de horizonte de agenda personal');
 const candidateProfile=readFileSync(root+prefix+'diary/profile100.js','utf8');
 assert.match(candidateProfile,/h\.textContent=name\|\|'Mi progreso'/);
 assert.match(candidateProfile,/welcome\.hidden=!!name/);
@@ -184,6 +186,7 @@ runIsolated1174(process.execPath,[new URL('./health-sources.test.mjs',import.met
 runIsolated1174(process.execPath,[new URL('./health-source-view.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
 runIsolated1174(process.execPath,[new URL('./food-lookup.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
 runIsolated1174(process.execPath,[new URL('./coach-provider-integration.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
+runIsolated1174(process.execPath,[new URL('./personal-reminders.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
 runIsolated1174(process.execPath,[new URL('./coach-context1181.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
 
 runIsolated1174(process.execPath,[new URL('./coach-review1182.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
