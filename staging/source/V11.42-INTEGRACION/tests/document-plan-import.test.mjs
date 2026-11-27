@@ -31,3 +31,17 @@ assert.throws(()=>reviewNativeRoutines(data,missing,Gym));
 const unknown=structuredClone(routine);unknown.days[0].sections[0].items[0].name='Ejercicio desconocido';
 assert.throws(()=>reviewNativeRoutines(data,unknown,Gym));
 console.log('Document plan import: consent, file signatures, account switch, unknown values and native Gym templates PASS; extraction simulated');
+
+const entry={name:'Ejercicio desconocido',equipment:'Gimnasio completo',part:'lower',groups:['Cuádriceps'],technique:'',unilateral:false};
+const added=reviewNativeRoutines(data,unknown,Gym,{additions:[entry]});
+const savedNew=applyNativeRoutines(data,added,Gym,{confirmed:true});
+assert.deepEqual(Gym.library104(savedNew.settings),[entry]);
+assert.equal(Gym.templates(savedNew.settings)[0].entries[0].exercise,entry.name);
+assert.throws(()=>reviewNativeRoutines(data,routine,Gym,{additions:[entry]}));
+assert.throws(()=>reviewNativeRoutines(data,unknown,Gym,{additions:[{...entry,groups:[]}]}));
+assert.throws(()=>reviewNativeRoutines(data,unknown,Gym,{additions:[{...entry,unilateral:null}]}));
+assert.throws(()=>reviewNativeRoutines(data,unknown,Gym,{additions:[entry,entry]}));
+assert.throws(()=>reviewNativeRoutines(savedNew,unknown,Gym,{additions:[entry]}));
+assert.throws(()=>applyNativeRoutines({...data,settings:savedNew.settings},added,Gym,{confirmed:true}));
+assert.deepEqual(data,{settings:{},work:{}});
+console.log('New imported exercises: explicit native library registration, validation, no overwrite and atomic routine creation PASS');

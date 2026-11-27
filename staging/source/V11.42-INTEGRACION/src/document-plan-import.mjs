@@ -45,10 +45,18 @@ export async function extractDocumentPlan({enabled=false,consent=false,file,read
 }
 // Convert reviewed, fully specified strength rows into existing native routine templates.
 // Exact catalog mapping only: unknown or ambiguous names require explicit user correction.
-export function reviewNativeRoutines(data,plan,Gym){
+export function reviewNativeRoutines(data,plan,Gym,{additions=[]}={}){
  const p=validateExtractedPlan(plan);check(p.kind==='routine'&&p.uncertainties.length===0&&p.notes===null,'Revisá las incertidumbres o instrucciones no representables');
  check(typeof Gym?.names104==='function'&&typeof Gym?.append==='function'&&typeof Gym?.templates==='function'&&typeof Gym?.compatibleSettings==='function','Gym no disponible');
- const settings=data.settings??{},known=new Set(Gym.names104(settings));let next=settings;const slots=[];
+ const settings=data.settings??{},original=new Set(Gym.names104(settings));let next=settings;const slots=[];
+ const requested=new Set(p.days.flatMap(d=>d.sections.flatMap(s=>s.items.map(i=>i.name))));
+ check(Array.isArray(additions)&&additions.length<=30&&typeof Gym.add104==='function','Fichas nuevas inválidas');
+ const seen=new Set();
+ for(const item of additions){
+  check(exact(item,['name','equipment','part','groups','technique','unilateral'])&&requested.has(item.name)&&!original.has(item.name)&&!seen.has(item.name),'Solo agregá ejercicios nuevos utilizados en este plan');
+  next=Gym.add104(next,clone(item));seen.add(item.name);
+ }
+ const known=new Set(Gym.names104(next));
  for(const day of p.days){
   check(day.sections.length===1,'Separá o revisá las secciones del entrenamiento');
   const entries=day.sections[0].items.map(item=>{
@@ -60,13 +68,14 @@ export function reviewNativeRoutines(data,plan,Gym){
   slots.push({slot,name,weekday:day.weekday,entries});
  }
  Gym.compatibleSettings(settings,next,data.work);
- return {basis:JSON.stringify([settings,data.work??{}]),draft:p,view:slots};
+ return {basis:JSON.stringify([settings,data.work??{}]),draft:p,additions:clone(additions),view:slots};
 }
 export function applyNativeRoutines(data,review,Gym,{confirmed=false}={}){
  check(confirmed===true&&review?.basis===JSON.stringify([data.settings??{},data.work??{}]),'Confirmá el plan con los datos actuales');
- const fresh=reviewNativeRoutines(data,review.draft,Gym);
+ const fresh=reviewNativeRoutines(data,review.draft,Gym,{additions:review.additions??[]});
  check(JSON.stringify(fresh.view)===JSON.stringify(review.view),'Cambió la revisión');
  let settings=data.settings??{};
+ for(const item of fresh.additions)settings=Gym.add104(settings,item);
  for(const {name,entries} of fresh.view)settings=Gym.append(settings,{name,entries});
  Gym.compatibleSettings(data.settings??{},settings,data.work);
  return {...data,settings};
@@ -77,7 +86,7 @@ export function applyNativeRoutines(data,review,Gym,{confirmed=false}={}){
 const calendarDay=d=>typeof d==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(d)&&d>='1900-01-01'&&d<='2199-12-31'&&Number.isFinite(Date.parse(d))&&new Date(d).toISOString().slice(0,10)===d;
 const nextDay=d=>new Date(Date.parse(d)+86400000).toISOString().slice(0,10);
 const calendarBasis=(data,today)=>JSON.stringify([today,data.settings??{},data.work??{},data.running1174??null,data.sport1177??null]);
-function prepareRoutineProgramme(data,document,config,today,{Gym,S,T,R,Sport}){
+function prepareRoutineProgramme(data,document,config,today,{Gym,S,T,R,Sport},additions=[]){
  check(calendarDay(today)&&exact(config,['id','name','start','end','objective','equipment','minutes','equipmentConfirmed'])&&typeof config.id==='string'&&/^prog-[a-f0-9]{32}$/.test(config.id)&&config.equipmentConfirmed===true,'Confirmá fechas y equipamiento disponible');
  const p=validateExtractedPlan(document),before=data.settings??{};
  check(p.kind==='routine'&&p.days.length>=2&&p.days.length<=6&&p.days.every(d=>int(d.weekday,0,6))&&new Set(p.days.map(d=>d.weekday)).size===p.days.length,'Asigná entre dos y seis días distintos de la semana');
@@ -85,7 +94,7 @@ function prepareRoutineProgramme(data,document,config,today,{Gym,S,T,R,Sport}){
  check(c.start>=today,'No se modifica el calendario pasado');
  const previous=S.programmes(before);
  check(!previous.some(p=>p.id===config.id||!p.cancelled&&c.start<=p.end&&c.end>=p.start),'Ya existe un programa en esas fechas');
- const review=reviewNativeRoutines(data,p,Gym);
+ const review=reviewNativeRoutines(data,p,Gym,{additions});
  check(review.view.every(r=>T.estimate(r.entries)<=c.minutes),'La duración orientativa de la rutina supera el tiempo confirmado');
  const next=applyNativeRoutines(data,review,Gym,{confirmed:true}),days=review.view.map(r=>({weekday:r.weekday,slot:r.slot})).sort((a,b)=>(a.weekday+6)%7-(b.weekday+6)%7);
  const programme={id:config.id,name:c.name,start:c.start,end:c.end,objective:c.objective,equipment:c.equipment,minutes:c.minutes,days,cancelled:false};
@@ -103,15 +112,15 @@ function prepareRoutineProgramme(data,document,config,today,{Gym,S,T,R,Sport}){
  R.assertStrengthChange(data.running1174,before,settings,today,S);
  if(data.running1174)R.validateHybrid(data.running1174,settings,S);
  Sport.assertCalendar(data.sport1177,settings,data.running1174,S,R);
- return {next:{...next,settings},view:{programme,dates,routines:review.view}};
+ return {next:{...next,settings},view:{programme,dates,routines:review.view,additions:review.additions}};
 }
-export function reviewRoutineProgramme(data,document,config,today,api){
- const draft=validateExtractedPlan(document),c=clone(config),result=prepareRoutineProgramme(data,draft,c,today,api);
- return {basis:calendarBasis(data,today),draft,config:c,view:result.view};
+export function reviewRoutineProgramme(data,document,config,today,api,{additions=[]}={}){
+ const draft=validateExtractedPlan(document),c=clone(config),result=prepareRoutineProgramme(data,draft,c,today,api,additions);
+ return {basis:calendarBasis(data,today),draft,config:c,additions:clone(additions),view:result.view};
 }
 export function applyRoutineProgramme(data,review,today,api,{confirmed=false}={}){
  check(confirmed===true&&review?.basis===calendarBasis(data,today),'Revisá y confirmá el calendario vigente');
- const result=prepareRoutineProgramme(data,review.draft,review.config,today,api);
+ const result=prepareRoutineProgramme(data,review.draft,review.config,today,api,review.additions??[]);
  check(JSON.stringify(result.view)===JSON.stringify(review.view),'Cambió el calendario revisado');
  return result.next;
 }

@@ -43,5 +43,11 @@ assert.deepEqual(scheduled.work,final.work);assert.deepEqual(scheduled.importedD
 assert.throws(()=>G.reviewRoutineProgramme(scheduled,planDoc,{...config,id:'prog-'+'d'.repeat(32)},today,api));
 await c.review('documentRoutineProgramme',programme,snap.diary);await c.apply('documentRoutineProgramme',programme,snap.diary);assert.equal(writes,4);
 assert.deepEqual(JSON.parse(snap.diary),scheduled);
-enabled=false;await assert.rejects(()=>c.review('documentDietLog',log,snap.diary));assert.equal(writes,4);
+const custom=structuredClone(routine);custom.days[0].sections[0].items[0].name='Sentadilla personalizada prueba';
+const customEntry={name:'Sentadilla personalizada prueba',equipment:'Gimnasio completo',part:'lower',groups:['Cuádriceps'],technique:'',unilateral:false};
+const customReview=G.reviewNativeRoutines(scheduled,custom,Gym,{additions:[customEntry]});
+await c.review('documentRoutine',customReview,snap.diary);await c.apply('documentRoutine',customReview,snap.diary);assert.equal(writes,5);
+const customSaved=JSON.parse(snap.diary);assert.deepEqual(Gym.library104(customSaved.settings),[customEntry]);assert.equal(Gym.templates(customSaved.settings).at(-1).entries[0].exercise,customEntry.name);
+assert.deepEqual(customSaved.settings.programmes102,scheduled.settings.programmes102);
+enabled=false;await assert.rejects(()=>c.review('documentDietLog',log,snap.diary));assert.equal(writes,5);
 console.log('Imported plans: coordinated diary revision, tampering and stale guards, native routine, diet adherence and encrypted portable round trip PASS');

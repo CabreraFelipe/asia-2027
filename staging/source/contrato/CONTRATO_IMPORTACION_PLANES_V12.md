@@ -23,3 +23,6 @@ Paneles nativos de dieta y entrenamiento, selector PDF/JPG/PNG, consentimiento p
 
 ## Calendario de rutinas importadas
 Se reutilizan programmes102, plantillas y calendario nativos. Alta opcional con fechas, objetivo, equipamiento y tiempo confirmados; 2–6 días distintos, sin regenerar ejercicios. Se rechazan solapamientos, historial, Running, eventos deportivos y conflictos PRO mediante el guardado coordinado. No se activa automáticamente el calendario personal. Falta validar la UI, sincronización y proveedores reales.
+
+## Ejercicios desconocidos
+Alta explícita y atómica en exerciseLibrary104 junto con plantillas o programa. Reutiliza fichas y catálogo nativos, exige material, zona, grupos y lateralidad confirmados, no inventa técnica ni reemplaza fichas existentes. La revisión se conserva en la operación CAS; faltan validaciones completas de la nueva interfaz y conexión real.

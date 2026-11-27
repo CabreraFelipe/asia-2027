@@ -42,13 +42,15 @@ function mount(kind,host){
   field(editor,'Indicaciones originales (revisar)',d.notes,v=>d.notes=v.trim()||null);
   for(const issue of d.uncertainties)editor.append(n('p','Revisar: '+issue));
   if(d.uncertainties.length){const l=n('label','Revisé las incertidumbres y corregí los datos.'),c=n('input');c.type='checkbox';c.onchange=()=>{if(c.checked)d.uncertainties=[]};l.prepend(c);editor.append(l)}
+  const newExercises=new Map(),knownNames=Gym.names104(data.settings),known=new Set(knownNames);
+  const catalogue=n('datalist');catalogue.id='documentExerciseNamesV12';for(const name of knownNames){const o=n('option');o.value=name;catalogue.append(o)}if(kind==='routine')editor.append(catalogue);
   d.days.forEach(day=>{
    const box=n('details');box.open=true;box.append(n('summary',day.label));field(box,'Nombre del día',day.label,v=>day.label=v);
    select(box,'Día de semana',[['','Sin día específico'],...labels.map((l,i)=>[String(i),l])],day.weekday===null?'':String(day.weekday),v=>day.weekday=v===''?null:Number(v));
    for(const section of day.sections){field(box,'Comida o sección',section.label,v=>section.label=v);
     for(const option of section.alternatives??[{items:section.items}]){
      if(option.label!==undefined)field(box,'Alternativa',option.label,v=>option.label=v);
-     for(const item of option.items){const row=n('div');row.append(n('small','Texto de origen: '+item.source));field(row,kind==='diet'?'Alimento':'Ejercicio',item.name,v=>item.name=v);
+     for(const item of option.items){const row=n('div');row.append(n('small','Texto de origen: '+item.source));const nameInput=field(row,kind==='diet'?'Alimento':'Ejercicio (elegí del catálogo o escribí el nombre)',item.name,v=>item.name=v.trim());if(kind==='routine')nameInput.setAttribute('list',catalogue.id);
       if(kind==='diet')field(row,'Cantidad (vacío = no indicada)',item.quantity,v=>item.quantity=v.trim()||null);
       else for(const [k,t] of [['sets','Series'],['min','Repeticiones mínimas'],['max','Repeticiones máximas'],['rest','Descanso en segundos']])field(row,t,item[k],v=>item[k]=v===''?null:Number(v),'number');
       box.append(row)
@@ -56,6 +58,22 @@ function mount(kind,host){
     }
    }editor.append(box)
   });
+  if(kind==='routine'){
+   const extra=n('div');editor.append(extra);
+   const collect=()=>[...new Set(d.days.flatMap(x=>x.sections.flatMap(s=>s.items.map(i=>i.name))))].filter(x=>!known.has(x));
+   function showNew(){extra.replaceChildren();for(const name of collect()){
+    let item=newExercises.get(name);if(!item){item={name,equipment:'',part:'',groups:[],technique:'',unilateral:null};newExercises.set(name,item)}
+    const box=n('details');box.open=true;box.append(n('summary','Ejercicio nuevo: '+name),n('p','Confirmá la ficha o corregí el nombre para usar un ejercicio existente.'));
+    select(box,'Equipamiento',[['','Elegí'],...Gym.equipment104.map(x=>[x,x])],item.equipment,v=>item.equipment=v);
+    select(box,'Zona',[['','Elegí'],['upper','Tren superior'],['lower','Tren inferior'],['full','Cuerpo completo']],item.part,v=>item.part=v);
+    box.append(n('p','Grupos musculares (1 a 3)'));
+    for(const group of Gym.groups104){const l=n('label',group),c=n('input');c.type='checkbox';c.checked=item.groups.includes(group);c.onchange=()=>{item.groups=c.checked?[...item.groups,group]:item.groups.filter(g=>g!==group)};l.prepend(c);box.append(l)}
+    field(box,'Nota técnica (opcional, escrita por vos)',item.technique,v=>item.technique=v);
+    select(box,'¿Se registra por lado?',[['','Elegí'],['yes','Sí'],['no','No']],item.unilateral===null?'':item.unilateral?'yes':'no',v=>item.unilateral=v===''?null:v==='yes');
+    extra.append(box)
+   }}
+   button(editor,'Actualizar ejercicios nuevos',showNew);showNew();
+  }
   const config={start:date(),end:date(),dayMap:Array(7).fill(null)};
   if(kind==='diet'){
    field(editor,'Inicio',config.start,v=>config.start=v,'date');field(editor,'Fin',config.end,v=>config.end=v,'date');
@@ -74,10 +92,10 @@ function mount(kind,host){
    field(fields,'Tiempo disponible por sesión (minutos)',null,v=>routineConfig.minutes=v===''?null:Number(v),'number');
    const eq=n('label','Confirmo que tengo el material de todos los ejercicios importados'),ec=n('input');ec.type='checkbox';ec.onchange=()=>routineConfig.equipmentConfirmed=ec.checked;eq.prepend(ec);fields.append(eq);
   }
-  button(editor,'Revisar y guardar',async()=>{if(busy)return;busy=true;try{current();check(originDiary===disk600,'Cambió el diario. Analizá nuevamente.');const reviewed=G.validateExtractedPlan(d);let proposal,next,operation;
+  button(editor,'Revisar y guardar',async()=>{if(busy)return;busy=true;try{current();check(originDiary===disk600,'Cambió el diario. Analizá nuevamente.');const reviewed=G.validateExtractedPlan(d);let proposal,next,operation;const additions=kind==='routine'?[...new Set(reviewed.days.flatMap(x=>x.sections.flatMap(s=>s.items.map(i=>i.name))))].filter(x=>!known.has(x)).map(x=>{check(newExercises.has(x),'Actualizá las fichas de ejercicios nuevos');return newExercises.get(x)}):[];
    if(kind==='diet'){const id='dietplan-'+crypto.randomUUID().replaceAll('-','');proposal=D.reviewDietPlan(data.importedDietV12,reviewed,{id,...config},date());next={...data,importedDietV12:D.applyDietPlan(data.importedDietV12,proposal,date(),{confirmed:true})};operation='documentDiet'}
-   else if(scheduleRoutine){const id='prog-'+crypto.randomUUID().replaceAll('-','');proposal=G.reviewRoutineProgramme(data,reviewed,{id,...routineConfig},date(),api);next=G.applyRoutineProgramme(data,proposal,date(),api,{confirmed:true});operation='documentRoutineProgramme'}
-   else{proposal=G.reviewNativeRoutines(data,reviewed,Gym);next=G.applyNativeRoutines(data,proposal,Gym,{confirmed:true});operation='documentRoutine'}
+   else if(scheduleRoutine){const id='prog-'+crypto.randomUUID().replaceAll('-','');proposal=G.reviewRoutineProgramme(data,reviewed,{id,...routineConfig},date(),api,{additions});next=G.applyRoutineProgramme(data,proposal,date(),api,{confirmed:true});operation='documentRoutineProgramme'}
+   else{proposal=G.reviewNativeRoutines(data,reviewed,Gym,{additions});next=G.applyNativeRoutines(data,proposal,Gym,{confirmed:true});operation='documentRoutine'}
    if(!confirm(kind==='diet'?'¿Guardar el menú y calendario revisados sin cambiar tus objetivos?':scheduleRoutine?'¿Guardar las plantillas y programar '+proposal.view.dates.length+' sesiones desde '+proposal.view.programme.start+' hasta '+proposal.view.programme.end+'?':'¿Guardar las nuevas plantillas Gym sin modificar las existentes?'))return;
    await save(operation,proposal,next);reset();status.textContent='Guardado local verificado. La sincronización se realiza por separado.';window.asiaImportedDietRefresh?.();refresh();
   }catch(e){status.textContent=e.message||'No se pudo guardar.'}finally{busy=false}});
