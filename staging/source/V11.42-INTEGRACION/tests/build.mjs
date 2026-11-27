@@ -38,7 +38,14 @@ replaceExtras('return {version:1,primary:raw.primary,items};','return {version:r
 replaceExtras('profile100,goals101,goalDay101','profile100,goals101,emptyGoals1148,goalDay101');
 replaceExtras("['Peso corporal','Fuerza','Hábitos','Bienestar','Otro']","['Peso corporal','Fuerza','Hábitos','Bienestar','Otro','Running','Rendimiento deportivo']");
 replaceExtras('function diary(d){','function diary(d){globalThis.asiaRunning1174.validate(d.running1174,goals101(d.settings?.goals101));if(d.running1174)globalThis.asiaRunning1174.validateHybrid(d.running1174,d.settings,globalThis.asiaSchedule829);globalThis.asiaSport1177.validate(d.sport1177,goals101(d.settings?.goals101));globalThis.asiaSport1177.assertCalendar(d.sport1177,d.settings,d.running1174,globalThis.asiaSchedule829,globalThis.asiaRunning1174);if(Object.hasOwn(d.settings??{},\'coachRoutine1179\'))globalThis.asiaCoachActions1179.validate(d.settings,globalThis.asiaGym826,globalThis.asiaSchedule829.programmes(d.settings));');
-extras1148=readFileSync(base+'/src/coach-actions1179.js','utf8')+'\n'+readFileSync(base+'/src/sport1177.js','utf8')+'\n'+readFileSync(base+'/src/running1174.js','utf8')+'\n'+extras1148;
+// Generate the same pure diet validator for classic diary, backup shell and Worker.
+replaceExtras('function diary(d){','function diary(d){globalThis.asiaImportedDiet.validateDietPlanBook(d.importedDietV12);');
+const importSource=readFileSync(base+'/src/document-plan-import.mjs','utf8'),dietSource=readFileSync(base+'/src/document-diet-plan.mjs','utf8');
+const dietImport="import {validateExtractedPlan} from './document-plan-import.mjs';";
+if(dietSource.split(dietImport).length!==2)throw Error('Marcador de dieta importada');
+const pureImports='(function(){\n'+importSource.replace(/^export /gm,'')+'\nglobalThis.asiaDocumentPlan=Object.freeze({validateExtractedPlan,reviewNativeRoutines,applyNativeRoutines});})();\n';
+const pureDiet='(function(){\nconst {validateExtractedPlan}=globalThis.asiaDocumentPlan;\n'+dietSource.replace(dietImport,'').replace(/^export /gm,'')+'\nglobalThis.asiaImportedDiet=Object.freeze({validateDietPlanBook,reviewDietPlan,applyDietPlan,dietDay,recordDietMeal,dietAdherence});})();\n';
+extras1148=readFileSync(base+'/src/coach-actions1179.js','utf8')+'\n'+readFileSync(base+'/src/sport1177.js','utf8')+'\n'+readFileSync(base+'/src/running1174.js','utf8')+'\n'+pureImports+pureDiet+extras1148;
 writeFileSync(web+'/diary/extras830.js',extras1148);
 execFileSync(process.execPath,['--check',web+'/diary/extras830.js'],{stdio:'inherit'});
 // V11.49: first-use invitation only with an explicitly verified empty local

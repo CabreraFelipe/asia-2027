@@ -11,3 +11,6 @@ Contrato inicial de extracción y transformación a plantillas Gym implementado,
 
 ## Menús y adherencia — implementación de dominio
 El contrato acepta alternativas explícitas por comida y conserva las cantidades desconocidas como null. El libro propuesto permite revisión del calendario semanal, alta sin solapamiento, elección de alternativa, registro manual de adherencia y tasas separadas de registro/cumplimiento. No genera ingestas ni cambia macros. Aún no integrado al esquema de diario cifrado ni a la interfaz; CI pendiente.
+
+## Persistencia coordinada
+El candidato utiliza importedDietV12 dentro del diario existente. La validación se genera desde el mismo dominio para diario, shell y Worker. Se incorporan las operaciones documentDiet, documentDietLog y documentRoutine a la revisión y CAS existente, con pruebas de respaldo portátil cifrado y preservación de historial. Recuperación de conflictos conserva su política conservadora para campos desconocidos; falta probar sincronización real del nuevo campo y conectar la UI. No se cambia V10.6.

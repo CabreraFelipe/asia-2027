@@ -14,6 +14,20 @@ function calculate(data,kind,proposal,today){
  check(day(today),'Fecha inválida');let next,dates,sportRows=null,qualityRows=null;const x=api();
  if(kind==='strength'){next=x.A.apply(data,proposal,today,x);dates=proposal.view.dates;}
  else if(kind==='bundle'){next=globalThis.asiaCoachBundle1180.apply(data,proposal,today,x,current(data));dates=proposal.view.affectedDates;sportRows=proposal.view.sport?.after??null;qualityRows=proposal.view.running?.after?.filter(x.R.isQuality)??null;}
+ else if(kind==='documentDiet'){
+  next={...data,importedDietV12:globalThis.asiaImportedDiet.applyDietPlan(data.importedDietV12,proposal,today,{confirmed:true})};dates=[];
+ }
+ else if(kind==='documentDietLog'){
+  check(proposal&&Object.keys(proposal).length===3&&Object.hasOwn(proposal,'entry')&&Object.hasOwn(proposal,'basis')&&Object.hasOwn(proposal,'view'),'Registro de dieta inválido');
+  const D=globalThis.asiaImportedDiet,b=D.validateDietPlanBook(data.importedDietV12);
+  check(proposal.basis===JSON.stringify(b),'Cambió la dieta; revisá nuevamente');
+  const result=D.recordDietMeal(b,proposal.entry,today,{confirmed:true});
+  check(eq(D.dietDay(result,proposal.entry.day),proposal.view),'Cambió la comida revisada');
+  next={...data,importedDietV12:result};dates=[];
+ }
+ else if(kind==='documentRoutine'){
+  next=globalThis.asiaDocumentPlan.applyNativeRoutines(data,proposal,x.Gym,{confirmed:true});dates=[];
+ }
  else if(kind==='onboard'){
   const o=globalThis.asiaOnboard1176,goalApi=globalThis.asiaGoals101;
   check(o&&goalApi,'Onboarding no disponible');

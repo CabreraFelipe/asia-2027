@@ -187,6 +187,7 @@ runIsolated1174(process.execPath,[new URL('./notification-webpush-provider.test.
 runIsolated1174(process.execPath,[new URL('./notification-end-to-end.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
 runIsolated1174(process.execPath,[new URL('./document-plan-import.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
 runIsolated1174(process.execPath,[new URL('./document-diet-plan.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
+runIsolated1174(process.execPath,[new URL('./document-plan-persistence.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
 runIsolated1174(process.execPath,[new URL('./health-sources.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
 runIsolated1174(process.execPath,[new URL('./health-source-view.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
 runIsolated1174(process.execPath,[new URL('./food-lookup.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
