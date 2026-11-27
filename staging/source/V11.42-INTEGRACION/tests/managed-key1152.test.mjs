@@ -39,6 +39,27 @@ try{
  const first=await req(F,{env:extraEnv});assert.equal(first.status,200);const firstSecret=(await first.json()).secret;
  db.prepare('INSERT OR IGNORE INTO accounts_v11 VALUES(?,?,?,?)').run(F.id,'https://accounts.google.com',F.email,new Date().toISOString());
  assert.equal((await (await req(F,{env:extraEnv})).json()).secret,firstSecret);
+ // Legacy test profile G: old ciphertext remains, no managed key existed.
+ const G={id:'acct_'+'1'.repeat(32),token:'G'.repeat(43),csrf:'g'.repeat(43),email:'g@example.invalid'};
+ // Install the successor schema, then create a fixture representing an account predating 0015.
+ db.exec(readFileSync(new URL('../migrations/0016_pilot_fresh_profiles.proposed.sql',import.meta.url),'utf8'));
+ db.prepare('INSERT INTO accounts_v11 VALUES(?,?,?,?)').run(G.id,'https://accounts.google.com',G.email,new Date().toISOString());
+ db.prepare('DELETE FROM managed_account_keys_v1152 WHERE account_id=?').run(G.id);
+ db.prepare('INSERT INTO auth_oidc_sessions_v1111 VALUES(?,?,?,?,?,?)').run(await digest(G.token),G.id,G.csrf,await digest(G.email),Date.now(),Date.now()+600000);
+ db.prepare('INSERT INTO encrypted_snapshots_v11 VALUES(?,?,?,?)').run(G.id,1,'old-ciphertext',new Date().toISOString());
+ const resetEnv={...env,STAGING_ALLOWED_EMAILS:G.email,STAGING_ALLOW_PILOT_FRESH_PROFILE_V12:'true'};
+ const reset=(extra={},config=resetEnv)=>worker.fetch(new Request(origin+'/v12/pilot/fresh-profile',{method:'POST',headers:{Cookie:'__Host-asia1111_session='+G.token,Origin:origin,'X-Asia-CSRF':G.csrf,'X-Asia-Fresh-Profile':'archive-legacy-v1',...extra}}),config);
+ assert.equal((await reset({}, {...resetEnv,STAGING_ALLOW_PILOT_FRESH_PROFILE_V12:'false'})).status,404);
+ assert.equal((await reset({'X-Asia-CSRF':A.csrf})).status,403);
+ assert.equal((await reset()).status,200);
+ const successor=db.prepare('SELECT fresh_account_id FROM pilot_fresh_profiles_v12 WHERE legacy_account_id=?').get(G.id).fresh_account_id;
+ assert.notEqual(successor,G.id);
+ assert.equal(db.prepare('SELECT envelope FROM encrypted_snapshots_v11 WHERE account_id=?').get(G.id).envelope,'old-ciphertext');
+ assert.equal(db.prepare('SELECT COUNT(*) AS n FROM auth_oidc_sessions_v1111 WHERE account_id=?').get(G.id).n,0);
+ assert.equal(db.prepare('SELECT enrollment_kind FROM managed_account_keys_v1152 WHERE account_id=?').get(successor).enrollment_kind,'new');
+ assert.equal(db.prepare('SELECT COUNT(*) AS n FROM encrypted_snapshots_v11 WHERE account_id=?').get(successor).n,0);
+ assert.notEqual((await reset()).status,200);
+ assert.throws(()=>db.prepare('INSERT INTO auth_oidc_sessions_v1111 VALUES(?,?,?,?,?,?)').run('0'.repeat(64),G.id,G.csrf,'1'.repeat(64),Date.now(),Date.now()+600000));
  enroll(A);enroll(B);enroll(C);enroll(D);enroll(E);
  const responses=await Promise.all(Array.from({length:5},()=>req(A)));
  for(const r of responses){assert.equal(r.status,200);assert.match(r.headers.get('cache-control'),/no-store/)}

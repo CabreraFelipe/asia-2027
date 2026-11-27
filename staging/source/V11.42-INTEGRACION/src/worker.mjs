@@ -1,6 +1,7 @@
 // Isolated synthetic pilot only. The asset binding MUST run behind this Worker.
 import {createServiceWorker} from '../../V11.39-INTEGRACION/src/service-worker.mjs';
 import {handleManagedKey} from './managed-key1152.mjs';
+import {handleFreshPilotProfile} from './fresh-pilot-profile.mjs';
 import {handleRemoteRekey1159} from './remote-rekey-route1159.mjs';
 const scope='/v11.42/',home=scope+'index.html',pub=new Set(['index.html','manifest.json','shell.css','entry.js','managed-entry1153.mjs','sw.js','offline.html','asia-icon-v4-192.png','asia-icon-v4-512.png','asia-icon-v4-180.png'].map(p=>scope+p));
 const originPattern=/^https:\/\/asia-v1142-candidate-staging\.[a-z0-9-]+\.workers\.dev$/;
@@ -18,6 +19,7 @@ export function createPwaWorker({assetPaths,fetchImpl=fetch}={}){
    if(p.endsWith('/callback')&&r.status===303){const h=new Headers(r.headers);h.set('Location',home);return new Response(null,{status:303,headers:h})}return r;
   }
   if(p==='/v11.59/rekey')return handleRemoteRekey1159(request,env,{authenticate:async()=>{const r=await original.fetch(new Request(u.origin+'/v11.11/auth/me',{headers:{Cookie:request.headers.get('Cookie')||''}}),env);return r.ok?await r.json():null}});
+  if(p==='/v12/pilot/fresh-profile')return handleFreshPilotProfile(request,env,{authenticate:async()=>{const r=await original.fetch(new Request(u.origin+'/v11.11/auth/me',{headers:{Cookie:request.headers.get('Cookie')||''}}),env);return r.ok?await r.json():null}});
   if(p==='/v11.52/account-key')return handleManagedKey(request,env,{authenticate:async()=>{const r=await original.fetch(new Request(u.origin+'/v11.11/auth/me',{headers:{Cookie:request.headers.get('Cookie')||''}}),env);return r.ok?await r.json():null}});
   if(p==='/v11.38/sync'||/^\/v11\.38\/sync\/[1-9]\d{0,2}$/.test(p)||/^\/v11\.39\/services\/(health|workouts|coach|chat|diet|weekly|training)$/.test(p))return original.fetch(request,env);
   if(request.method!=='GET'||request.body!==null)return deny(405);

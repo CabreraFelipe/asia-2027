@@ -198,10 +198,13 @@ const renewRoute=`  if(path==='/v11.11/auth/renew'&&request.method==='POST'&&!u.
   }
 `;
 replaceIdentity("  if(path==='/v11.11/auth/logout'&&request.method==='POST'&&!u.search)",renewRoute+"  if(path==='/v11.11/auth/logout'&&request.method==='POST'&&!u.search)");
+// Only the verified Google callback may resolve the explicitly created successor.
+replaceIdentity("    phase='SESION_D1';","    let activeOwner=owner;\n    if(env.STAGING_ALLOW_PILOT_FRESH_PROFILE_V12==='true'&&env.STAGING_ALLOW_MANAGED_KEYS_1152==='true'){\n     const fresh=await env.STAGING_DB.prepare(\"SELECT p.fresh_account_id FROM pilot_fresh_profiles_v12 p JOIN accounts_v11 a ON a.account_id=p.fresh_account_id JOIN managed_account_keys_v1152 k ON k.account_id=a.account_id WHERE p.legacy_account_id=? AND a.issuer='urn:asia:synthetic-fresh-profile-v12' AND a.subject=? AND k.enrollment_kind='new'\").bind(owner,owner).first();\n     if(fresh){if(!/^acct_[a-f0-9]{32}$/.test(fresh.fresh_account_id))throw Error('Perfil inválido');activeOwner=fresh.fresh_account_id;}\n    }\n    phase='SESION_D1';");
+replaceIdentity(".bind(await digest(raw),owner,csrf,await digest(id.email),now,now+SESSION_MS)",".bind(await digest(raw),activeOwner,csrf,await digest(id.email),now,now+SESSION_MS)");
 writeFileSync(identityFile,identityText);
 execFileSync(process.execPath,['--check',identityFile],{stdio:'inherit'});
 const worker=sroot+'/V11.42-INTEGRACION/src/worker.mjs';mkdirSync(dirname(worker),{recursive:true});cpSync(base+'/src/worker.mjs',worker);
-for(const n of ['account-key1150.mjs','managed-key1152.mjs','remote-rekey1157.mjs','remote-rekey-route1159.mjs','coach-contract1185.mjs','coach-inference1181.mjs','coach-quota1186.mjs','coach-route1186.mjs','coach-hybrid-contract1187.mjs','coach-intake1199.mjs'])cpSync(base+'/src/'+n,dirname(worker)+'/'+n);
+for(const n of ['fresh-pilot-profile.mjs','account-key1150.mjs','managed-key1152.mjs','remote-rekey1157.mjs','remote-rekey-route1159.mjs','coach-contract1185.mjs','coach-inference1181.mjs','coach-quota1186.mjs','coach-route1186.mjs','coach-hybrid-contract1187.mjs','coach-intake1199.mjs'])cpSync(base+'/src/'+n,dirname(worker)+'/'+n);
 // Extract policy from the immutable V10.6 source without evaluating DOM code
 // in the Worker. The server sees only portable keys and presentation groups.
 const policyContext={module:{exports:{}}};runInNewContext(readFileSync('accounts106.js','utf8'),policyContext);
