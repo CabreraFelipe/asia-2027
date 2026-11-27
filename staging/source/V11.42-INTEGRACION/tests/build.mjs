@@ -43,7 +43,7 @@ replaceExtras('function diary(d){','function diary(d){globalThis.asiaImportedDie
 const importSource=readFileSync(base+'/src/document-plan-import.mjs','utf8'),dietSource=readFileSync(base+'/src/document-diet-plan.mjs','utf8');
 const dietImport="import {validateExtractedPlan} from './document-plan-import.mjs';";
 if(dietSource.split(dietImport).length!==2)throw Error('Marcador de dieta importada');
-const pureImports='(function(){\n'+importSource.replace(/^export /gm,'')+'\nglobalThis.asiaDocumentPlan=Object.freeze({validateExtractedPlan,reviewNativeRoutines,applyNativeRoutines});})();\n';
+const pureImports='(function(){\n'+importSource.replace(/^export /gm,'')+'\nglobalThis.asiaDocumentPlan=Object.freeze({validateExtractedPlan,reviewNativeRoutines,applyNativeRoutines,reviewRoutineProgramme,applyRoutineProgramme});})();\n';
 const pureDiet='(function(){\nconst {validateExtractedPlan}=globalThis.asiaDocumentPlan;\n'+dietSource.replace(dietImport,'').replace(/^export /gm,'')+'\nglobalThis.asiaImportedDiet=Object.freeze({validateDietPlanBook,reviewDietPlan,applyDietPlan,dietDay,recordDietMeal,dietAdherence});})();\n';
 extras1148=readFileSync(base+'/src/coach-actions1179.js','utf8')+'\n'+readFileSync(base+'/src/sport1177.js','utf8')+'\n'+readFileSync(base+'/src/running1174.js','utf8')+'\n'+pureImports+pureDiet+extras1148;
 writeFileSync(web+'/diary/extras830.js',extras1148);

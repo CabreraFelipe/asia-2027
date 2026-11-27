@@ -61,10 +61,24 @@ function mount(kind,host){
    field(editor,'Inicio',config.start,v=>config.start=v,'date');field(editor,'Fin',config.end,v=>config.end=v,'date');
    for(let w=0;w<7;w++){const ix=d.days.findIndex(x=>x.weekday===w);config.dayMap[w]=ix<0?null:ix;select(editor,labels[w],[['','Sin plan'],...d.days.map((x,i)=>[String(i),x.label])],ix<0?'':String(ix),v=>config.dayMap[w]=v===''?null:Number(v))}
   }
+  const api={Gym,S:window.asiaSchedule829,T:window.asiaTraining102,R:window.asiaRunning1174,Sport:window.asiaSport1177};
+  let scheduleRoutine=false;
+  const routineConfig={name:d.name,start:'',end:'',objective:'',equipment:'',minutes:null,equipmentConfirmed:false};
+  if(kind==='routine'){
+   const l=n('label','Programar también en mi calendario (requiere calendario personal activo o período posterior al original)'),c=n('input');c.type='checkbox';l.prepend(c);editor.append(l);
+   const fields=n('div');fields.hidden=true;editor.append(fields);c.onchange=()=>{scheduleRoutine=c.checked;fields.hidden=!c.checked};
+   field(fields,'Nombre del programa',routineConfig.name,v=>routineConfig.name=v);
+   field(fields,'Inicio',routineConfig.start,v=>routineConfig.start=v,'date');field(fields,'Fin',routineConfig.end,v=>routineConfig.end=v,'date');
+   select(fields,'Objetivo',[['','Elegí'],...api.S.objectives.map(x=>[x,x])],'',v=>routineConfig.objective=v);
+   select(fields,'Equipamiento',[['','Elegí'],...api.S.equipment.map(x=>[x,x])],'',v=>routineConfig.equipment=v);
+   field(fields,'Tiempo disponible por sesión (minutos)',null,v=>routineConfig.minutes=v===''?null:Number(v),'number');
+   const eq=n('label','Confirmo que tengo el material de todos los ejercicios importados'),ec=n('input');ec.type='checkbox';ec.onchange=()=>routineConfig.equipmentConfirmed=ec.checked;eq.prepend(ec);fields.append(eq);
+  }
   button(editor,'Revisar y guardar',async()=>{if(busy)return;busy=true;try{current();check(originDiary===disk600,'Cambió el diario. Analizá nuevamente.');const reviewed=G.validateExtractedPlan(d);let proposal,next,operation;
    if(kind==='diet'){const id='dietplan-'+crypto.randomUUID().replaceAll('-','');proposal=D.reviewDietPlan(data.importedDietV12,reviewed,{id,...config},date());next={...data,importedDietV12:D.applyDietPlan(data.importedDietV12,proposal,date(),{confirmed:true})};operation='documentDiet'}
+   else if(scheduleRoutine){const id='prog-'+crypto.randomUUID().replaceAll('-','');proposal=G.reviewRoutineProgramme(data,reviewed,{id,...routineConfig},date(),api);next=G.applyRoutineProgramme(data,proposal,date(),api,{confirmed:true});operation='documentRoutineProgramme'}
    else{proposal=G.reviewNativeRoutines(data,reviewed,Gym);next=G.applyNativeRoutines(data,proposal,Gym,{confirmed:true});operation='documentRoutine'}
-   if(!confirm(kind==='diet'?'¿Guardar el menú y calendario revisados sin cambiar tus objetivos?':'¿Guardar las nuevas plantillas Gym sin modificar las existentes?'))return;
+   if(!confirm(kind==='diet'?'¿Guardar el menú y calendario revisados sin cambiar tus objetivos?':scheduleRoutine?'¿Guardar las plantillas y programar '+proposal.view.dates.length+' sesiones desde '+proposal.view.programme.start+' hasta '+proposal.view.programme.end+'?':'¿Guardar las nuevas plantillas Gym sin modificar las existentes?'))return;
    await save(operation,proposal,next);reset();status.textContent='Guardado local verificado. La sincronización se realiza por separado.';window.asiaImportedDietRefresh?.();refresh();
   }catch(e){status.textContent=e.message||'No se pudo guardar.'}finally{busy=false}});
  }

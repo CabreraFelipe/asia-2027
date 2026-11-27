@@ -20,3 +20,6 @@ Adaptador Responses API (PDF input_file e imágenes input_image), salida estruct
 
 ## Interfaz inicial
 Paneles nativos de dieta y entrenamiento, selector PDF/JPG/PNG, consentimiento por archivo, corrección de campos, confirmación mediante persistencia coordinada y seguimiento de comidas. Carga deshabilitada sin grant real verificado del padre; cliente preparado pero no provisionado. Pendiente prueba visual Chrome específica, programación de rutinas y ejercicio nuevo, sincronización real y analizador seguro.
+
+## Calendario de rutinas importadas
+Se reutilizan programmes102, plantillas y calendario nativos. Alta opcional con fechas, objetivo, equipamiento y tiempo confirmados; 2–6 días distintos, sin regenerar ejercicios. Se rechazan solapamientos, historial, Running, eventos deportivos y conflictos PRO mediante el guardado coordinado. No se activa automáticamente el calendario personal. Falta validar la UI, sincronización y proveedores reales.
