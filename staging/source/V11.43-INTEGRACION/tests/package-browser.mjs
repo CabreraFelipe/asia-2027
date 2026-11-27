@@ -184,7 +184,7 @@ try{
   if(document.querySelector('iframe').contentDocument.querySelector('header .brand h1').textContent!=='Usuario A')throw Error('Nombre perdido al reabrir');
   const diaryA=document.querySelector('iframe').contentDocument;
   if(!diaryA.getElementById('pilotWelcome1146').hidden)throw Error('Invitación reaparece con perfil persistente');
-  if(!diaryA.getElementById('pilotGoals1149').hidden||!diaryA.getElementById('goalBrand101').textContent.includes('Asia 2027'))throw Error('Cuenta existente reinterpretada como nueva');
+  if(diaryA.getElementById('pilotGoals1149').hidden||diaryA.getElementById('goalBrand101').textContent!=='Sin meta principal'||!diaryA.getElementById('countdown').hidden)throw Error('Cuenta sin meta explícita hereda objetivo original');
   if(diaryA.getElementById('reminderTime821_weight').value!=='06:35'||!diaryA.getElementById('reminderEnabled821_weight').checked||!diaryA.getElementById('reminderCloud95_weight').checked)throw Error('Preferencias de avisos perdidas al reabrir');
 
   el('close1140').click();await wait(()=>!document.querySelector('iframe')&&!el('reconcile1140').disabled,'No cerró');
@@ -224,11 +224,11 @@ try{
   if(diaryB.getElementById('reminderTime821_weight').value==='06:35'||[...diaryB.querySelectorAll('input[id^="reminderEnabled821_"],input[id^="reminderCloud95_"]')].some(x=>x.checked))throw Error('Horario o preferencias cruzadas entre cuentas');
 
   if((await (await fetch('/v11.38/sync')).json()).head!==0)throw Error('Nube cruzada');
-  const w=diaryB.defaultView,setup=diaryB.getElementById('pilotGoals1149'),own=diaryB.getElementById('pilotOwnGoals1149');if(setup.hidden)throw Error('B no tiene alta explícita');
-  const oldConfirm=w.confirm;try{w.confirm=()=>false;own.click();if(setup.hidden||!diaryB.getElementById('goalBrand101').textContent.includes('Asia 2027'))throw Error('Cancelar modificó las metas');w.confirm=()=>true;own.click()}finally{w.confirm=oldConfirm}
+  const w=diaryB.defaultView,setup=diaryB.getElementById('pilotGoals1149'),own=diaryB.getElementById('pilotOwnGoals1149');if(setup.hidden||diaryB.getElementById('goalBrand101').textContent!=='Sin meta principal'||!diaryB.getElementById('countdown').hidden||diaryB.getElementById('goalTarget101').textContent.includes('72 kg'))throw Error('B hereda cuenta regresiva');const runPanel=diaryB.getElementById('homeRunningPanel1174'),sportPanel=diaryB.getElementById('sport1177');if(runPanel.tagName!=='DETAILS'||runPanel.className!==sportPanel.className||runPanel.firstElementChild.tagName!=='SUMMARY'||Math.abs(runPanel.getBoundingClientRect().width-sportPanel.getBoundingClientRect().width)>1)throw Error('Formato Running inconsistente');runPanel.open=true;if(!diaryB.getElementById('homeRunning1174').getClientRects().length)throw Error('Acceso Running no visible');
+  const oldConfirm=w.confirm;try{w.confirm=()=>false;own.click();if(setup.hidden||diaryB.getElementById('goalBrand101').textContent!=='Sin meta principal'||!diaryB.getElementById('countdown').hidden)throw Error('Cancelar modificó las metas');w.confirm=()=>true;own.click()}finally{w.confirm=oldConfirm}
   await wait(()=>setup.hidden&&diaryB.getElementById('goalBrand101').textContent==='Sin meta principal'&&el('status1140').textContent.includes('saved'),'Libro vacío no guardado');
   for(const [k,v] of Object.entries({title:'Mi meta B',kind:'Fuerza',target:'5 dominadas',motivation:'Constancia',deadline:'2027-08-01'}))diaryB.getElementById('goal101-'+k).value=v;
-  diaryB.getElementById('goalForm101').requestSubmit();await wait(()=>diaryB.getElementById('goalBrand101').textContent==='Meta principal · Mi meta B'&&el('status1140').textContent.includes('saved'),'Primera meta propia no guardada');
+  diaryB.getElementById('goalForm101').requestSubmit();await wait(()=>diaryB.getElementById('goalBrand101').textContent==='Meta principal · Mi meta B'&&!diaryB.getElementById('countdown').hidden&&el('status1140').textContent.includes('saved'),'Primera meta propia no guardada o sin cuenta regresiva');
   const training=diaryB.getElementById('training102');training.open=true;diaryB.getElementById('goalPlanning1173').click();await wait(()=>!diaryB.getElementById('personalPlanning1173').hidden,'Calendario personal no disponible');
   const personal=diaryB.getElementById('activatePersonal1173'),dateInput=diaryB.getElementById('personalStart1173');const originalConfirm=w.confirm;
   try{w.confirm=()=>false;personal.click();if(personal.hidden)throw Error('Cancelación activó calendario');w.confirm=()=>true;personal.click()}finally{w.confirm=originalConfirm}

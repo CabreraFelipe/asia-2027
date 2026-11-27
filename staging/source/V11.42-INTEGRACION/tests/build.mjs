@@ -23,13 +23,14 @@ const releaseFile=web+'/diary/release831.mjs';
 const releaseText=readFileSync(releaseFile,'utf8'),catchMarker="catch{window.asiaGym84Ready=false;";
 if(releaseText.split(catchMarker).length!==2)throw Error('Marcador de diagnóstico Gym no único');
 writeFileSync(releaseFile,releaseText.replace(catchMarker,`catch(e){const m=String(e?.message||'');window.asiaPilotGymDiagnostic=/Rama bloqueada|Permiso local vencido/.test(m)?'LEASE':/Sesión|sesión|Diario bloqueado/.test(m)?'SESSION':/Revisión Gym/.test(m)?'REVISION':/Registro inicial/.test(m)?'INITIAL':/Esquema|Límite de registros|ID duplicado/.test(m)?'SCHEMA':/Candidato CI|Contexto incompleto|openStore|store\.read|store\.close/.test(m)?'ADAPTER':/read|lectura|Transacción/.test(m)?'READ':'OTHER';window.asiaGym84Ready=false;`));
-// Explicit personal goal book v2, without legacy defaults. Undefined and v1
-// keep their original semantics; no account is migrated or initialized here.
+// Candidate defaults to an empty goal book. Explicit v1 books retain their
+// original semantics; no persisted account is migrated or initialized here.
 // Both the diary and the shell backup/sync validators must use the same bytes.
 const extrasSource=readFileSync('extras830.js','utf8');
 let extras1148=extrasSource;
 function replaceExtras(from,to){if(extras1148.split(from).length!==2)throw Error('Marcador de metas no único: '+from);extras1148=extras1148.replace(from,to)}
 replaceExtras('function goals101(raw){','function emptyGoals1148(){return {version:2,primary:"",items:[]};}function goals101(raw){');
+replaceExtras("if(raw===undefined)return {version:1,primary:'asia-2027',items:[{id:'asia-2027',title:'Asia 2027',kind:'Peso corporal',target:'72 kg',motivation:'',start:'2026-11-16',deadline:'2027-03-08',status:'Activa',closedOn:'',result:''}]};",'if(raw===undefined)return emptyGoals1148();');
 replaceExtras('raw.version===1&&typeof raw.primary', '[1,2].includes(raw.version)&&typeof raw.primary');
 replaceExtras('raw.items.length>=1&&raw.items.length<=100','raw.items.length>=(raw.version===1?1:0)&&raw.items.length<=100');
 replaceExtras("(g.id==='asia-2027'||/^goal-[a-f0-9]{32}$/.test(g.id))","((raw.version===1&&g.id==='asia-2027')||/^goal-[a-f0-9]{32}$/.test(g.id))");
@@ -49,7 +50,7 @@ extras1148=readFileSync(base+'/src/coach-actions1179.js','utf8')+'\n'+readFileSy
 writeFileSync(web+'/diary/extras830.js',extras1148);
 execFileSync(process.execPath,['--check',web+'/diary/extras830.js'],{stdio:'inherit'});
 // V11.49: first-use invitation only with an explicitly verified empty local
-// context and remote index. No automatic conversion of undefined/v1 books.
+// context and remote index. Undefined is displayed as empty; explicit v1 stays intact.
 const preloadFile=web+'/diary/candidate-preload.js';
 const preloadText=readFileSync(preloadFile,'utf8');
 if(preloadText.split('moduleStore:f.moduleStore,').length!==2)throw Error('Marcador preload metas');
@@ -57,8 +58,9 @@ writeFileSync(preloadFile,preloadText.replace('moduleStore:f.moduleStore,','init
 const goalsFile=web+'/diary/goals101.js';
 let goalsText=readFileSync(goalsFile,'utf8');
 function replaceGoals(from,to){if(goalsText.split(from).length!==2)throw Error('Marcador onboarding metas no único: '+from);goalsText=goalsText.replace(from,to)}
-replaceGoals("const newBtn=make('button','+ Crear nueva meta');","const setup=make('section',undefined,'card');setup.id='pilotGoals1149';setup.append(make('h3','Elegí tus propias metas'),make('p','Podés comenzar sin una meta predefinida. El calendario, las rutinas y los objetivos diarios del piloto todavía usan el programa de referencia; no son recomendaciones personales.','meta'));const startOwn=make('button','Empezar sin meta predefinida');startOwn.type='button';startOwn.id='pilotOwnGoals1149';setup.append(startOwn);el('home42').prepend(setup);const eligible=()=>asiaCandidateSession.initialGoalSetup===true&&data.settings?.goals101===undefined;const newBtn=make('button','+ Crear nueva meta');");
+replaceGoals("const newBtn=make('button','+ Crear nueva meta');","const setup=make('section',undefined,'card');setup.id='pilotGoals1149';setup.append(make('h3','Elegí tus propias metas'),make('p','Todavía no tenés metas personales. Elegí tu primera meta cuando quieras. El calendario, las rutinas y los objetivos diarios del piloto todavía usan un programa de referencia; no son recomendaciones personales.','meta'));const startOwn=make('button','Configurar mis metas');startOwn.type='button';startOwn.id='pilotOwnGoals1149';setup.append(startOwn);el('home42').prepend(setup);const eligible=()=>data.settings?.goals101===undefined;const newBtn=make('button','+ Crear nueva meta');");
 replaceGoals("function renderHeader(){const g=primary(book());","function renderHeader(){const b=book();const reference=el('goalPlan101');if(b.version===2)reference.textContent='Calendario del piloto: programa de referencia aún no personalizado';const g=primary(b);");
+replaceGoals("const n=el('countdown'),label=el('countdownLabel');if(!g){n.textContent='—';label.textContent='Tu historial continúa';return;}","const n=el('countdown'),label=el('countdownLabel');n.hidden=!g?.deadline;n.style.display=g?.deadline?'':'none';if(!g){n.textContent='';label.textContent='Configurá una meta a tu ritmo';return;}");
 replaceGoals("function render(){renderHeader();if(!panel.open)return;","function render(){renderHeader();setup.hidden=!eligible();if(!panel.open)return;");
 replaceGoals("const next=upsert(book(),g,date());","const previous=book();let next=upsert(previous,g,date());if(previous.version===2&&previous.items.length===0)next=select(next,g.id);");
 replaceGoals("newBtn.onclick=()=>begin(null);","startOwn.onclick=()=>{try{if(!eligible())throw Error('Configuración inicial no disponible.');if(!canDiscard())return;if(!confirm('¿Comenzar con un libro de metas propio y vacío? No cambia tus registros, rutinas ni calendario de referencia.'))return;commit(validation.emptyGoals1148());endForm();panel.open=true;refresh();begin(null);message.textContent='Libro propio creado. Podés elegir una meta ahora o más adelante.';}catch(e){panel.open=true;message.textContent=e.message;}};newBtn.onclick=()=>begin(null);");

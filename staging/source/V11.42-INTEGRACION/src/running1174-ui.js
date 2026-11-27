@@ -13,7 +13,7 @@ const fmtPace=p=>p===null?'—':Math.floor(p/60)+':'+String(p%60).padStart(2,'0'
 function save(next,nextSettings=data.settings){if(blocked600||localStorage.getItem(key)!==disk600)throw Error('Los datos cambiaron. Recargá antes de guardar.');R.validate(next,G.goals101(nextSettings?.goals101));R.validateHybrid(next,nextSettings,S);window.asiaSport1177?.assertCalendar(data.sport1177,nextSettings,next,S,R);const old=data;data={...data,settings:nextSettings,running1174:next};if(!persist()){data=old;throw Error('No se guardó; conservá los registros anteriores')}refresh();render()}
 function reveal(){tab('training');root.open=true;root.scrollIntoView({block:'start'});render()}
 window.asiaOpenRunning1174=reveal;
-button(el('home42'),'homeRunning1174','Running y preparación de carreras',reveal);
+const home=n('details');home.id='homeRunningPanel1174';home.className='card sectionfold';home.append(n('summary','Running y preparación de carreras'));const intro=n('p','Registrá carreras, revisá tu progreso y prepará tu próximo objetivo.');intro.className='meta';home.append(intro);button(home,'homeRunning1174','Abrir Running',reveal).className='secondary';el('home42').append(home);
 button(root,'runCreateGoal1174','Crear o editar una meta Running',()=>{tab('home');el('goals101').open=true;el('goalNew101').click();el('goal101-kind').value='Running';el('goals101').scrollIntoView({block:'start'})});
 const summary=n('div');summary.id='runSummary1174';root.append(summary);
 const targetBox=n('div');targetBox.append(n('h3','Objetivo de carrera'));root.append(targetBox);

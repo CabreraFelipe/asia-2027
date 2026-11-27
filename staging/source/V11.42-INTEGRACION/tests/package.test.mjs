@@ -60,7 +60,7 @@ assert.match(candidateProfile,/h\.textContent=name\|\|'Mi progreso'/);
 assert.match(candidateProfile,/welcome\.hidden=!!name/);
 assert.match(candidateProfile,/inputs\.displayName\.focus/);
 assert.equal((await req(prefix+'diary/profile100.js')).status,401);
-assert.match(readFileSync(root+prefix+'diary/goals101.js','utf8'),/asiaCandidateSession\.initialGoalSetup===true&&data\.settings\?\.goals101===undefined/);
+assert.match(readFileSync(root+prefix+'diary/goals101.js','utf8'),/const eligible=\(\)=>data\.settings\?\.goals101===undefined/);
 assert.equal((await req(prefix+'diary/goals101.js')).status,401);
 assert.equal((await req(prefix+'sw.js')).headers.get('service-worker-allowed'),prefix);assert.equal((await req(prefix+'diary/sw.js',true)).status,404);assert.equal((await req('/v11.24/',true)).status,404);assert.equal((await req(prefix+'app.mjs',true,{...env,STAGING_ALLOW_V1142_TESTS:'false'})).status,403);
 assert.equal((await req('/v11.11/auth/me',true)).status,200);
@@ -102,7 +102,7 @@ function domain(path){
 }
 const legacy=domain(''),current=domain(dir),{extras,goals}=current,plain=x=>JSON.parse(JSON.stringify(x));
 const old=plain(legacy.goals.validate(undefined));
-assert.deepEqual(plain(goals.validate(undefined)),old);
+assert.deepEqual(plain(goals.validate(undefined)),{version:2,primary:'',items:[]});
 assert.deepEqual(plain(goals.validate(old)),old);
 assert.throws(()=>goals.validate({version:1,primary:'',items:[]}));
 const empty=extras.emptyGoals1148();
