@@ -1,0 +1,25 @@
+import assert from 'node:assert/strict';
+import {installNotificationReceiver,parseNotificationPayload} from '../src/notification-receiver.mjs';
+const now=1700000000000,origin='https://candidate.example.test',target=origin+'/v11.42/index.html';
+const payload={version:1,kind:'gym',due:now-1000};
+assert.deepEqual(parseNotificationPayload(JSON.stringify(payload),now),{kind:'gym',due:now-1000});
+for(const v of [null,{}, {...payload,account:'secret'}, {...payload,kind:'bad'}, {...payload,due:now+60001},{...payload,due:now-3600000},{...payload,kind:'rest',due:now-300000},{...payload,due:1.5}])assert.equal(parseNotificationPayload(JSON.stringify(v),now),null);
+assert.equal(parseNotificationPayload('x'.repeat(513),now),null);
+assert.equal(parseNotificationPayload('{',now),null);
+const listeners=new Map(),shown=[],opened=[],focused=[];
+let windows=[];
+const scope={location:{origin},registration:{async showNotification(title,options){shown.push({title,options})}},clients:{async matchAll(){return windows},async openWindow(url){opened.push(url)}},addEventListener(k,f){listeners.set(k,f)}};
+assert.equal(installNotificationReceiver(scope),false);assert.equal(listeners.size,0);
+assert.equal(installNotificationReceiver(scope,{enabled:true,now:()=>now}),true);
+async function emit(k,e){let work;listeners.get(k)({...e,waitUntil(p){work=p}});await work}
+await emit('push',{data:{text:()=>JSON.stringify({...payload,url:'https://evil.test'})}});assert.equal(shown.length,0);
+await emit('push',{data:{text:()=>JSON.stringify(payload)}});assert.equal(shown.length,1);
+const n=shown[0];assert.equal(n.title,'Asia 2027');assert.deepEqual(n.options.data,{version:1,source:'asia-v12'});assert.ok(!JSON.stringify(n.options.data).includes('gym'));
+let closed=0;
+await emit('notificationclick',{notification:{data:{...n.options.data,url:'https://evil.test'},tag:n.options.tag,close(){closed++}}});assert.equal(closed,0);assert.equal(opened.length,0);
+const notification={data:n.options.data,tag:n.options.tag,close(){closed++}};
+windows=[{url:origin+'/v11.42/diary/index.html',async focus(){focused.push('private')}},{url:'https://evil.test',async focus(){focused.push('external')}}];
+await emit('notificationclick',{notification});assert.deepEqual(opened,[target]);assert.equal(focused.length,0);
+windows=[{url:target,async focus(){focused.push('shell')}}];
+await emit('notificationclick',{notification});assert.deepEqual(focused,['shell']);assert.equal(opened.length,1);assert.equal(closed,2);
+console.log('Notification receiver: strict payload, generic notice and safe shell navigation PASS');

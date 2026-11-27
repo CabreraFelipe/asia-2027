@@ -47,3 +47,15 @@ WHEN OLD.revoked=0 AND NEW.revoked=1
 BEGIN
  UPDATE notification_push_v12 SET iv=NULL,ciphertext=NULL WHERE account_id=NEW.account_id AND device_id=NEW.device_id;
 END;
+
+-- Durable attempts, independent of agenda revision. Retain tombstones until a safe retention policy is defined.
+CREATE TABLE notification_delivery_v12 (
+ account_id TEXT NOT NULL,
+ device_id TEXT NOT NULL,
+ channel TEXT NOT NULL CHECK(channel IN ('agenda','rest')),
+ kind TEXT NOT NULL CHECK(kind IN ('weight','gym','diet','weekly','rest')),
+ due INTEGER NOT NULL,
+ status TEXT NOT NULL CHECK(status IN ('attempted','accepted','failed','skipped')),
+ PRIMARY KEY(account_id,device_id,channel,kind,due),
+ FOREIGN KEY(account_id,device_id) REFERENCES notification_devices_v12(account_id,device_id)
+);
