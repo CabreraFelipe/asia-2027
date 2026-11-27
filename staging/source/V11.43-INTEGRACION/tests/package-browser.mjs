@@ -448,7 +448,7 @@ try{
    await fetch('/__ci/head-resume');el('open1140').click();
    await wait(()=>document.querySelector('iframe')?.contentWindow?.asiaGym84Ready===true&&!el('close1140').disabled,'Recuperación gestionada no abrió');
    const d=document.querySelector('iframe').contentDocument,row=await repo.readSync(id);
-   if(d.querySelector('header .brand h1').textContent!=='Usuario C'||!d.getElementById('pilotGoals1149').hidden||!el('unlock').hidden||!row.local||!row.modules||row.baseline?.remote!==1)throw Error('C no recuperó la copia confirmada');
+   if(d.querySelector('header .brand h1').textContent!=='Usuario C'||d.getElementById('pilotGoals1149').hidden||d.getElementById('goalBrand101').textContent!=='Sin meta principal'||!d.getElementById('countdown').hidden||!el('unlock').hidden||!row.local||!row.modules||row.baseline?.remote!==1)throw Error('C no recuperó la copia confirmada');
    if((await (await fetch('/v11.38/sync')).json()).head!==1)throw Error('Recuperación hizo escritura remota');
    return true;
   }finally{repo.close();pending.close()}
