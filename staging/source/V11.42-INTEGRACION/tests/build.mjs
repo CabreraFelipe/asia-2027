@@ -182,11 +182,12 @@ let identityText=readFileSync(identityFile,'utf8');
 function replaceIdentity(from,to){if(identityText.split(from).length!==2)throw Error('Marcador identidad no único: '+from);identityText=identityText.replace(from,to)}
 replaceIdentity('SESSION_MS=3600000,','SESSION_MS=30*86400000,SESSION_ABSOLUTE_MS=180*86400000,');
 replaceIdentity('cookie(SESSION_COOKIE,raw,3600)','cookie(SESSION_COOKIE,raw,SESSION_MS/1000)');
+replaceIdentity('const noBody=r=>r.body===null;',"async function emptyRequestBody(request){\n const length=request.headers.get('Content-Length');\n if(length!==null&&length!=='0')return false;\n if(request.body===null)return true;\n const reader=request.body.getReader();\n try{\n  // An empty stream and a null body represent the same zero-byte POST.\n  // Never buffer a payload; reject the first nonempty chunk and bound empty reads.\n  for(let i=0;i<8;i++){\n   const {done,value}=await reader.read();\n   if(done)return true;\n   if(value?.byteLength!==0)return false;\n  }\n  return false;\n }catch{return false}\n finally{try{void reader.cancel().catch(()=>{});reader.releaseLock()}catch{}}\n}\nconst noBody=emptyRequestBody;");
 const renewRoute=`  if(path==='/v11.11/auth/renew'&&request.method==='POST'&&!u.search){
    try{
     const s=await basic(request,env);if(!s)return err(401,'NO_AUTORIZADO');
     if(!validWrite(request,env,s))return err(403,'CSRF_INVALIDO');
-    if(!noBody(request))return err(400,'CUERPO_NO_PERMITIDO');
+    if(!await noBody(request))return err(400,'CUERPO_NO_PERMITIDO');
     const now=Date.now();
     // Single conditional UPDATE; no INSERT and no renewal of a deleted,
     // expired or differently authenticated session. Preserve CSRF/token
@@ -201,6 +202,7 @@ replaceIdentity("  if(path==='/v11.11/auth/logout'&&request.method==='POST'&&!u.
 // Only the verified Google callback may resolve the explicitly created successor.
 replaceIdentity("    phase='SESION_D1';","    let activeOwner=owner;\n    if(env.STAGING_ALLOW_PILOT_FRESH_PROFILE_V12==='true'&&env.STAGING_ALLOW_MANAGED_KEYS_1152==='true'){\n     const fresh=await env.STAGING_DB.prepare(\"SELECT p.fresh_account_id FROM pilot_fresh_profiles_v12 p JOIN accounts_v11 a ON a.account_id=p.fresh_account_id JOIN managed_account_keys_v1152 k ON k.account_id=a.account_id WHERE p.legacy_account_id=? AND a.issuer='urn:asia:synthetic-fresh-profile-v12' AND a.subject=? AND k.enrollment_kind='new'\").bind(owner,owner).first();\n     if(fresh){if(!/^acct_[a-f0-9]{32}$/.test(fresh.fresh_account_id))throw Error('Perfil inválido');activeOwner=fresh.fresh_account_id;}\n    }\n    phase='SESION_D1';");
 replaceIdentity(".bind(await digest(raw),owner,csrf,await digest(id.email),now,now+SESSION_MS)",".bind(await digest(raw),activeOwner,csrf,await digest(id.email),now,now+SESSION_MS)");
+identityText=identityText.replaceAll('!noBody(request)','!await noBody(request)');
 writeFileSync(identityFile,identityText);
 execFileSync(process.execPath,['--check',identityFile],{stdio:'inherit'});
 const worker=sroot+'/V11.42-INTEGRACION/src/worker.mjs';mkdirSync(dirname(worker),{recursive:true});cpSync(base+'/src/worker.mjs',worker);

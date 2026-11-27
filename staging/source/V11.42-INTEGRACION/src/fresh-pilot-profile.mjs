@@ -1,12 +1,30 @@
 // Explicit one-time fresh profile for the isolated synthetic pilot only.
 import {importWrappingKey} from './account-key1150.mjs';
 import {digest} from '../../official/V11.24-STAGING/src/security1111.mjs';
+async function emptyRequestBody(request){
+ const length=request.headers.get('Content-Length');
+ if(length!==null&&length!=='0')return false;
+ if(request.body===null)return true;
+ const reader=request.body.getReader();
+ try{
+  // An empty stream and a null body represent the same zero-byte POST.
+  // Never buffer a payload; reject the first nonempty chunk and bound empty reads.
+  for(let i=0;i<8;i++){
+   const {done,value}=await reader.read();
+   if(done)return true;
+   if(value?.byteLength!==0)return false;
+  }
+  return false;
+ }catch{return false}
+ finally{try{void reader.cancel().catch(()=>{});reader.releaseLock()}catch{}}
+}
 const reply=(status,code)=>new Response(JSON.stringify({ok:status===200,code}),{status,headers:{'Cache-Control':'no-store, private','Content-Type':'application/json; charset=utf-8','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'}});
 const valid=s=>s?.ok===true&&s.syntheticOnly===true&&typeof s.accountId==='string'&&/^acct_[a-f0-9]{32}$/.test(s.accountId)&&typeof s.csrf==='string'&&/^[A-Za-z0-9_-]{43}$/.test(s.csrf);
 export async function handleFreshPilotProfile(request,env,{authenticate,now=Date.now}={}){
  if(env.STAGING_ALLOW_PILOT_FRESH_PROFILE_V12!=='true'||env.STAGING_ALLOW_MANAGED_KEYS_1152!=='true')return reply(404,'NO_HABILITADO');
  const u=new URL(request.url);
- if(u.origin!==env.STAGING_ORIGIN||u.pathname!=='/v12/pilot/fresh-profile'||u.search||request.method!=='POST'||request.body!==null||request.headers.get('Origin')!==env.STAGING_ORIGIN||request.headers.get('Sec-Fetch-Site')==='cross-site'||request.headers.get('X-Asia-Fresh-Profile')!=='archive-legacy-v1')return reply(403,'SOLICITUD_INVALIDA');
+ if(u.origin!==env.STAGING_ORIGIN||u.pathname!=='/v12/pilot/fresh-profile'||u.search||request.method!=='POST'||request.headers.get('Origin')!==env.STAGING_ORIGIN||request.headers.get('Sec-Fetch-Site')==='cross-site'||request.headers.get('X-Asia-Fresh-Profile')!=='archive-legacy-v1')return reply(403,'SOLICITUD_INVALIDA');
+ if(!await emptyRequestBody(request))return reply(403,'SOLICITUD_INVALIDA');
  const cookies=(request.headers.get('Cookie')||'').split(';').map(x=>x.trim()).filter(x=>x.startsWith('__Host-asia1111_session='));
  if(cookies.length!==1||!/^__Host-asia1111_session=[A-Za-z0-9_-]{43}$/.test(cookies[0]))return reply(401,'NO_AUTORIZADO');
  try{

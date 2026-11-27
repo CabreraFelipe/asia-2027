@@ -3,6 +3,23 @@
 // from missing local/remote data; an old device may still have unsynced data.
 import {generateAccountSecret,importWrappingKey,wrapAccountSecret,unwrapWithKeyring1172} from './account-key1150.mjs';
 import {digest} from '../../official/V11.24-STAGING/src/security1111.mjs';
+async function emptyRequestBody(request){
+ const length=request.headers.get('Content-Length');
+ if(length!==null&&length!=='0')return false;
+ if(request.body===null)return true;
+ const reader=request.body.getReader();
+ try{
+  // An empty stream and a null body represent the same zero-byte POST.
+  // Never buffer a payload; reject the first nonempty chunk and bound empty reads.
+  for(let i=0;i<8;i++){
+   const {done,value}=await reader.read();
+   if(done)return true;
+   if(value?.byteLength!==0)return false;
+  }
+  return false;
+ }catch{return false}
+ finally{try{void reader.cancel().catch(()=>{});reader.releaseLock()}catch{}}
+}
 const headers={'Cache-Control':'no-store, private','Pragma':'no-cache','Content-Type':'application/json; charset=utf-8','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Cross-Origin-Resource-Policy':'same-origin'};
 const json=(x,status=200)=>new Response(JSON.stringify(x),{status,headers});
 const fail=(status,code)=>json({ok:false,error:code},status);
@@ -12,7 +29,7 @@ export async function handleManagedKey(request,env,{authenticate,now=Date.now}){
  const u=new URL(request.url);
  if(u.pathname!=='/v11.52/account-key'||u.search||u.origin!==env.STAGING_ORIGIN)return fail(404,'RUTA_INVALIDA');
  if(request.method!=='POST')return fail(405,'METODO_INVALIDO');
- if(request.body!==null)return fail(400,'CUERPO_NO_PERMITIDO');
+ if(!await emptyRequestBody(request))return fail(400,'CUERPO_NO_PERMITIDO');
  const cookies=(request.headers.get('Cookie')||'').split(';').map(s=>s.trim()).filter(s=>s.startsWith('__Host-asia1111_session='));
  if(cookies.length!==1||!/^__Host-asia1111_session=[A-Za-z0-9_-]{43}$/.test(cookies[0]))return fail(401,'NO_AUTORIZADO');
  try{

@@ -31,11 +31,16 @@ async function login(subject,mail,overrides={}){
  return result;
 }
 const me=async cookie=>{const r=await req('/v11.11/auth/me',{headers:{Cookie:cookie}});assert.equal(r.status,200);return r.json()};
-const post=(path,cookie,s,extra={},config=env)=>req(path,{method:'POST',headers:{Cookie:cookie,Origin:origin,'X-Asia-CSRF':s.csrf,...extra}},config);
+const post=(path,cookie,s,extra={},config=env,body='')=>req(path,{method:'POST',headers:{Cookie:cookie,Origin:origin,'X-Asia-CSRF':s.csrf,...extra},body},config);
 try{
  const prior=await login(sub,email);assert.equal(prior.status,303);const oldCookie=cookieFrom(prior,'__Host-asia1111_session'),old=await me(oldCookie);assert.equal(old.accountId,A);
  const old2=await login(sub,email);assert.equal(old2.status,303);const oldCookie2=cookieFrom(old2,'__Host-asia1111_session');
  const other=await login('fixture-other',otherEmail);assert.equal(other.status,303);const otherCookie=cookieFrom(other,'__Host-asia1111_session');assert.equal((await me(otherCookie)).accountId,B);
+ assert.equal((await post('/v11.52/account-key',oldCookie,old,{},env,'x')).status,400);
+ const legacy=await post('/v11.52/account-key',oldCookie,old);assert.equal(legacy.status,409);assert.equal((await legacy.json()).freshProfileAvailable,true);
+ assert.equal((await post('/v11.11/auth/renew',oldCookie,old,{},env,'x')).status,400);
+ assert.equal((await post('/v11.11/auth/renew',oldCookie,old)).status,200);
+ assert.equal((await post('/v12/pilot/fresh-profile',oldCookie,old,{'X-Asia-Fresh-Profile':'archive-legacy-v1'},env,'x')).status,403);
  assert.equal((await post('/v12/pilot/fresh-profile',oldCookie,old,{'X-Asia-Fresh-Profile':'archive-legacy-v1'})).status,200);
  for(const cookie of [oldCookie,oldCookie2])assert.equal((await req('/v11.11/auth/me',{headers:{Cookie:cookie}})).status,401);
  assert.equal((await me(otherCookie)).accountId,B);
