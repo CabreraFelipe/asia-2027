@@ -18,8 +18,11 @@ export function validateExtractedPlan(x){
  for(const day of x.days){
   check(exact(day,['label','weekday','sections'])&&txt(day.label,80)&&nullable(day.weekday,n=>int(n,0,6))&&array(day.sections,1,12),'Día inválido');
   for(const section of day.sections){
-   check(exact(section,['label','items'])&&txt(section.label,80)&&array(section.items,1,30),'Sección inválida');
-   for(const item of section.items){
+   const simple=exact(section,['label','items'])&&array(section.items,1,30);
+   const choices=x.kind==='diet'&&exact(section,['label','alternatives'])&&array(section.alternatives,1,8)&&section.alternatives.every(a=>exact(a,['label','items'])&&txt(a.label,80)&&array(a.items,1,30));
+   check(txt(section.label,80)&&(simple||choices),'Sección inválida');
+   const items=simple?section.items:section.alternatives.flatMap(a=>a.items);
+   for(const item of items){
     if(x.kind==='diet')check(exact(item,['name','quantity','source'])&&txt(item.name,120)&&nullable(item.quantity,s=>txt(s,100))&&txt(item.source,300),'Alimento inválido');
     else check(exact(item,['name','sets','min','max','rest','source'])&&txt(item.name,120)&&nullable(item.sets,n=>int(n,1,100))&&nullable(item.min,n=>int(n,1,1000))&&nullable(item.max,n=>int(n,1,1000))&&(item.min===null||item.max===null||item.min<=item.max)&&nullable(item.rest,n=>int(n,0,3600))&&txt(item.source,300),'Ejercicio inválido');
    }

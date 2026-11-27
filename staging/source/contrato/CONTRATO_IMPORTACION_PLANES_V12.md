@@ -8,3 +8,6 @@ Nueva funcionalidad solicitada: PDF o foto de dieta/rutina profesional, detecci�
 - Confirmación única del plan revisado y previsualización de diferencias; escritura CAS verificada por cuenta, persistencia y sincronización; reversión sin borrar historial.
 ## Estado
 Contrato inicial de extracción y transformación a plantillas Gym implementado, proveedor simulado y sin conexión. Falta extractor real multimodal, selector de archivo/UI, persistencia coordinada, agenda y seguimiento de menú, integración de catálogo/ejercicios nuevos, pruebas de documentos reales y de aislamiento. Mantener V10.6 y no desplegar.
+
+## Menús y adherencia — implementación de dominio
+El contrato acepta alternativas explícitas por comida y conserva las cantidades desconocidas como null. El libro propuesto permite revisión del calendario semanal, alta sin solapamiento, elección de alternativa, registro manual de adherencia y tasas separadas de registro/cumplimiento. No genera ingestas ni cambia macros. Aún no integrado al esquema de diario cifrado ni a la interfaz; CI pendiente.
