@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
 import {validatePlanFile,validateExtractedPlan,extractDocumentPlan,reviewNativeRoutines,applyNativeRoutines} from '../src/document-plan-import.mjs';
-const require=createRequire(import.meta.url),Gym=require('../../../../gym826.js');
+const require=createRequire(import.meta.url);require('../../../../gym826.js');const Gym=globalThis.asiaGym826;
 const pdf={mime:'application/pdf',bytes:new TextEncoder().encode('%PDF-1.7 fixture')};
 assert.equal(validatePlanFile(pdf).mime,'application/pdf');
 assert.throws(()=>validatePlanFile({...pdf,mime:'image/png'}));
