@@ -14,3 +14,6 @@ El contrato acepta alternativas explícitas por comida y conserva las cantidades
 
 ## Persistencia coordinada
 El candidato utiliza importedDietV12 dentro del diario existente. La validación se genera desde el mismo dominio para diario, shell y Worker. Se incorporan las operaciones documentDiet, documentDietLog y documentRoutine a la revisión y CAS existente, con pruebas de respaldo portátil cifrado y preservación de historial. Recuperación de conflictos conserva su política conservadora para campos desconocidos; falta probar sincronización real del nuevo campo y conectar la UI. No se cambia V10.6.
+
+## Proveedor multimodal
+Adaptador Responses API (PDF input_file e imágenes input_image), salida estructurada validada, ruta autenticada no montada y cuota independiente propuesta (3 importaciones/cuenta y 50 globales por 24 horas por defecto). El analizador aislado de archivos es dependencia obligatoria, aún no implementada ni provisionada; no se realizan llamadas reales ni se garantiza retención cero del proveedor por store:false. Requiere revisar política y consentimiento, parser real, credenciales y prueba con documentos autorizados antes de activar.
