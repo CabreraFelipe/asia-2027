@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {openDocumentImportClient} from '../src/document-import-client.mjs';
+const origin='https://app.example.test',A='acct_'+'a'.repeat(32),B='acct_'+'b'.repeat(32);
+let session={ok:true,syntheticOnly:false,accountId:A,csrf:'fixture-csrf-123456'},calls=0,switching=false;
+const plan={version:1,kind:'diet',name:'Dieta',notes:null,uncertainties:[],days:[{label:'Lunes',weekday:1,sections:[{label:'Desayuno',items:[{name:'Avena',quantity:'50 g',source:'50 g avena'}]}]}]};
+const file={mime:'application/pdf',bytes:new TextEncoder().encode('%PDF-1.7 fixture')};
+const options={enabled:true,origin,readSession:async()=>session,fetcher:async(url,init)=>{calls++;assert.equal(url,origin+'/v12/import/plan');assert.equal(init.credentials,'same-origin');assert.equal(init.headers['X-Asia-Import-Consent'],'reviewed-v1');assert.equal(init.headers['X-Asia-CSRF'],session.csrf);assert.deepEqual(init.body,file.bytes);if(switching)session={...session,accountId:B};return new Response(JSON.stringify({ok:true,plan}),{headers:{'Content-Type':'application/json'}})}};
+await assert.rejects(()=>openDocumentImportClient({...options,enabled:false}));
+const c=await openDocumentImportClient(options);await assert.rejects(()=>c.analyze(file,false));assert.equal(calls,0);
+assert.deepEqual(await c.analyze(file,true),plan);assert.equal(calls,1);
+switching=true;await assert.rejects(()=>c.analyze(file,true));assert.equal(c.available(),false);assert.equal(calls,2);
+await assert.rejects(()=>c.analyze(file,true));assert.equal(calls,2);
+console.log('Document import client: explicit consent, scoped upload, account change and fail closed PASS');

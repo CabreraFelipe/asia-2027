@@ -28,6 +28,9 @@ function calculate(data,kind,proposal,today){
  else if(kind==='documentRoutine'){
   next=globalThis.asiaDocumentPlan.applyNativeRoutines(data,proposal,x.Gym,{confirmed:true});dates=[];
  }
+ else if(kind==='documentRoutineProgramme'){
+  next=globalThis.asiaDocumentPlan.applyRoutineProgramme(data,proposal,today,x,{confirmed:true});dates=proposal.view.dates;
+ }
  else if(kind==='onboard'){
   const o=globalThis.asiaOnboard1176,goalApi=globalThis.asiaGoals101;
   check(o&&goalApi,'Onboarding no disponible');
