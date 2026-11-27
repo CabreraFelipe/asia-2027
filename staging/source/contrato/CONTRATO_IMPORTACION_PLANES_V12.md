@@ -17,3 +17,6 @@ El candidato utiliza importedDietV12 dentro del diario existente. La validación
 
 ## Proveedor multimodal
 Adaptador Responses API (PDF input_file e imágenes input_image), salida estructurada validada, ruta autenticada no montada y cuota independiente propuesta (3 importaciones/cuenta y 50 globales por 24 horas por defecto). El analizador aislado de archivos es dependencia obligatoria, aún no implementada ni provisionada; no se realizan llamadas reales ni se garantiza retención cero del proveedor por store:false. Requiere revisar política y consentimiento, parser real, credenciales y prueba con documentos autorizados antes de activar.
+
+## Interfaz inicial
+Paneles nativos de dieta y entrenamiento, selector PDF/JPG/PNG, consentimiento por archivo, corrección de campos, confirmación mediante persistencia coordinada y seguimiento de comidas. Carga deshabilitada sin grant real verificado del padre; cliente preparado pero no provisionado. Pendiente prueba visual Chrome específica, programación de rutinas y ejercicio nuevo, sincronización real y analizador seguro.
