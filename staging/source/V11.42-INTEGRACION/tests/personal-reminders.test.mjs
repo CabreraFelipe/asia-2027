@@ -1,0 +1,27 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {runInNewContext} from 'node:vm';
+import {personalReminders,personalAgenda} from './personal-reminder-patch.mjs';
+const original=readFileSync('reminders821.js','utf8'),agenda=readFileSync('reminders845.js','utf8');
+const consent=original.replace("cloudKeys.includes(k)?raw?.enabled?.[k]!==false:raw?.enabled?.[k]===true","raw?.enabled?.[k]===true").replace("typeof raw?.cloudEnabled?.[k]==='boolean'?raw.cloudEnabled[k]:raw?.enabled?.[k]!==false","typeof raw?.cloudEnabled?.[k]==='boolean'?raw.cloudEnabled[k]:raw?.enabled?.[k]===true");
+const planner={agenda:(data,day)=>({days:[{date:day,phase:'active',routine:2,matching:false,weight:false,dietComplete:false,control:true}]})};
+function load(s,dependency){const module={exports:{}};runInNewContext(s,{module,require:()=>dependency,Date,Intl});return module.exports}
+const old=load(consent,planner),next=load(personalReminders(consent),planner),oldQueue=load(agenda,old),newQueue=load(personalAgenda(agenda),next);
+const t=new Date('2027-05-10T15:00:00Z'),prefs={enabled:{weight:true,diet:true,gym:true,weekly:true,checkin:true},cloudEnabled:{weight:true,diet:true,gym:true,weekly:true}};
+const account={settings:{goals101:{version:2},personalCalendar1173:'2027-05-01',reminders821:prefs}};
+const ids=(d,c={})=>next.plan(d,t,c).items.map(x=>x.id).join(',');
+assert.equal(ids(account),'weight,diet,gym,checkin');
+assert.equal(ids(account,{cloud:true}),'weight,diet,gym');
+assert.equal(ids({settings:{goals101:{version:2}}}),'');
+assert.equal(ids({settings:{...account.settings,personalCalendar1173:'2027-06-01'}}),'weight,diet,checkin');
+const queue=newQueue.build(account,t,true,next,true);
+assert.ok(queue.length>0&&queue.length<=42);
+assert.ok(queue.every(e=>e.due>t.getTime()&&e.due<=t.getTime()+14*86400000));
+assert.ok(queue.every(e=>['weight','gym','diet'].includes(e.kind)));
+assert.ok(newQueue.build(account,t,false,next,true).every(e=>e.kind!=='weight'));
+const legacy={settings:{reminders821:prefs}},historical=new Date('2026-12-01T15:00:00Z');
+assert.equal(JSON.stringify(next.plan(legacy,historical)),JSON.stringify(old.plan(legacy,historical)));
+assert.equal(JSON.stringify(newQueue.build(legacy,historical,true,next,true)),JSON.stringify(oldQueue.build(legacy,historical,true,old,true)));
+assert.throws(()=>personalReminders(''));
+assert.throws(()=>personalAgenda(''));
+console.log('Personal reminders: opted-in local and rolling agenda; original legacy output preserved PASS');
