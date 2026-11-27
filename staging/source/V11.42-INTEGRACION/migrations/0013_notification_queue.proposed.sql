@@ -15,3 +15,18 @@ CREATE TABLE notification_queue_v12 (
  PRIMARY KEY(account_id,device_id,channel),
  FOREIGN KEY(account_id,device_id) REFERENCES notification_devices_v12(account_id,device_id)
 );
+
+-- Revocation clears pending agenda/rest in the same transaction as the state change.
+CREATE TRIGGER notification_device_revoke_v12
+AFTER UPDATE OF revoked ON notification_devices_v12
+WHEN OLD.revoked=0 AND NEW.revoked=1
+BEGIN
+ DELETE FROM notification_queue_v12 WHERE account_id=NEW.account_id AND device_id=NEW.device_id;
+END;
+-- A revoked ID is never reusable.
+CREATE TRIGGER notification_device_no_reactivate_v12
+BEFORE UPDATE OF revoked ON notification_devices_v12
+WHEN OLD.revoked=1 AND NEW.revoked=0
+BEGIN
+ SELECT RAISE(ABORT,'notification binding revoked');
+END;
