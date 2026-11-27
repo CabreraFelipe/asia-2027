@@ -1,13 +1,13 @@
 name: Asia 2027 - runtime D1 y R2 local V11.71
 on:
   push:
-    branches: ['validation/notification-receiver']
+    branches: ['validation/notification-webpush-provider']
     paths: ['staging/source/V11.42-INTEGRACION/**','staging/source/V11.38-INTEGRACION/**','.github/workflows/asia-v1171-runtime.yml']
 permissions:
   contents: read
 jobs:
   local-runtime:
-    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/validation/notification-receiver'
+    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/validation/notification-webpush-provider'
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:

@@ -1,13 +1,13 @@
 name: Asia 2027 - paquete completo Chrome V11.43
 on:
   push:
-    branches: ['validation/notification-receiver']
+    branches: ['validation/notification-webpush-provider']
     paths: ['staging/source/V11.43-INTEGRACION/**','staging/source/V11.42-INTEGRACION/**','.github/workflows/asia-v1143.yml']
 permissions:
   contents: read
 jobs:
   chrome:
-    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/validation/notification-receiver'
+    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/validation/notification-webpush-provider'
     strategy:
       fail-fast: false
       matrix:
@@ -36,7 +36,7 @@ jobs:
           ASIA_SLOW_DIARY: '1'
         run: node staging/source/V11.43-INTEGRACION/tests/package-browser.mjs
   pilot:
-    if: always() && github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/validation/notification-receiver'
+    if: always() && github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/validation/notification-webpush-provider'
     needs: chrome
     runs-on: ubuntu-latest
     timeout-minutes: 2
