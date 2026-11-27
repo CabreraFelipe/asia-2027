@@ -71,5 +71,21 @@ try{
  assert.equal((await (await call(b,'/v11.38/sync')).json()).head,3);
  assert.deepEqual(new Uint8Array(await (await bucket.get(source.object_key)).arrayBuffer()),original);
  assert.equal((await first('SELECT COUNT(*) AS n FROM sync_v1138_objects WHERE account_id=?',other)).n,0);
+ // Actual D1 trigger transaction for a legacy pilot profile, using account B.
+ for(const n of ['0015_new_account_enrollment.proposed.sql','0016_pilot_fresh_profiles.proposed.sql']){
+  const path=new URL('../migrations/'+n,import.meta.url).pathname;
+  for(const sql of JSON.parse(execFileSync('python3',['-c',split,path],{encoding:'utf8'})))await db.prepare(sql).run();
+ }
+ Object.assign(env,{STAGING_ALLOW_PILOT_FRESH_PROFILE_V12:'true'});
+ const reset=()=>worker.fetch(new Request(origin+'/v12/pilot/fresh-profile',{method:'POST',headers:{Cookie:'__Host-asia1111_session='+c.token,Origin:origin,'X-Asia-CSRF':c.csrf,'X-Asia-Fresh-Profile':'archive-legacy-v1'}}),env);
+ const resets=await Promise.all([reset(),reset()]);
+ assert.equal(resets.filter(r=>r.status===200).length,1);
+ const successor=await first('SELECT fresh_account_id FROM pilot_fresh_profiles_v12 WHERE legacy_account_id=?',other);
+ assert.ok(successor?.fresh_account_id&&successor.fresh_account_id!==other);
+ assert.equal((await first('SELECT enrollment_kind FROM managed_account_keys_v1152 WHERE account_id=?',successor.fresh_account_id)).enrollment_kind,'new');
+ assert.equal((await first('SELECT COUNT(*) AS n FROM auth_oidc_sessions_v1111 WHERE account_id=?',other)).n,0);
+ assert.equal((await call(c,'/v11.11/auth/me')).status,401);
+ assert.equal((await call(b,'/v11.11/auth/me')).status,200);
+ assert.deepEqual(new Uint8Array(await (await bucket.get(source.object_key)).arrayBuffer()),original);
  console.log('Local workerd D1/R2: exact migration chain, concurrent CAS, isolated accounts, rekey trigger transaction, session revocation and original ciphertext PASS');
 }finally{await mf.dispose()}
