@@ -1,4 +1,4 @@
--- Proposed only: no production migration, no subscription credentials or delivery.
+-- Proposed only: no production migration, no production credentials or delivery.
 -- Device IDs are issued by a future verified enrollment flow; never adopted from a request body.
 CREATE TABLE notification_devices_v12 (
  device_id TEXT PRIMARY KEY,
@@ -29,4 +29,21 @@ BEFORE UPDATE OF revoked ON notification_devices_v12
 WHEN OLD.revoked=1 AND NEW.revoked=0
 BEGIN
  SELECT RAISE(ABORT,'notification binding revoked');
+END;
+
+-- Encrypted credentials, one per binding. Keep only the hash tombstone after revocation.
+CREATE TABLE notification_push_v12 (
+ account_id TEXT NOT NULL,
+ device_id TEXT NOT NULL PRIMARY KEY,
+ endpoint_hash TEXT NOT NULL UNIQUE,
+ iv TEXT,
+ ciphertext TEXT,
+ CHECK ((iv IS NULL AND ciphertext IS NULL) OR (iv IS NOT NULL AND ciphertext IS NOT NULL)),
+ FOREIGN KEY(account_id,device_id) REFERENCES notification_devices_v12(account_id,device_id)
+);
+CREATE TRIGGER notification_push_revoke_v12
+AFTER UPDATE OF revoked ON notification_devices_v12
+WHEN OLD.revoked=0 AND NEW.revoked=1
+BEGIN
+ UPDATE notification_push_v12 SET iv=NULL,ciphertext=NULL WHERE account_id=NEW.account_id AND device_id=NEW.device_id;
 END;

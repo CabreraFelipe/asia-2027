@@ -1,13 +1,13 @@
 name: Asia 2027 - CI de fuentes y smoke real
 on:
   push:
-    branches: ['validation/notification-device-lifecycle']
+    branches: ['validation/notification-push-subscription']
     paths: ['staging/source/**', '.github/workflows/asia-source-ci.yml']
 permissions:
   contents: read
 jobs:
   regression:
-    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/validation/notification-device-lifecycle'
+    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/validation/notification-push-subscription'
     runs-on: ubuntu-latest
     timeout-minutes: 18
     steps:
@@ -32,7 +32,7 @@ jobs:
           node VERIFICAR_V11_25.mjs
           echo 'CI de fuentes versionadas OK. Sin escrituras remotas.'
   smoke:
-    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/validation/notification-device-lifecycle'
+    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/validation/notification-push-subscription'
     runs-on: ubuntu-latest
     timeout-minutes: 7
     steps:
