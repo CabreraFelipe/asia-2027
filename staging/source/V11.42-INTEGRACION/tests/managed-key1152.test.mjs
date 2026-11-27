@@ -33,7 +33,7 @@ try{
  assert.equal((await req(A)).status,409);
  const F={id:'acct_'+'f'.repeat(32),token:'F'.repeat(43),csrf:'f'.repeat(43),email:'f@example.invalid'};
  db.prepare('INSERT OR IGNORE INTO accounts_v11 VALUES(?,?,?,?)').run(F.id,'https://accounts.google.com',F.email,new Date().toISOString());
- assert.deepEqual(db.prepare('SELECT enrollment_kind,envelope FROM managed_account_keys_v1152 WHERE account_id=?').get(F.id),{enrollment_kind:'new',envelope:null});
+ assert.deepEqual({...db.prepare('SELECT enrollment_kind,envelope FROM managed_account_keys_v1152 WHERE account_id=?').get(F.id)},{enrollment_kind:'new',envelope:null});
  db.prepare('INSERT INTO auth_oidc_sessions_v1111 VALUES(?,?,?,?,?,?)').run(await digest(F.token),F.id,F.csrf,await digest(F.email),Date.now(),Date.now()+600000);
  const extraEnv={STAGING_ALLOWED_EMAILS:F.email};
  const first=await req(F,{env:extraEnv});assert.equal(first.status,200);const firstSecret=(await first.json()).secret;
