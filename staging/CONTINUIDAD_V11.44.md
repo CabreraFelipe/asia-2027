@@ -352,3 +352,6 @@ Se añade vista de fuentes autorizadas dentro de Comparar pasos manuales y Apple
 
 ## Paridad nutrición — consulta de códigos de barras
 Se preserva el lector local, selector de base, ficha, edición y registro original. Solo la consulta externa pasa a capacidad del shell; piloto sin grant no llama red. Adaptador real no montado: validación GTIN, origen fijo OFF, campos mínimos, contacto técnico explícito, consentimiento, identidad antes/después, límite y timeout, sin datos de diario. No realiza consultas reales, no incluye credenciales. Falta montaje, cuotas y aceptación del proveedor. Prueba añadida al paquete.
+
+## Consolidación de validaciones y prueba del recorrido del Coach
+Confirmadas 4/4 CI de V11.99.1 e657c3dd, 4/4 de validation/consolidated-parity-fixed 2303a7e8 y 4/4 de validation/consolidated-health-food 7ec3ffa7. Se promovió V11.99.2 634336d7 a desarrollo conservando gates secuenciales. Nueva prueba integra los tres contratos, transportes reales de cliente, gateway, proveedor con HTTP simulado y reserva SQLite real; aún no ejecutada. No se activa proveedor real ni se modifica producción. Quedan identidad real/servicios, autorización operativa, revisión física y migración.

@@ -183,6 +183,7 @@ runIsolated1174(process.execPath,[new URL('./notification-queue.test.mjs',import
 runIsolated1174(process.execPath,[new URL('./health-sources.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
 runIsolated1174(process.execPath,[new URL('./health-source-view.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
 runIsolated1174(process.execPath,[new URL('./food-lookup.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
+runIsolated1174(process.execPath,[new URL('./coach-provider-integration.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
 runIsolated1174(process.execPath,[new URL('./coach-context1181.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
 
 runIsolated1174(process.execPath,[new URL('./coach-review1182.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
