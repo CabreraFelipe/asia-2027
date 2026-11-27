@@ -1,11 +1,11 @@
 import {createConversation1185} from './coach-conversation1185.mjs';
+import {coachUiPolicy} from './coach-client-policy.mjs';
 const el=id=>document.getElementById(id),n=(tag,t)=>{const x=document.createElement(tag);if(t!==undefined)x.textContent=t;return x},anchor=el('coachActions1179');
 if(anchor&&window.asiaCoachContext1181&&window.asiaCoachPersist1184){
  const api={A:window.asiaCoachActions1179,Gym:window.asiaGym826,S:window.asiaSchedule829,T:window.asiaTraining102,R:window.asiaRunning1174,Sport:window.asiaSport1177},uid=()=> 'coachchange-'+Array.from(crypto.getRandomValues(new Uint8Array(16)),x=>x.toString(16).padStart(2,'0')).join('');
- // No real provider on synthetic staging. No network access from the test path.
- const transport=null;
- const c=createConversation1185({context:window.asiaCoachContext1181,api,persist:window.asiaCoachPersist1184,newId:uid,transport,allowSynthetic:true,getState:()=>({data,disk:disk600,today:date(),busy:blocked600||localStorage.getItem(key)!==disk600||JSON.stringify(data)!==disk600||window.asiaGym84Ready!==true||window.asiaGym84Active===true||!!window.asiaGymHasSession532?.()||!!window.asiaClassicRunning532?.()||el('routine').disabled})});
- const panel=n('details');panel.id='coachConversation1185';panel.className='gymMini571';anchor.before(panel);panel.append(n('summary','Conversación con el Coach'),n('p','Candidato sintético: proveedor real no habilitado. Podés revisar el contexto y probar el recorrido con una respuesta fija local. No es asesoramiento ni una respuesta de IA. No ingreses información personal. Los ajustes manuales siguen disponibles.'));
+ const mode=coachUiPolicy(typeof asiaCandidateSession!=='undefined'?asiaCandidateSession.coachInference:null,'strength'),transport=mode.transport;
+ const c=createConversation1185({context:window.asiaCoachContext1181,api,persist:window.asiaCoachPersist1184,newId:uid,transport,allowSynthetic:mode.synthetic,getState:()=>({data,disk:disk600,today:date(),busy:blocked600||localStorage.getItem(key)!==disk600||JSON.stringify(data)!==disk600||window.asiaGym84Ready!==true||window.asiaGym84Active===true||!!window.asiaGymHasSession532?.()||!!window.asiaClassicRunning532?.()||el('routine').disabled})});
+ const panel=n('details');panel.id='coachConversation1185';panel.className='gymMini571';anchor.before(panel);panel.append(n('summary','Conversación con el Coach'),n('p',mode.synthetic?'Candidato sintético: proveedor real no habilitado. Podés revisar el contexto y probar el recorrido con una respuesta fija local. No es asesoramiento ni una respuesta de IA. No ingreses información personal. Los ajustes manuales siguen disponibles.':'Revisá qué datos compartís antes de consultar. Los ajustes manuales siguen disponibles; ninguna propuesta se aplica sin confirmación.'));
  const field=(id,label,tag,type)=>{const l=n('label',label),x=n(tag);x.id='cc1185-'+id;l.htmlFor=x.id;if(type)x.type=type;panel.append(l,x);return x};
  const question=field('question','¿Qué querés cambiar de tu próxima rutina?','textarea');question.maxLength=1200;
  const goal=field('goal','Objetivo opcional (texto que se compartiría)','input','text');goal.maxLength=300;

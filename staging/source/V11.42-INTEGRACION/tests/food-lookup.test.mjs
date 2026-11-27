@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {openFoodLookup,barcodeValue} from '../src/food-lookup.mjs';
+const code='3017620422003',identity={ok:true,syntheticOnly:false,accountId:'acct_'+'a'.repeat(32),csrf:'fixture-csrf-1234567890'};
+let s=identity,calls=0,response={status:1,product:{code,product_name:'Producto de prueba',nutriments:{'energy-kcal_100g':500,proteins_100g:6,fat_100g:30},ingredients_text:'No necesario'}};
+const opts={enabled:true,readSession:async()=>s,contact:'fixture@example.invalid',fetcher:async(u,o)=>{calls++;assert.equal(u,'https://world.openfoodfacts.org/api/v2/product/'+code+'.json?fields=code,product_name,product_name_es,nutriments');assert.equal(o.credentials,'omit');assert.equal(o.redirect,'error');assert.equal(Object.hasOwn(o.headers,'Authorization'),false);return new Response(JSON.stringify(response),{headers:{'Content-Type':'application/json'}})}};
+assert.equal(barcodeValue(code),'0'+code);assert.throws(()=>barcodeValue(code.slice(0,-1)+'4'));await assert.rejects(()=>openFoodLookup({...opts,enabled:false}));
+const c=await openFoodLookup(opts);await assert.rejects(()=>c.lookup(code,false));assert.equal(calls,0);
+const x=await c.lookup(code,true);assert.equal(x.product.product_name,'Producto de prueba');assert.equal(Object.hasOwn(x.product,'ingredients_text'),false);assert.equal(Object.hasOwn(x.product.nutriments,'carbohydrates_100g'),false);
+response={status:0};assert.deepEqual(await c.lookup(code,true),{status:0});
+response={status:1,product:{code:'00000000',product_name:'Otro',nutriments:{'energy-kcal_100g':500,proteins_100g:6}}};await assert.rejects(()=>c.lookup(code,true));
+s={...identity,accountId:'acct_'+'b'.repeat(32)};await assert.rejects(()=>c.lookup(code,true));assert.equal(calls,3);assert.equal(c.available(),false);
+console.log('Food lookup: original barcode contract, explicit consent, minimal upstream data, account binding and invalid product rejection PASS');

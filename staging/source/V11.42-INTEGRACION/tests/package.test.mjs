@@ -14,9 +14,22 @@ const req=(p,auth=false,e=env)=>worker.fetch(new Request(origin+p,{headers:auth?
 const prefix='/v11.42/';
 assert.equal((await req(prefix+'index.html')).status,200);const m=await (await req(prefix+'manifest.json')).json();assert.equal(m.scope,prefix);assert.equal(m.start_url,prefix+'index.html');assert.equal(m.display,'standalone');assert.equal(m.icons.length,2);
 const publicIndex=await (await req(prefix+'index.html')).text();
-assert.ok(publicIndex.includes('<title>Asia 2027 · V11.99.2</title>'),'Versión exacta del título');
-assert.ok(publicIndex.includes('<p>V11.99.2 · Pruebas privadas. Solo datos sintéticos.</p>'),'Versión visible exacta');
+assert.ok(publicIndex.includes('<title>Asia 2027 · V11.99.3</title>'),'Versión exacta del título');
+assert.ok(publicIndex.includes('<p>V11.99.3 · Pruebas privadas. Solo datos sintéticos.</p>'),'Versión visible exacta');
 assert.equal(m.id,prefix);
+
+const originalHtml=readFileSync('index.html','utf8'),packagedHtml=readFileSync(root+prefix+'diary/index.html','utf8');
+const scriptBlocks=html=>[...html.matchAll(/<script\b[^>]*>[\s\S]*?<\/script>/gi)].map(m=>m[0]);
+const visibleMarkup=html=>html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'').replace(/<link rel="manifest" href="manifest.json">/,'');
+assert.equal(visibleMarkup(packagedHtml),visibleMarkup(originalHtml),'Conservar HTML y CSS del diario original');
+const originalBlocks=scriptBlocks(originalHtml),packagedBlocks=scriptBlocks(packagedHtml);
+assert.equal(originalBlocks.length,53);
+const expectedPersist="const next=JSON.stringify(data);localStorage.setItem(key,next);disk600=next;return true",expectedGuard="if(disk600!==null){const previous=JSON.parse(disk600);if(JSON.stringify(previous.settings??{})!==JSON.stringify(data.settings??{})){window.asiaGym826.compatibleSettings(previous.settings,data.settings,previous.work);const programmes=window.asiaSchedule829.programmes(data.settings);window.asiaCoachActions1179.validate(data.settings,window.asiaGym826,programmes);}}";
+assert.equal(originalBlocks[5].split(expectedPersist).length,2,'Marcador de persistencia original único');
+originalBlocks[5]=originalBlocks[5].replace(expectedPersist,()=>expectedGuard+expectedPersist);
+let originalPosition=0;for(const block of packagedBlocks)if(block===originalBlocks[originalPosition])originalPosition++;
+assert.equal(originalPosition,originalBlocks.length,'Conservar los 53 scripts originales del HTML en orden');
+
 assert.match(readFileSync(root+prefix+'index.html','utf8'),/id="advancedUnlock" type="checkbox" autocomplete="off"/);
 // The pre-auth entry imports exactly this public, data-free helper.
 const entrySource=await (await req(prefix+'entry.js')).text();
@@ -164,6 +177,13 @@ runIsolated1174(process.execPath,[new URL('./coach-intake1199.test.mjs',import.m
 runIsolated1174(process.execPath,[new URL('./coach-intake-flow11991.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
 runIsolated1174(process.execPath,[new URL('./coach-intake-params11992.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
 runIsolated1174(process.execPath,[new URL('./coach-transport1181.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
+runIsolated1174(process.execPath,[new URL('./coach-client-policy.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
+runIsolated1174(process.execPath,[new URL('./nutrition-menu.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
+runIsolated1174(process.execPath,[new URL('./notification-queue.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
+runIsolated1174(process.execPath,[new URL('./health-sources.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
+runIsolated1174(process.execPath,[new URL('./health-source-view.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
+runIsolated1174(process.execPath,[new URL('./food-lookup.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
+runIsolated1174(process.execPath,[new URL('./coach-provider-integration.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
 runIsolated1174(process.execPath,[new URL('./coach-context1181.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
 
 runIsolated1174(process.execPath,[new URL('./coach-review1182.test.mjs',import.meta.url).pathname],{stdio:'inherit'});

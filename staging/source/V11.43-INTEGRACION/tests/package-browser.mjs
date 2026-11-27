@@ -268,8 +268,8 @@ try{
   for(const [k,v] of Object.entries({title:'Plan manual B',kind:'Running',target:'5K',start:obStart,end:obEnd,mode:'Híbrido',strengthName:'Fuerza manual B',distance:'5',weekly:'80',longest:'35',level:'Habitual',surface:'Exterior',available:'35',symptoms:'Sin síntomas preocupantes',nutritionAction:'Guardar',kcal:'2400',protein:'120',fat:'70',share0:'20',share1:'30',share2:'20',share3:'30'}))ob(k).value=v;
   ob('objective').value='Bienestar general';ob('equipment').value='Mancuernas y banco';ob('strengthMinutes').value='45';ob('nutKind').value='Mantenimiento';for(const d of [1,4])ob('sd'+d).checked=true;for(const d of [3,6])ob('rd'+d).checked=true;
   const review=diaryB.getElementById('onboardReview1176'),apply=diaryB.getElementById('onboardApply1176'),obStatus=diaryB.getElementById('onboardStatus1176');
-  review.click();if(!diaryB.getElementById('onboardPreview1176').textContent.includes('Fuerza manual B'))throw Error('Asistente sin propuesta: '+obStatus.textContent);
-  diaryB.getElementById('onboardReject1176').click();if(!obStatus.textContent.includes('Sin cambios'))throw Error('Rechazo no disponible');review.click();
+  review.click();await wait(()=>diaryB.getElementById('onboardPreview1176').textContent.includes('Fuerza manual B')&&onboard.getAttribute('aria-busy')==='false','Asistente sin propuesta: '+obStatus.textContent);
+  diaryB.getElementById('onboardReject1176').click();if(!obStatus.textContent.includes('Sin cambios'))throw Error('Rechazo no disponible');review.click();await wait(()=>diaryB.getElementById('onboardPreview1176').textContent.includes('Fuerza manual B')&&onboard.getAttribute('aria-busy')==='false','Segunda revisión no disponible');
   try{w.confirm=()=>true;apply.click()}finally{w.confirm=originalConfirm}
   await wait(()=>obStatus.textContent==='Plan personal guardado.'&&el('status1140').textContent.includes('saved'),'Asistente no aplicó plan: '+obStatus.textContent);
   const sport=diaryB.getElementById('sport1177');sport.open=true;const sp=id=>diaryB.getElementById('sp1177-'+id),spStatus=diaryB.getElementById('sportStatus1177');

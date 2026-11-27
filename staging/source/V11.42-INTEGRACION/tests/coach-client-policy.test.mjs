@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {openCoachClients,coachUiPolicy} from '../src/coach-client-policy.mjs';
+const identity={ok:true,syntheticOnly:false,accountId:'acct_'+'a'.repeat(32),csrf:'fixture-csrf-1234567890'};
+let session=identity,created=0,closed=0,sends=0,release;
+const factory=async()=>{created++;let live=true;return {available:()=>live,preview:x=>({payload:x}),send:async(p,c)=>{if(c!==true)throw Error('consent');sends++;await new Promise(r=>release=r);return p},take:async x=>x,discard(){},close(){live=false;closed++}}};
+const opts={enabled:true,identity,readSession:async()=>session,origin:'https://fixture.example',fetcher:async()=>{throw Error('no network')},transportFactory:factory};
+assert.equal(coachUiPolicy(null,'intake').synthetic,true);assert.equal(coachUiPolicy(undefined,'strength').transport,null);assert.throws(()=>coachUiPolicy({mode:'unknown'},'hybrid'));
+await assert.rejects(()=>openCoachClients({...opts,enabled:false}));await assert.rejects(()=>openCoachClients({...opts,identity:{...identity,syntheticOnly:true}}));assert.equal(created,0);
+const clients=await openCoachClients(opts);assert.equal(created,3);const a=coachUiPolicy(clients,'intake'),b=coachUiPolicy(clients,'strength');assert.equal(a.synthetic,false);assert.equal(b.synthetic,false);assert.throws(()=>a.transport.preview({version:1}));
+const p=a.transport.preview({version:3});await assert.rejects(()=>a.transport.send(p,false));assert.equal(sends,0);
+const flight=a.transport.send(p,true);while(!release)await Promise.resolve();await assert.rejects(()=>b.transport.send({},true));assert.throws(()=>b.transport.preview({version:1}));release();await flight;assert.equal(sends,1);
+session={...identity,accountId:'acct_'+'b'.repeat(32)};await assert.rejects(()=>a.transport.take(p));assert.equal(closed,3);assert.equal(a.transport.available(),false);assert.equal(b.transport.available(),false);assert.throws(()=>a.transport.preview({version:3}));
+console.log('Coach shared connection: explicit grant, synthetic isolation, fixed identity, per-mode input, no parallel requests, account change closes transports PASS');

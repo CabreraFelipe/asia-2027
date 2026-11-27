@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {openHealthSourceView} from '../src/health-source-view.mjs';
+const identity={ok:true,syntheticOnly:false,accountId:'acct_'+'a'.repeat(32),csrf:'fixture-csrf-1234567890'},id='health_'+'a'.repeat(32),d='2026-11-26',query={from:d,to:d,today:d};
+const payload={sources:[{id,provider:'health-connect',status:'active',label:'Android',metrics:['step_count']}],records:[{sourceId:id,day:d,metric:'step_count',qty:8000,units:'count',revision:1,updatedAt:1795700000000}]};
+let session=identity,calls=0,release=null,delay=false;const opts={enabled:true,readSession:async()=>session,readAuthorized:async x=>{assert.deepEqual(x,{from:d,to:d});calls++;if(delay)await new Promise(r=>release=r);return payload}};
+await assert.rejects(()=>openHealthSourceView({...opts,enabled:false}));await assert.rejects(()=>openHealthSourceView({...opts,readSession:async()=>({...identity,syntheticOnly:true})}));assert.equal(calls,0);
+const view=await openHealthSourceView(opts);assert.equal(calls,0);const result=await view.read(query);assert.equal(result.rows[0].provider,'health-connect');assert.equal(result.rows[0].qty,8000);assert.equal(Object.hasOwn(result,'accountId'),false);
+result.rows[0].qty=0;assert.equal((await view.read(query)).rows[0].qty,8000);
+delay=true;const pending=view.read(query);while(!release)await Promise.resolve();await assert.rejects(()=>view.read(query));view.discard();release();await assert.rejects(()=>pending);assert.equal(view.available(),true);
+delay=false;session={...identity,accountId:'acct_'+'b'.repeat(32)};await assert.rejects(()=>view.read(query));assert.equal(view.available(),false);assert.equal(calls,3);
+session=identity;const invalid=await openHealthSourceView({...opts,readAuthorized:async()=>({...payload,accountId:identity.accountId})});await assert.rejects(()=>invalid.read(query));invalid.close();assert.equal(invalid.available(),false);
+console.log('Health source view: real session grant, minimal range, cancellation, account change and read-only projection PASS');

@@ -1,13 +1,15 @@
 import {createHybrid1187} from './coach-hybrid1187.mjs';
 import {createHybridSample1188} from './coach-hybrid-sample1188.mjs';
 import {generateCalendar1189} from './coach-calendar1189.mjs';
+import {coachUiPolicy} from './coach-client-policy.mjs';
 const el=id=>document.getElementById(id),n=(tag,text)=>{const x=document.createElement(tag);if(text!==undefined)x.textContent=text;return x},anchor=el('coachBundle1180'),form=window.asiaBundleDraft1188;
 if(anchor&&form&&window.asiaCoachPersist1184){
  const api={A:window.asiaCoachActions1179,Gym:window.asiaGym826,S:window.asiaSchedule829,T:window.asiaTraining102,R:window.asiaRunning1174,Sport:window.asiaSport1177,N:window.asiaNutrition103,G:window.asiaExtras830.goals101},bundle=window.asiaCoachBundle1180,uid=p=>p+'-'+Array.from(crypto.getRandomValues(new Uint8Array(16)),x=>x.toString(16).padStart(2,'0')).join('');
  const state=()=>({data,disk:disk600,today:date(),current:window.asiaGoals50(),busy:blocked600||localStorage.getItem(key)!==disk600||JSON.stringify(data)!==disk600||window.asiaGym84Ready!==true||window.asiaGym84Active===true||!!window.asiaGymHasSession532?.()||!!window.asiaClassicRunning532?.()||el('routine').disabled});
- const c=createHybrid1187({bundle,api,state,persist:window.asiaCoachPersist1184,newId:uid,transport:createHybridSample1188({syntheticOnly:true})});
+ const mode=coachUiPolicy(typeof asiaCandidateSession!=='undefined'?asiaCandidateSession.coachInference:null,'hybrid');
+ const c=createHybrid1187({bundle,api,state,persist:window.asiaCoachPersist1184,newId:uid,transport:mode.synthetic?createHybridSample1188({syntheticOnly:true}):mode.transport});
  const panel=n('details');panel.id='coachHybrid1188';panel.className='card sectionfold';panel.setAttribute('aria-busy','false');anchor.after(panel);
- panel.append(n('summary','Coach multidisciplinario · recorrido de prueba'),n('p','Configurá las disciplinas en el formulario anterior y añadí alternativas antes de aceptar nada. Conversación fija local, sin IA ni red. No ingreses información personal. La planificación manual sigue disponible.'));
+ panel.append(n('summary',mode.synthetic?'Coach multidisciplinario · recorrido de prueba':'Coach multidisciplinario'),n('p',mode.synthetic?'Configurá las disciplinas en el formulario anterior y añadí alternativas antes de aceptar nada. Conversación fija local, sin IA ni red. No ingreses información personal. La planificación manual sigue disponible.':'Compará alternativas de entrenamiento y nutrición verificadas localmente. Revisá los datos que compartirás y confirmá el conjunto antes de guardarlo.'));
  const field=(id,label,tag)=>{const x=n(tag),l=n('label',label);x.id='ch1188-'+id;l.htmlFor=x.id;panel.append(l,x);return x};
  const question=field('question','¿Qué querés comparar?','textarea'),goal=field('goal','Objetivo opcional','input');question.maxLength=1200;goal.maxLength=300;
  const list=n('div'),out=n('div'),status=n('p');list.id='coachHybridAlternatives1188';out.id='coachHybridOutput1188';status.id='coachHybridStatus1188';status.setAttribute('role','status');
@@ -31,23 +33,22 @@ if(anchor&&form&&window.asiaCoachPersist1184){
  panel.append(out,status);
  function draw(v){if(!panel.open&&!['idle','saved','unconfirmed'].includes(v.phase)){clearReview();return}displayed=v;out.replaceChildren();
   if(v.phase==='consent'){
-   out.append(n('h3','Contexto exacto · prueba local'),n('p','Solo resúmenes de alternativas, texto y aclaraciones. No incluye automáticamente fechas exactas, notas, fotos ni identificadores internos.'));const pre=n('pre',JSON.stringify(v.payload,null,2));pre.style.whiteSpace='pre-wrap';pre.style.overflowWrap='anywhere';out.append(pre);
+   out.append(n('h3',mode.synthetic?'Contexto exacto · prueba local':'Contexto exacto para el Coach IA'),n('p','Solo resúmenes de alternativas, texto y aclaraciones. No incluye automáticamente fechas exactas, notas, fotos ni identificadores internos.'));const pre=n('pre',JSON.stringify(v.payload,null,2));pre.style.whiteSpace='pre-wrap';pre.style.overflowWrap='anywhere';out.append(pre);
    const consent=n('input'),l=n('label','Confirmo el contexto exacto');consent.type='checkbox';consent.id='ch1188-consent';l.htmlFor=consent.id;out.append(consent,l);
-   const provider=n('button','Proveedor de IA no habilitado');provider.type='button';provider.id='coachHybridSend1188';provider.disabled=true;out.append(provider);
-   btn(out,'Sample','Probar respuesta fija local (sin IA)',async()=>draw(await c.send(displayed,consent.checked)));
+   if(mode.synthetic){const provider=n('button','Proveedor de IA no habilitado');provider.type='button';provider.id='coachHybridSend1188';provider.disabled=true;out.append(provider);btn(out,'Sample','Probar respuesta fija local (sin IA)',async()=>draw(await c.send(displayed,consent.checked)));}else btn(out,'Send','Enviar al Coach IA',async()=>draw(await c.send(displayed,consent.checked))).disabled=!v.available;
   }else if(['answer','review'].includes(v.phase)){
-   out.append(n('h3','Respuesta fija local · sin IA'),n('p',v.reply.answer));
+   out.append(n('h3',mode.synthetic?'Respuesta fija local · sin IA':'Respuesta del Coach IA'),n('p',v.reply.answer));
    if(v.reply.kind==='clarify'){
     const answers=v.reply.questions.map((q,i)=>{const l=n('label',q),x=n('textarea');x.id='ch1188-answer'+i;x.maxLength=500;l.htmlFor=x.id;out.append(l,x);return x});
     btn(out,'Follow','Revisar respuestas antes de continuar',()=>draw(c.followUp(displayed,answers.map(x=>x.value))));
    }else if(v.reply.kind==='proposal'){
-    out.append(n('p','Alternativa de prueba: '+v.reply.choice+'. Podés elegir otra.'));
+    out.append(n('p',(mode.synthetic?'Alternativa de prueba: ':'Alternativa sugerida: ')+v.reply.choice+'. Podés elegir otra.'));
     const choice=n('select'),l=n('label','Alternativa a revisar');choice.id='ch1188-choice';l.htmlFor=choice.id;for(const o of v.options)choice.add(new Option('Alternativa '+o.alias.slice(1),o.alias));choice.value=v.choice??v.reply.choice;out.append(l,choice);
     const confirmed=n('input'),cl=n('label','Confirmo la alternativa y los datos indicados');confirmed.type='checkbox';confirmed.id='ch1188-confirm';cl.htmlFor=confirmed.id;out.append(confirmed,cl);
     btn(out,'Review','Revisar conjunto seleccionado',async()=>draw(await c.review(displayed,choice.value,confirmed.checked)));
     if(v.phase==='review'){
      const review=n('div');review.id='coachHybridReviewView1188';form.render(v.proposal,review);out.append(review);
-     const apply=btn(out,'Apply','Aceptar y guardar conjunto localmente',async()=>{if(choice.value!==displayed.choice)throw Error('Revisá la alternativa seleccionada');if(!confirm('¿Guardar este conjunto revisado sin modificar el historial?'))return;draw(await c.apply(displayed,true));alternatives=[];stamp=null;showList();refresh();status.textContent='Conjunto de prueba guardado localmente.'});choice.onchange=()=>{apply.disabled=true};
+     const apply=btn(out,'Apply','Aceptar y guardar conjunto localmente',async()=>{if(choice.value!==displayed.choice)throw Error('Revisá la alternativa seleccionada');if(!confirm('¿Guardar este conjunto revisado sin modificar el historial?'))return;draw(await c.apply(displayed,true));alternatives=[];stamp=null;showList();refresh();status.textContent=mode.synthetic?'Conjunto de prueba guardado localmente.':'Conjunto guardado localmente.'});choice.onchange=()=>{apply.disabled=true};
     }
    }
   }

@@ -324,5 +324,37 @@ Base V11.99.1 7fc142c4491d9efc3c1f58c484b9d6c1716b7969; no promover antes de gat
 
 Reconstruido V11.99.2 sobre e657c3dd3eb7b05192079727bdae70c1c8d255f3; original add1e3101447243c9a61c3ea4c6c57087e58af3d. CI pendiente.
 
-## Corrección de prueba V11.99.2
-CI fuentes/runtime/PWA aprobadas; ambas variantes Chrome fallaron en configuración manual después del traspaso de meta, porque la prueba no repone campos limpiados intencionalmente (objetivo/equipo/minutos/días de fuerza y Running y tipo de nutrición). La corrección ya existe en el candidato posterior validado; se aplica exactamente al head de desarrollo sin tocar código de producto. Revalidación requerida. V10.6 intacta.
+## V11.99.3 — candidato onboarding con guardado coordinado
+Base V11.99.2 add1e3101447243c9a61c3ea4c6c57087e58af3d. Sin promoción antes de gates anteriores. Importa motores puros de metas y onboarding al shell para recálculo exacto, revisión de fechas afectadas y guardado cifrado CAS diario/PRO; bloquea coincidencias con registros y eventos. UI manual usa frontera compartida y descarte, no escribe directamente. Ajusta recorrido Chrome para elegir explícitamente campos limpiados tras traspaso. Prueba de integración preparada, no ejecutada aún; no garantiza coordinación distribuida. No habilita proveedor real ni modifica producción.
+
+Reconstruido V11.99.3 sobre 634336d70eb42a3f40b228a236be505de48b4b7c; original 07cecdf87eaa8414fd6fae91714e59e428dec536. Corrección Chrome conservada. CI pendiente. No integrar ramas de validación ni producción.
+
+## V11.99.3 — corrección de integración metas en shell
+CI paralela original b8466167a66f5dffaba03029bd33f12452dd2b65: fuentes/runtime OK, package y Chrome fallaron en tests/coach-commit1184.test.mjs (TypeError validate de G indefinido). Causa: extracción goals101 conservaba retorno temprano CommonJS antes de asignar globalThis.asiaGoals101. Se elimina exclusivamente dicho retorno en copia pura empaquetada, con ancla única y aserciones explícitas; no modifica goals101.js original ni navegador. Revalidar candidato corregido antes de promover. Sin credenciales, despliegues ni producción.
+
+## Consolidación bloque Coach — conexión de interfaces preparada
+Base 46fa582b0e8a1fcde9d29a5b46589537bd7a2fc9. Las tres interfaces seleccionan un transporte autorizado exclusivamente desde una capacidad explícita del shell; el piloto no recibe esa capacidad y conserva recorrido sintético separado. Factory real no montada crea tres transportes, fija identidad/CSRF, impide consultas simultáneas y bloquea cambio de cuenta; no se concede acceso por texto/URL. No hay llamadas reales ni credenciales. La autorización real, montaje del servidor, configuración y aceptación siguen pendientes. No promover sobre CI fallida.
+
+## Consolidación nutrición — comparación de menús con biblioteca propia
+Base d7349da96153a37aaa0d3cea983279f42cf9a186; candidato local. Usa favoritos y recetas existentes, porciones explícitas, estrategias previamente guardadas, hasta seis alternativas por cada una de las cuatro comidas y tres combinaciones ordenadas por proximidad a energía y proteína declaradas. Conserva ausencia de macros; no prescribe, no comprueba alergias ni adecuación clínica, no cambia cantidades, no registra ingestas, no persiste menú y no realiza llamadas externas. Pruebas de motor preparadas; interfaz integrada pendiente de navegador. Sin cambios en producción ni promoción antes de gates.
+
+## Notificaciones por cuenta — cola persistente propuesta
+Base 2a720b777201aa6e2625b88ccafc8cc8a27704c2. Se prepara almacenamiento por cuenta/dispositivo, canales agenda y descanso separados, revisiones CAS, cancelación vacía, idempotencia de reemplazos y revocación. Solo tipos y vencimientos; sin credenciales ni datos de salud. No modifica UI ni temporizadores originales, no monta endpoint, no aplica migración, no suscribe ni envía push. El alta de dispositivo autorizada, scheduler, entrega, puente a controles V10.6 y pruebas físicas permanecen pendientes. Prueba SQLite real añadida al paquete, pendiente ejecución CI.
+
+## Paridad — corrección de prueba integral
+La rama consolidada 7bd9c96c4d4cafe2996fb354b6a59d498d05b68a aprobó fuentes y runtime pero falló package en orden de scripts (5/53); comparación HTML/CSS sin scripts aprobada. La copia del script inline contiene la protección explícita de persistencia introducida por patch-routine1190. Se incorpora únicamente esa modificación exacta al esperado de la prueba, sin flexibilizar comparación del resto de scripts ni quitar protección. Revalidar; no se acredita paridad funcional completa.
+
+## Salud — selección de fuentes autorizadas
+Proyección pura de agregados diarios normalizados con procedencia, revisión y unidades; no suma fuentes, distingue cero/ausente/conflicto, no usa fuentes revocadas ni métricas sin permiso, compatibilidad Apple solo para Apple. No persiste, no conecta dispositivos ni modifica UI histórica. Adaptadores, autorización real, ingesta cifrada, representación genérica, retención y pruebas físicas pendientes. Prueba de dominio añadida al paquete. Sin producción.
+
+## Salud — integración de lectura dentro de Salud original
+Se añade vista de fuentes autorizadas dentro de Comparar pasos manuales y Apple Salud, solo si el shell otorga capacidad real; no aparece en piloto sin grant. Fachada verifica identidad al iniciar/antes/después, descarta consultas, no expone identificadores de cuenta, no suma ni persiste. Fecha y selección explícita; se limpian al cerrar o cambiar día. Se preservan gráficos y registro original. No hay adaptador de proveedor ni alta de conexión real aún. Pruebas de dominio añadidas; UI pendiente navegador autorizado. Sin despliegue.
+
+## Paridad nutrición — consulta de códigos de barras
+Se preserva el lector local, selector de base, ficha, edición y registro original. Solo la consulta externa pasa a capacidad del shell; piloto sin grant no llama red. Adaptador real no montado: validación GTIN, origen fijo OFF, campos mínimos, contacto técnico explícito, consentimiento, identidad antes/después, límite y timeout, sin datos de diario. No realiza consultas reales, no incluye credenciales. Falta montaje, cuotas y aceptación del proveedor. Prueba añadida al paquete.
+
+## Consolidación de validaciones y prueba del recorrido del Coach
+Confirmadas 4/4 CI de V11.99.1 e657c3dd, 4/4 de validation/consolidated-parity-fixed 2303a7e8 y 4/4 de validation/consolidated-health-food 7ec3ffa7. Se promovió V11.99.2 634336d7 a desarrollo conservando gates secuenciales. Nueva prueba integra los tres contratos, transportes reales de cliente, gateway, proveedor con HTTP simulado y reserva SQLite real; aún no ejecutada. No se activa proveedor real ni se modifica producción. Quedan identidad real/servicios, autorización operativa, revisión física y migración.
+
+## Consolidación de candidato integral validado
+V11.99.2 corregida 996f0684 aprobó las dos workflows disparadas por el cambio exclusivo de prueba; las dos restantes del padre 634336d7 habían aprobado. El candidato integral dbedfbe9 fue validado en af671326 con 4/4 (45914858969, 45914858973, 45914858977, 45914858946); comparación exacta de árboles confirma solo cuatro YAML de disparo diferentes. Se consolida su snapshot sobre el head corregido, conservando las 110 fuentes V10.6 sin diferencias. Esta nueva revisión añade únicamente esta nota respecto al snapshot probado y debe pasar CI propia. No se incorpora aún 2814a7c8 ni se activa ningún servicio real. Producción intacta.
