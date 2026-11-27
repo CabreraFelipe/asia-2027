@@ -1,13 +1,13 @@
 name: Asia 2027 - runtime D1 y R2 local V11.71
 on:
   push:
-    branches: ['validation/notification-session-fail-closed']
+    branches: ['validation/notification-queue-api']
     paths: ['staging/source/V11.42-INTEGRACION/**','staging/source/V11.38-INTEGRACION/**','.github/workflows/asia-v1171-runtime.yml']
 permissions:
   contents: read
 jobs:
   local-runtime:
-    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/validation/notification-session-fail-closed'
+    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/validation/notification-queue-api'
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:

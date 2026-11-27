@@ -1,13 +1,13 @@
 name: Asia 2027 - paquete PWA aislado V11.42
 on:
   push:
-    branches: ['validation/notification-session-fail-closed']
+    branches: ['validation/notification-queue-api']
     paths: ['staging/source/V11.42-INTEGRACION/**','.github/workflows/asia-v1142.yml']
 permissions:
   contents: read
 jobs:
   package:
-    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/validation/notification-session-fail-closed'
+    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/validation/notification-queue-api'
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
