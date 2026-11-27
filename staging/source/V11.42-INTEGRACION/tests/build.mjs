@@ -45,7 +45,7 @@ execFileSync(process.execPath,['--check',web+'/diary/extras830.js'],{stdio:'inhe
 const preloadFile=web+'/diary/candidate-preload.js';
 const preloadText=readFileSync(preloadFile,'utf8');
 if(preloadText.split('moduleStore:f.moduleStore,').length!==2)throw Error('Marcador preload metas');
-writeFileSync(preloadFile,preloadText.replace('moduleStore:f.moduleStore,','initialGoalSetup:f.initialGoalSetup===true,coachCommit:f.coachCommit,coachInference:f.coachInference,healthSources:f.healthSources,foodLookup:f.foodLookup,moduleStore:f.moduleStore,'));
+writeFileSync(preloadFile,preloadText.replace('moduleStore:f.moduleStore,','initialGoalSetup:f.initialGoalSetup===true,coachCommit:f.coachCommit,coachInference:f.coachInference,coachSyntheticOnly:true,healthSources:f.healthSources,foodLookup:f.foodLookup,moduleStore:f.moduleStore,'));
 const goalsFile=web+'/diary/goals101.js';
 let goalsText=readFileSync(goalsFile,'utf8');
 function replaceGoals(from,to){if(goalsText.split(from).length!==2)throw Error('Marcador onboarding metas no único: '+from);goalsText=goalsText.replace(from,to)}

@@ -355,3 +355,6 @@ Se preserva el lector local, selector de base, ficha, edición y registro origin
 
 ## Consolidación de validaciones y prueba del recorrido del Coach
 Confirmadas 4/4 CI de V11.99.1 e657c3dd, 4/4 de validation/consolidated-parity-fixed 2303a7e8 y 4/4 de validation/consolidated-health-food 7ec3ffa7. Se promovió V11.99.2 634336d7 a desarrollo conservando gates secuenciales. Nueva prueba integra los tres contratos, transportes reales de cliente, gateway, proveedor con HTTP simulado y reserva SQLite real; aún no ejecutada. No se activa proveedor real ni se modifica producción. Quedan identidad real/servicios, autorización operativa, revisión física y migración.
+
+## Coach — separación inequívoca de pruebas y proveedor real
+El paquete exclusivamente sintético marca explícitamente coachSyntheticOnly:true en la copia de preload. Sin permiso explícito, la ausencia de grant no da acceso a respuestas de prueba; grant real en modo sintético también rechazado. Verificación de identidad exige tipo string y cierra las tres conexiones ante lectura de sesión fallida. Pruebas existentes extendidas, CI pendiente. El futuro controlador real debe emitir solo capacidades verificadas y no reutilizar este indicador sintético. No se modifica producción ni se habilita proveedor.
