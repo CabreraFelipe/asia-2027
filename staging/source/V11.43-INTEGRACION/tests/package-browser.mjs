@@ -16,10 +16,12 @@ db.exec('PRAGMA foreign_keys=ON');
 for(const n of ['0001_staging.sql','0006_identity_oidc.sql','0007_synthetic_journal_v115.sql','0009_large_sync.sql'])db.exec(readFileSync(root+'migrations/'+n,'utf8'));
 db.exec(readFileSync(new URL('../../V11.42-INTEGRACION/migrations/0010_managed_keys.proposed.sql',import.meta.url),'utf8'));
 for(const [id,t,email,csrf] of [[A,ta,'a@example.invalid','a'.repeat(43)],[B,tb,'b@example.invalid','b'.repeat(43)],[C,tc,'c@example.invalid','c'.repeat(43)]]){
+ // A and B predate the rollout. Install the enrollment trigger before C's first account insertion.
+ if(id===C)db.exec(readFileSync(new URL('../../V11.42-INTEGRACION/migrations/0015_new_account_enrollment.proposed.sql',import.meta.url),'utf8'));
  db.prepare('INSERT INTO accounts_v11 VALUES(?,?,?,?)').run(id,'https://accounts.google.com',email,new Date().toISOString());
  db.prepare('INSERT INTO auth_oidc_sessions_v1111(token_digest,account_id,csrf,email_digest,created_at,expires_at) VALUES(?,?,?,?,?,?)').run(await digest(t),id,csrf,await digest(email),Date.now(),Date.now()+600000);
 }
-db.prepare('INSERT INTO managed_account_keys_v1152(account_id,enrollment_kind) VALUES(?,\'new\')').run(C);
+assert.deepEqual(db.prepare('SELECT account_id,enrollment_kind,envelope FROM managed_account_keys_v1152 ORDER BY account_id').all().map(row=>({...row})),[{account_id:C,enrollment_kind:'new',envelope:null}]);
 const objects=new Map(),mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.json':'application/json','.png':'image/png','.css':'text/css; charset=utf-8'};
 const env={STAGING_MODE:'asia-v1111-identity-private',STAGING_ORIGIN:origin,STAGING_ALLOW_V1142_TESTS:'true',STAGING_ALLOW_V1138_TESTS:'true',STAGING_ALLOW_V1139_TESTS:'true',STAGING_GOOGLE_CLIENT_ID:'test.apps.googleusercontent.com',STAGING_GOOGLE_CLIENT_SECRET:'synthetic-only',STAGING_ALLOWED_EMAILS:'a@example.invalid,b@example.invalid,c@example.invalid',STAGING_ALLOW_MANAGED_KEYS_1152:'true',STAGING_MANAGED_KEK_ID_1152:'ci-v1',STAGING_MANAGED_KEK_1152:Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString('base64url'),
  STAGING_DB:{prepare(sql){let args=[];return {bind(...a){args=a;return this},async first(){return db.prepare(sql).get(...args)||null},async all(){return {results:db.prepare(sql).all(...args)}},async run(){return db.prepare(sql).run(...args)}}}},
