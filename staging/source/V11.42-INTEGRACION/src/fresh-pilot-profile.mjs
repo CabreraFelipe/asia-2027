@@ -1,4 +1,5 @@
 // Explicit one-time fresh profile for the isolated synthetic pilot only.
+import {importWrappingKey} from './account-key1150.mjs';
 import {digest} from '../../official/V11.24-STAGING/src/security1111.mjs';
 const reply=(status,code)=>new Response(JSON.stringify({ok:status===200,code}),{status,headers:{'Cache-Control':'no-store, private','Content-Type':'application/json; charset=utf-8','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'}});
 const valid=s=>s?.ok===true&&s.syntheticOnly===true&&typeof s.accountId==='string'&&/^acct_[a-f0-9]{32}$/.test(s.accountId)&&typeof s.csrf==='string'&&/^[A-Za-z0-9_-]{43}$/.test(s.csrf);
@@ -10,6 +11,9 @@ export async function handleFreshPilotProfile(request,env,{authenticate,now=Date
  if(cookies.length!==1||!/^__Host-asia1111_session=[A-Za-z0-9_-]{43}$/.test(cookies[0]))return reply(401,'NO_AUTORIZADO');
  try{
   const s=await authenticate();if(!valid(s)||s.csrf!==request.headers.get('X-Asia-CSRF'))return reply(403,'NO_AUTORIZADO');
+  // Refuse retirement if managed custody is not configured.
+  if(typeof env.STAGING_MANAGED_KEK_ID_1152!=='string'||!/^[a-zA-Z0-9_-]{1,48}$/.test(env.STAGING_MANAGED_KEK_ID_1152))return reply(503,'CLAVE_NO_DISPONIBLE');
+  await importWrappingKey(env.STAGING_MANAGED_KEK_1152);
   const token=await digest(cookies[0].split('=')[1]),t=now(),fresh='acct_'+Array.from(crypto.getRandomValues(new Uint8Array(16)),x=>x.toString(16).padStart(2,'0')).join('');
   // The SQL statement and triggers atomically create a disjoint empty profile,
   // enroll it and revoke old sessions. No old snapshot or browser vault is deleted.

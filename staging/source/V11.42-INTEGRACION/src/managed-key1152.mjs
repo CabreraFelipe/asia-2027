@@ -23,7 +23,13 @@ export async function handleManagedKey(request,env,{authenticate,now=Date.now}){
   const live='EXISTS(SELECT 1 FROM auth_oidc_sessions_v1111 WHERE token_digest=? AND account_id=? AND csrf=? AND expires_at>?)';
   const liveArgs=()=>[tokenDigest,accountId,session.csrf,now()];
   const read=()=>db.prepare('SELECT envelope,migration_lock,enrollment_kind FROM managed_account_keys_v1152 WHERE account_id=? AND '+live).bind(accountId,...liveArgs()).first();
-  let row=await read();if(!row)return fail(409,'ALTA_NO_HABILITADA');
+  let row=await read();if(!row){
+   if(env.STAGING_ALLOW_PILOT_FRESH_PROFILE_V12==='true'){
+    const eligible=await db.prepare("SELECT account_id FROM accounts_v11 WHERE account_id=? AND issuer='https://accounts.google.com' AND NOT EXISTS(SELECT 1 FROM pilot_fresh_profiles_v12 WHERE legacy_account_id=? OR fresh_account_id=?)").bind(accountId,accountId,accountId).first();
+    if(eligible?.account_id===accountId)return json({ok:false,error:'ALTA_NO_HABILITADA',freshProfileAvailable:true},409);
+   }
+   return fail(409,'ALTA_NO_HABILITADA');
+  }
   if(row.migration_lock!==null)return fail(409,'MIGRACION_EN_CURSO');
   // The previous KEK is opt-in; an unknown version fails closed.
   const kekId=env.STAGING_MANAGED_KEK_ID_1152,key=await importWrappingKey(env.STAGING_MANAGED_KEK_1152);

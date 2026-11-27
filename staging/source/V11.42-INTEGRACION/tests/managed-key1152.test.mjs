@@ -51,6 +51,8 @@ try{
  const reset=(extra={},config=resetEnv)=>worker.fetch(new Request(origin+'/v12/pilot/fresh-profile',{method:'POST',headers:{Cookie:'__Host-asia1111_session='+G.token,Origin:origin,'X-Asia-CSRF':G.csrf,'X-Asia-Fresh-Profile':'archive-legacy-v1',...extra}}),config);
  assert.equal((await reset({}, {...resetEnv,STAGING_ALLOW_PILOT_FRESH_PROFILE_V12:'false'})).status,404);
  assert.equal((await reset({'X-Asia-CSRF':A.csrf})).status,403);
+ assert.equal((await reset({}, {...resetEnv,STAGING_MANAGED_KEK_1152:'invalid'})).status,409);
+ const eligibility=await req(G,{env:resetEnv});assert.equal(eligibility.status,409);assert.equal((await eligibility.json()).freshProfileAvailable,true);
  assert.equal((await reset()).status,200);
  const successor=db.prepare('SELECT fresh_account_id FROM pilot_fresh_profiles_v12 WHERE legacy_account_id=?').get(G.id).fresh_account_id;
  assert.notEqual(successor,G.id);
