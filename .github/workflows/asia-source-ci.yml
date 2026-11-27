@@ -44,3 +44,16 @@ jobs:
           node-version: '22.16.0'
       - name: Smoke original V11.24, GET sin sesión
         run: node staging/source/official/V11.24-STAGING/scripts/smoke1124.mjs
+  document-inspector:
+    if: github.repository == 'CabreraFelipe/asia-2027' && github.ref == 'refs/heads/validation/document-plan-import'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Build and test isolated document sanitizer (synthetic fixtures only)
+        run: |
+          set -euo pipefail
+          docker build -t asia-document-inspector:ci staging/source/V11.42-INTEGRACION/document-inspector
+          timeout 90s docker run --rm --network none --read-only --cap-drop ALL --security-opt no-new-privileges --pids-limit 32 --memory 512m --cpus 1 --tmpfs /tmp:rw,noexec,nosuid,size=96m --entrypoint /usr/bin/python3 asia-document-inspector:ci /app/test_inspector.py

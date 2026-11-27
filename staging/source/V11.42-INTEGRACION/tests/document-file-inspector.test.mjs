@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {createDocumentFileInspector} from '../src/document-file-inspector.mjs';
+const bytes=Uint8Array.of(137,80,78,71,13,10,26,10,0,1),file={mime:'image/png',bytes};
+let responseHeaders={'Content-Type':'image/png','X-Asia-Inspector':'raster-v1','X-Asia-Pages':'1','X-Asia-Width':'100','X-Asia-Height':'100'},calls=0;
+const binding={async fetch(url,opts){calls++;assert.equal(url,'https://document-inspector.internal/inspect');assert.deepEqual(Object.keys(opts.headers),['Content-Type']);assert.equal(opts.redirect,'error');assert.deepEqual(opts.body,bytes);return new Response(bytes,{headers:responseHeaders})}};
+assert.throws(()=>createDocumentFileInspector({binding}));
+const inspect=createDocumentFileInspector({enabled:true,binding});
+assert.deepEqual(await inspect(file),{safe:true,mime:'image/png',pages:1,width:100,height:100,bytes});
+responseHeaders={...responseHeaders,'X-Asia-Pages':'11'};await assert.rejects(()=>inspect(file));
+responseHeaders={...responseHeaders,'X-Asia-Pages':'1','X-Asia-Width':'20000000'};await assert.rejects(()=>inspect(file));
+const c=new AbortController();c.abort();await assert.rejects(()=>inspect(file,{signal:c.signal}));assert.equal(calls,3);
+console.log('Private document inspector adapter: strict result metadata and limits PASS (simulated binding)');

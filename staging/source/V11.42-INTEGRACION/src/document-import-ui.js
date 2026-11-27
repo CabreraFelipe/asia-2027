@@ -26,7 +26,7 @@ function mount(kind,host){
   if(busy)return;busy=true;analyze.disabled=true;const mark=++generation,selected=file.files?.[0];draft=null;editor.replaceChildren();status.textContent='Analizando documento…';
   try{current();check(allowed()&&consent.checked&&selected&&selected.size<=10*1024*1024,'Seleccioná un archivo válido y autorizá su análisis.');
    const original=disk600,bytes=new Uint8Array(await selected.arrayBuffer());let result;
-   try{result=await grant.analyze({mime:selected.type,bytes},true)}finally{bytes.fill(0)}
+   try{check(mark===generation&&panel.open&&consent.checked&&file.files?.[0]===selected,'El archivo o consentimiento cambió');result=await grant.analyze({mime:selected.type,bytes},true)}finally{bytes.fill(0)}
    if(mark!==generation||!panel.open)return;current();check(original===disk600,'El diario cambió durante el análisis.');check(result.kind===kind,'El archivo corresponde a otra sección.');draft=G.validateExtractedPlan(result);originDiary=original;render();status.textContent='Revisá cada dato antes de guardar.';
   }catch(e){if(mark===generation)status.textContent='No se pudo completar el análisis. Revisá el archivo y la conexión.'}
   finally{busy=false;analyze.disabled=!allowed();file.value='';consent.checked=false}

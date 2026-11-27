@@ -26,3 +26,6 @@ Se reutilizan programmes102, plantillas y calendario nativos. Alta opcional con 
 
 ## Ejercicios desconocidos
 Alta explícita y atómica en exerciseLibrary104 junto con plantillas o programa. Reutiliza fichas y catálogo nativos, exige material, zona, grupos y lateralidad confirmados, no inventa técnica ni reemplaza fichas existentes. La revisión se conserva en la operación CAS; faltan validaciones completas de la nueva interfaz y conexión real.
+
+## Analizador de archivos
+CLI real de reconstrucción con Poppler/Pillow y Docker candidato; test sintético ejecutado por CI dentro de contenedor con red deshabilitada. Adaptador Worker preparado para binding privado. El host que ejecuta un contenedor aislado por petición aún no está implementado ni provisionado; requiere auditoría de dependencias, límites externos y pruebas de documentos reales. No se activa el proveedor. Se evita también el envío si el usuario cambia archivo o consentimiento durante su lectura.

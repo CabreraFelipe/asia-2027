@@ -190,6 +190,7 @@ runIsolated1174(process.execPath,[new URL('./document-diet-plan.test.mjs',import
 runIsolated1174(process.execPath,[new URL('./document-plan-persistence.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
 runIsolated1174(process.execPath,[new URL('./document-import-provider.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
 runIsolated1174(process.execPath,[new URL('./document-import-client.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
+runIsolated1174(process.execPath,[new URL('./document-file-inspector.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
 runIsolated1174(process.execPath,[new URL('./health-sources.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
 runIsolated1174(process.execPath,[new URL('./health-source-view.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
 runIsolated1174(process.execPath,[new URL('./food-lookup.test.mjs',import.meta.url).pathname],{stdio:'inherit'});
