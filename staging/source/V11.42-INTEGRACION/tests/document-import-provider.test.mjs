@@ -1,0 +1,33 @@
+import assert from 'node:assert/strict';
+import {DatabaseSync} from 'node:sqlite';
+import {readFileSync} from 'node:fs';
+import {createDocumentImportRoute} from '../src/document-import-route.mjs';
+import {createDocumentProvider} from '../src/document-import-provider.mjs';
+const db=new DatabaseSync(':memory:');db.exec('PRAGMA foreign_keys=ON; CREATE TABLE accounts_v11(account_id TEXT PRIMARY KEY);');db.exec(readFileSync(new URL('../migrations/0014_document_import_quota.proposed.sql',import.meta.url),'utf8'));
+const A='acct_'+'a'.repeat(32),B='acct_'+'b'.repeat(32),origin='https://app.example.test';
+for(const a of [A,B])db.prepare('INSERT INTO accounts_v11 VALUES(?)').run(a);
+const adapter={prepare(sql){let args=[];return {bind(...x){args=x;return this},async run(){return {success:true,meta:{changes:Number(db.prepare(sql).run(...args).changes)}}}}}};
+const ident=accountId=>({ok:true,syntheticOnly:false,accountId,csrf:'fixture-csrf-123456789'});let session=ident(A),calls=0,mode='ok',safe=true;
+const diet={version:1,kind:'diet',name:'Dieta',notes:null,uncertainties:[],days:[{label:'Lunes',weekday:1,sections:[{label:'Desayuno',items:[{name:'Avena',quantity:'50 g',source:'50 g de avena'}]}]}]};
+const routine={version:1,kind:'routine',name:'Fuerza',notes:null,uncertainties:[],days:[{label:'Día A',weekday:null,sections:[{label:'Ejercicios',items:[{name:'Sentadilla con barra',sets:3,min:8,max:10,rest:null,source:'Sentadilla 3x8-10'}]}]}]};
+const pdf=new TextEncoder().encode('%PDF-1.7 fixture'),png=Uint8Array.of(137,80,78,71,13,10,26,10,0,1);
+const inspectFile=async f=>({safe,mime:f.mime,bytes:new Uint8Array(f.bytes),pages:1,width:100,height:100});
+const fetchImpl=async(url,o)=>{calls++;assert.equal(url,'https://api.openai.com/v1/responses');const body=JSON.parse(o.body),part=body.input[0].content[0];assert.equal(body.store,false);assert.equal(body.text.format.strict,true);assert.equal(JSON.stringify(body).includes(session.accountId),false);assert.equal(o.redirect,'error');
+ if(part.type==='input_file'){assert.equal(part.filename,'plan.pdf');assert.equal(part.file_data,'data:application/pdf;base64,'+Buffer.from(pdf).toString('base64'))}
+ else{assert.equal(part.type,'input_image');assert.equal(part.image_url,'data:image/png;base64,'+Buffer.from(png).toString('base64'))}
+ if(mode==='switch')session=ident(A);
+ const result=mode==='unreadable'?{status:'unreadable',reason:'No hay plan'}:{status:'ok',plan:part.type==='input_file'?diet:routine};
+ return new Response(JSON.stringify({status:'completed',output:[{type:'message',role:'assistant',content:[{type:'output_text',text:JSON.stringify({result})}]}]}),{headers:{'Content-Type':'application/json'}})};
+const opts={enabled:true,origin,authenticate:async()=>session,db:adapter,apiKey:'fixture-not-a-real-api-key',model:'fixture-model',inspectFile,fetchImpl,now:()=>1795700000000,perDay:3,globalPerDay:6};
+assert.throws(()=>createDocumentProvider({...opts,inspectFile:undefined}));assert.throws(()=>createDocumentImportRoute({...opts,enabled:false}));
+const route=createDocumentImportRoute(opts),id=i=>'00000000-0000-4000-8000-'+String(i).padStart(12,'0');
+const req=(i,body=pdf,mime='application/pdf',extra={})=>new Request(origin+'/v12/import/plan',{method:'POST',headers:{Origin:origin,'Content-Type':mime,'X-Asia-CSRF':session.csrf,'X-Asia-Import-Consent':'reviewed-v1','X-Asia-Import-Request':id(i),...extra},body});
+assert.equal((await route.fetch(req(1,pdf,'application/pdf',{'X-Asia-Import-Consent':'no'}))).status,403);assert.equal(calls,0);
+assert.deepEqual(await (await route.fetch(req(1))).json(),{ok:true,plan:diet});
+assert.equal((await route.fetch(req(1))).status,429);
+assert.deepEqual(await (await route.fetch(req(2,png,'image/png'))).json(),{ok:true,plan:routine});
+mode='unreadable';assert.equal((await route.fetch(req(3))).status,503);assert.equal((await route.fetch(req(4))).status,429);assert.equal(calls,3);
+session=ident(B);safe=false;assert.equal((await route.fetch(req(1))).status,503);assert.equal(calls,3);
+safe=true;mode='switch';assert.equal((await route.fetch(req(2))).status,503);assert.equal(calls,4);
+assert.deepEqual(db.prepare('SELECT account_id,COUNT(*) n FROM document_import_reservations_v12 GROUP BY account_id ORDER BY account_id').all().map(x=>[x.account_id,x.n]),[[A,3],[B,2]]);
+db.close();console.log('Document extraction: authenticated gateway, independent SQLite quota, PDF/image structured requests, mandatory inspection and account switching PASS (mock inspector and upstream)');
