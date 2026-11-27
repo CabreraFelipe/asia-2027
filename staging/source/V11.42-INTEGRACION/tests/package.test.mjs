@@ -134,6 +134,7 @@ console.log('Goal books v1/v2: explicit empty, independent goals, validation, im
 await import('./account-key1150.test.mjs');
 
 await import('./managed-key1152.test.mjs');
+await import('./fresh-profile-oidc.test.mjs');
 
 await import('./rekey1153.test.mjs');
 
