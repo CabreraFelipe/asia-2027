@@ -15,6 +15,20 @@ await assert.rejects(()=>openNotificationQueue({enabled:false,db:adapter,readSes
 await assert.rejects(()=>open(async()=>({...session,syntheticOnly:true})));await assert.rejects(()=>open(async()=>identity(B,D)));
 const a=await open(async()=>session),other=await open(async()=>identity(A,E)),b=await open(async()=>identity(B,F));
 const event={kind:'gym',due:now+3600000},rest={kind:'rest',due:now+60000};
+let unavailable=false;
+const failing=await open(async()=>{if(unavailable)throw Error('Session unavailable');return identity(A,D)});
+unavailable=true;
+await assert.rejects(()=>failing.read('agenda'),/No se pudo verificar/);
+unavailable=false;
+await assert.rejects(()=>failing.read('agenda'),/Servicio cerrado/);
+await assert.rejects(()=>failing.replace('agenda',0,[event]),/Servicio cerrado/);
+const failingWrite=await open(async()=>{if(unavailable)throw Error('Session unavailable');return identity(A,D)});
+unavailable=true;
+await assert.rejects(()=>failingWrite.replace('agenda',0,[event]),/No se pudo verificar/);
+unavailable=false;
+await assert.rejects(()=>failingWrite.replace('agenda',0,[event]),/Servicio cerrado/);
+assert.deepEqual(await a.read('agenda'),{revision:0,events:[]});
+
 assert.deepEqual(await a.read('agenda'),{revision:0,events:[]});
 assert.deepEqual(await a.replace('agenda',0,[event]),{revision:1,events:[event],status:'stored-not-delivered'});
 assert.equal((await a.replace('agenda',0,[event])).revision,1);

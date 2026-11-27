@@ -11,7 +11,7 @@ export async function openNotificationQueue({enabled=false,db,readSession,now=Da
  check(enabled===true&&typeof db?.prepare==='function'&&typeof readSession==='function'&&typeof now==='function','Notificaciones no habilitadas');
  const identity=await readSession();check(valid(identity),'Sesión de avisos inválida');
  const {accountId,deviceId,csrf}=identity;let closed=false;
- async function verify(){check(!closed,'Servicio cerrado');const s=await readSession();if(!valid(s)||s.accountId!==accountId||s.deviceId!==deviceId||s.csrf!==csrf){closed=true;throw Error('Cambió la sesión de avisos')}check(!closed,'Servicio cerrado');}
+ async function verify(){check(!closed,'Servicio cerrado');let s;try{s=await readSession()}catch{closed=true;throw Error('No se pudo verificar la sesión de avisos')}if(!valid(s)||s.accountId!==accountId||s.deviceId!==deviceId||s.csrf!==csrf){closed=true;throw Error('Cambió la sesión de avisos')}check(!closed,'Servicio cerrado');}
  async function binding(){const b=await db.prepare('SELECT 1 AS active FROM notification_devices_v12 WHERE account_id=? AND device_id=? AND revoked=0').bind(accountId,deviceId).first();check(b?.active===1,'Dispositivo no autorizado o revocado');}
  async function read(channel){check(channels.includes(channel),'Canal inválido');await verify();await binding();const r=await db.prepare('SELECT revision,events_json FROM notification_queue_v12 WHERE account_id=? AND device_id=? AND channel=?').bind(accountId,deviceId,channel).first();await verify();await binding();const t=now();return {revision:r?.revision??0,events:r?JSON.parse(r.events_json).filter(e=>e.due>t):[]};}
  async function replace(channel,expected,events){
